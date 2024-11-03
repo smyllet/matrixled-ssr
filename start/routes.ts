@@ -44,3 +44,6 @@ router
 
 const EmailVerificationController = () => import('#controllers/auth/email_verification_controller')
 router.get('auth/email/verify', [EmailVerificationController, 'verify']).as('auth.email.verify')
+
+const TestsController = () => import('#controllers/tests_controller')
+router.get('test', [TestsController, 'index'])
