@@ -6,7 +6,7 @@ export default class TestsController {
    * Display a list of resource
    */
   async index({ params, response }: HttpContext) {
-    let filePath = app.makePath(`testFiles/life.gif`)
+    let filePath = app.makePath(`testFiles/pacman.gif`)
 
     switch (app.config.get('testGif')) {
       case 'tardis':
@@ -17,6 +17,9 @@ export default class TestsController {
         break
       case 'homer':
         filePath = app.makePath(`testFiles/homer.gif`)
+        break
+      case 'pacman':
+        filePath = app.makePath(`testFiles/pacman.gif`)
         break
     }
 
