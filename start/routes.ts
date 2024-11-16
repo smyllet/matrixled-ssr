@@ -10,6 +10,8 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 
+router.get('', [() => import('#controllers/home_controller'), 'index']).use(middleware.auth())
+
 const LoginController = () => import('#controllers/auth/login_controller')
 router.resource('auth/login', LoginController).only(['index', 'store']).use('*', middleware.guest())
 
