@@ -18,6 +18,6 @@ export default class RegisterController {
 
     await User.create({ fullName, email, password })
 
-    return response.redirect().toRoute('auth/login.index')
+    return response.redirect().toPath('/auth/login')
   }
 }
