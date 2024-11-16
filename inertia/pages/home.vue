@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3'
-
+import { Head, router } from '@inertiajs/vue3'
 import Button from 'primevue/button'
 
 defineProps<{
@@ -29,8 +28,7 @@ defineProps<{
           ut labore et dolore magna aliqua.
         </p>
         <div class="flex items-center justify-center lg:justify-start gap-6">
-          <Button label="Learn More" type="button" />
-          <Button label="Live Demo" type="button" outlined />
+          <Button label="Logout" type="button" @click="router.post('/auth/logout')" />
         </div>
       </div>
     </div>
