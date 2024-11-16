@@ -74,6 +74,7 @@
     "edge.js": "^6.2.0",
     "luxon": "^3.5.0",
     "mysql2": "^3.11.3",
+    "primeicons": "^7.0.0",
     "primevue": "^4.2.1",
     "reflect-metadata": "^0.2.2",
     "tailwindcss-primeui": "^0.3.4",
