@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+    <style>
+      #renderer-container {
+        width: 100%;
+        display: flex;
+        background-color: #000;
+        position: relative;
+      }
+
+      #mask {
+        --scale: 1;
+        background-image: url('./mask.svg');
+        background-size: 0.78125%;
+        position: absolute;
+
+        box-sizing: border-box;
+      }
+
+      #renderer {
+        position: absolute;
+
+        font-smooth: never;
+        -webkit-font-smoothing: none;
+        image-rendering: pixelated;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: crisp-edges;
+        border: 1px solid #000;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <section class="renderer-container">
+        <canvas id="renderer"></canvas>
+        <div id="mask"></div>
+      </section>
+    </div>
+    <script type="module" src="/src/dev.ts"></script>
+  </body>
+</html>
