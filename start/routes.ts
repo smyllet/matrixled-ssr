@@ -23,3 +23,21 @@ router
   .resource('auth/register', RegisterController)
   .only(['index', 'store'])
   .use('*', middleware.guest())
+
+const PasswordResetController = () => import('#controllers/auth/password_reset_controller')
+router
+  .get('auth/password/forgot', [PasswordResetController, 'forgot'])
+  .use(middleware.guest())
+  .as('auth.password.forgot')
+router
+  .post('auth/password/forgot', [PasswordResetController, 'send'])
+  .use(middleware.guest())
+  .as('auth.password.send')
+router
+  .get('auth/password/reset', [PasswordResetController, 'reset'])
+  .use(middleware.guest())
+  .as('auth.password.reset')
+router
+  .post('auth/password/reset', [PasswordResetController, 'store'])
+  .use(middleware.guest())
+  .as('auth.password.store')
