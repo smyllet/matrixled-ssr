@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import User from '#models/user'
 import { Head, router } from '@inertiajs/vue3'
 import Button from 'primevue/button'
 
 defineProps<{
-  user: {
-    name?: string
-  }
+  user: User
 }>()
 </script>
 
@@ -19,7 +18,7 @@ defineProps<{
           class="text-3xl lg:text-5xl font-bold text-surface-900 dark:text-surface-0 mb-4 lg:leading-normal text-center lg:text-left"
         >
           Matrixled-SSR <br />
-          <span class="text-primary dark:text-primary">Welcome {{ user.name }} !</span>
+          <span class="text-primary dark:text-primary">Welcome {{ user.fullName }} !</span>
         </h1>
         <p
           class="text-surface-700 dark:text-surface-200 leading-normal mb-8 text-center lg:text-left"
