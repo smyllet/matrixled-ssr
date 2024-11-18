@@ -20,15 +20,10 @@ export class Gif extends BaseComponent {
     this.gif = parseGIF(gif)
     this.frames = decompressFrames(this.gif, true)
 
-    this._internalCanvas = document.createElement('canvas')
-    this._internalCanvas.width = this.gif.lsd.width
-    this._internalCanvas.height = this.gif.lsd.height
+    this._internalCanvas = this.renderer.createCanvas(this.gif.lsd.width, this.gif.lsd.height)
     this._internalContext = this._internalCanvas.getContext('2d') as CanvasRenderingContext2D
     this._internalContext.imageSmoothingEnabled = false
     this._internalContext.imageSmoothingQuality = 'high'
-
-    this._internalCanvas.style.marginTop = '450px'
-    document.body.appendChild(this._internalCanvas)
   }
 
   render(delta: number) {

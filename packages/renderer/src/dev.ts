@@ -18,7 +18,12 @@ const getDisplayTime = () => {
   return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`
 }
 
-const renderer = new Renderer(canvas, fonts)
+const renderer = new Renderer(canvas, fonts, (width, height) => {
+  const newCanvas = document.createElement('canvas')
+  newCanvas.width = width
+  newCanvas.height = height
+  return newCanvas
+})
 const gifComponent = new Gif(renderer, gif)
 
 let frame = 0

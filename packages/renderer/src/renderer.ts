@@ -7,9 +7,13 @@ export class Renderer {
 
   constructor(
     public canvas: HTMLCanvasElement,
-    public fonts: Fonts
+    private _createCanvas: (width: number, height: number) => HTMLCanvasElement
   ) {
     this._context = get2DContext(canvas)
+  }
+
+  createCanvas(width: number, height: number): HTMLCanvasElement {
+    return this._createCanvas(width, height)
   }
 
   writeNativeText(
