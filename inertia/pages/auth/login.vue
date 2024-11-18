@@ -7,8 +7,10 @@ import InputText from 'primevue/inputtext'
 import Message from 'primevue/message'
 import Link from '~/components/ui/link.vue'
 import { usePageErrorsBag } from '~/composables/use_page_errors_bag'
+import { usePageSuccess } from '~/composables/use_page_success'
 
 const errorsBag = usePageErrorsBag()
+const success = usePageSuccess()
 
 const form = useForm({
   email: '',
@@ -37,6 +39,10 @@ function submit() {
         <Message severity="error" v-if="errorsBag?.E_INVALID_CREDENTIALS">{{
           errorsBag.E_INVALID_CREDENTIALS
         }}</Message>
+        <Message severity="error" v-if="errorsBag?.E_EMAIL_VERIFICATION_TOKEN">{{
+          errorsBag.E_EMAIL_VERIFICATION_TOKEN
+        }}</Message>
+        <Message severity="success" v-if="success">{{ success }}</Message>
 
         <div class="flex flex-col gap-8">
           <FloatLabel>

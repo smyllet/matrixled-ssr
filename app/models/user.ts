@@ -25,6 +25,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column({ serializeAs: null })
   declare password: string
 
+  @column()
+  declare verified: boolean
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -38,6 +41,11 @@ export default class User extends compose(BaseModel, AuthFinder) {
     onQuery: (query) => query.where('type', 'PASSWORD_RESET'),
   })
   declare passwordResetToken: HasMany<typeof UserToken>
+
+  @hasMany(() => UserToken, {
+    onQuery: (query) => query.where('type', 'EMAIL_VERIFICATION'),
+  })
+  declare emailVerificationToken: HasMany<typeof UserToken>
 
   static rememberMeTokens = DbRememberMeTokensProvider.forModel(User)
 }

@@ -41,3 +41,6 @@ router
   .post('auth/password/reset', [PasswordResetController, 'store'])
   .use(middleware.guest())
   .as('auth.password.store')
+
+const EmailVerificationController = () => import('#controllers/auth/email_verification_controller')
+router.get('auth/email/verify', [EmailVerificationController, 'verify']).as('auth.email.verify')

@@ -67,12 +67,34 @@ export default class UserToken extends BaseModel {
     return record?.user
   }
 
-  // static async verify(token: string) {
-  //   const record = await UserToken.query()
-  //     .where('expires_at', '>', DateTime.now().toSQL())
-  //     .where('token', token)
-  //     .first()
+  static async generateEmailVerificationToken(user: User) {
+    await UserToken.deleteUserEmailVerificationTokens(user)
+    await UserToken.clearExpiredTokens()
 
-  //   return !!record
-  // }
+    const token = string.generateRandom(64)
+
+    const record = await user.related('tokens').create({
+      type: 'EMAIL_VERIFICATION',
+      expiresAt: DateTime.now().plus({ days: 1 }),
+      token,
+    })
+
+    return record
+  }
+
+  static async deleteUserEmailVerificationTokens(user: User) {
+    await user.related('emailVerificationToken').query().delete()
+  }
+
+  static async getEmailVerificationUser(token: string) {
+    const record = await UserToken.query()
+      .preload('user')
+      .where('type', 'EMAIL_VERIFICATION')
+      .where('token', token)
+      .where('expires_at', '>', DateTime.now().toSQL())
+      .orderBy('created_at', 'desc')
+      .first()
+
+    return record?.user
+  }
 }
