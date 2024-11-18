@@ -1,5 +1,5 @@
 {
-  "name": "matrixled-ssr",
+  "name": "@matrixled-ssr/platform",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -74,17 +74,15 @@
     "@primevue/themes": "^4.2.1",
     "@vinejs/vine": "^2.1.0",
     "@vue/server-renderer": "^3.5.12",
-    "bdfparser": "^2.2.5",
     "edge.js": "^6.2.0",
-    "fetchline": "^1.0.1",
-    "gifuct-js": "^2.1.2",
     "luxon": "^3.5.0",
     "mysql2": "^3.11.3",
-    "readlineiter": "^1.0.1",
     "primevue": "^4.2.1",
     "reflect-metadata": "^0.2.2",
     "tailwindcss-primeui": "^0.3.4",
-    "vue": "^3.5.12"
+    "vue": "^3.5.12",
+    "readlineiter": "^1.0.1",
+    "@matrixled-ssr/renderer": "workspace:*"
   },
   "hotHook": {
     "boundaries": [

@@ -1,12 +1,12 @@
 import { type Font } from 'bdfparser'
-import { type Fonts } from './load_bdf'
-import { ParsedFrame } from 'gifuct-js'
+import { type Fonts } from './fonts.ts'
 
 export class Renderer {
   private _context: CanvasRenderingContext2D
 
   constructor(
     public canvas: HTMLCanvasElement,
+    public fonts: Fonts,
     private _createCanvas: (width: number, height: number) => HTMLCanvasElement
   ) {
     this._context = get2DContext(canvas)
@@ -65,7 +65,8 @@ export class Renderer {
   }
 
   clear() {
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    this.context.fillStyle = 'black'
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
   }
 
   get context() {

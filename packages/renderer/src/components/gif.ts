@@ -1,6 +1,6 @@
 import { decompressFrames, ParsedFrame, ParsedGif, parseGIF } from 'gifuct-js'
-import { BaseComponent } from './base_component'
-import { Renderer } from '../renderer'
+import { BaseComponent } from './base_component.ts'
+import { Renderer } from '../renderer.ts'
 
 export class Gif extends BaseComponent {
   public gif: ParsedGif
@@ -51,14 +51,6 @@ export class Gif extends BaseComponent {
 
     const scale = this.renderer.canvas.width / this.gif.lsd.width
     this.renderer.drawImage(this._internalCanvas, 0, 0, { scale: { x: scale, y: scale } })
-    console.log(
-      'size',
-      this._internalCanvas.width,
-      this._internalCanvas.height,
-      scale,
-      this.gif.lsd.width * scale,
-      this.gif.lsd.height * scale
-    )
 
     return imageData
   }

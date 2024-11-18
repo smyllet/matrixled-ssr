@@ -1,7 +1,7 @@
 import fetchline from 'fetchline'
-import { Renderer } from './renderer'
-import { Fonts } from './load_bdf'
-import { Gif } from './components/gif'
+import { Renderer } from './renderer.ts'
+import { Fonts } from './fonts.ts'
+import { Gif } from './components/gif.ts'
 
 const canvas = document.getElementById('renderer') as HTMLCanvasElement
 canvas.width = 64
