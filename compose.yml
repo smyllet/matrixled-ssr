@@ -1,9 +1,9 @@
-version: "3.9"
+version: '3.9'
 services:
   mariadb:
     image: mariadb:10.7.1
     ports:
-      - "3306:3306"
+      - '3306:3306'
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
@@ -15,6 +15,11 @@ services:
     links:
       - mariadb
     ports:
-      - "8080:80"
+      - '8080:80'
     environment:
       PMA_HOST: mariadb
+  maildev:
+    image: maildev/maildev
+    ports:
+      - '1080:1080'
+      - '1025:1025'

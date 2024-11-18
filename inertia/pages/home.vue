@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import User from '#models/user'
+import type User from '#models/user'
 import { Head, router } from '@inertiajs/vue3'
 import Button from 'primevue/button'
 

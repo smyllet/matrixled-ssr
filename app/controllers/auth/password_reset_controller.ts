@@ -1,9 +1,11 @@
 import User from '#models/user'
 import UserToken from '#models/user_token'
+import env from '#start/env'
 import { passwordForgotValidator } from '#validators/password_forgot_validator'
 import { passwordResetValidator } from '#validators/password_reset_validator'
 import { type HttpContext } from '@adonisjs/core/http'
 import Router from '@adonisjs/core/services/router'
+import mail from '@adonisjs/mail/services/main'
 
 export default class PasswordResetController {
   async forgot({ inertia, request }: HttpContext) {
@@ -22,10 +24,12 @@ export default class PasswordResetController {
 
       const resetLink = Router.makeUrl('auth.password.reset', undefined, {
         qs: { token: token.token },
+        prefixUrl: env.get('BASE_URL').replace(/\/$/, ''),
       })
 
-      // TODO: Send email with reset link
-      console.log(resetLink)
+      await mail.sendLater((message) => {
+        message.to(user.email).subject('Password reset').text(`Reset your password: ${resetLink}`)
+      })
     }
 
     return response.redirect().withQs({ success: true }).back()
@@ -54,6 +58,10 @@ export default class PasswordResetController {
     await user.save()
 
     await UserToken.deleteUserPasswordResetTokens(user)
+
+    mail.sendLater((message) => {
+      message.to(user.email).subject('Password reset').text('Your password has been reset')
+    })
 
     return response.redirect().toPath('/auth/login')
   }
