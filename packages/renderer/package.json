@@ -1,0 +1,25 @@
+{
+  "name": "@matrixled-ssr/renderer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "bdfparser": "^2.2.5",
+    "canvas": "^2.11.2",
+    "gifuct-js": "^2.1.2"
+  },
+  "devDependencies": {
+    "fetchline": "^1.0.1",
+    "readlineiter": "^1.0.1",
+    "typescript": "~5.6.2",
+    "vite": "^5.4.10"
+  }
+}
