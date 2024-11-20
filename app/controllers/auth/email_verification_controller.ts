@@ -26,7 +26,10 @@ export default class EmailVerificationController {
 
       await UserToken.deleteUserEmailVerificationTokens(user)
 
-      session.flash('success', 'Email verified successfully')
+      session.flash('notification', {
+        type: 'success',
+        message: 'Email verified successfully',
+      })
     } else {
       session.flashErrors({
         E_EMAIL_VERIFICATION_TOKEN:

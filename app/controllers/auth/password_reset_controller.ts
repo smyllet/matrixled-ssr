@@ -8,13 +8,11 @@ import Router from '@adonisjs/core/services/router'
 import mail from '@adonisjs/mail/services/main'
 
 export default class PasswordResetController {
-  async forgot({ inertia, request }: HttpContext) {
-    return inertia.render('auth/password/forgot', {
-      success: !!request.qs().success,
-    })
+  async forgot({ inertia }: HttpContext) {
+    return inertia.render('auth/password/forgot')
   }
 
-  async send({ request, response }: HttpContext) {
+  async send({ request, response, session }: HttpContext) {
     const { email } = await request.validateUsing(passwordForgotValidator)
 
     const user = await User.findBy('email', email)
@@ -32,7 +30,13 @@ export default class PasswordResetController {
       })
     }
 
-    return response.redirect().withQs({ success: true }).back()
+    session.flash('notification', {
+      type: 'success',
+      message:
+        'If an account with that email exists, you will receive a password reset link shortly.',
+    })
+
+    return response.redirect().back()
   }
 
   async reset({ inertia, request }: HttpContext) {
@@ -61,6 +65,11 @@ export default class PasswordResetController {
 
     mail.sendLater((message) => {
       message.to(user.email).subject('Password reset').text('Your password has been reset')
+    })
+
+    session.flash('notification', {
+      type: 'success',
+      message: 'Your password has been reset',
     })
 
     return response.redirect().toPath('/auth/login')

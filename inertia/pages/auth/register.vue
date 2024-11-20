@@ -4,6 +4,7 @@ import Button from 'primevue/button'
 import FloatLabel from 'primevue/floatlabel'
 import InputText from 'primevue/inputtext'
 import Message from 'primevue/message'
+import ErrorAndNotificationDisplay from '~/components/ErrorAndNotificationDisplay.vue'
 import Link from '~/components/ui/link.vue'
 
 const form = useForm({
@@ -29,6 +30,8 @@ function submit() {
         <div class="text-center">
           <div class="text-3xl font-medium">Register</div>
         </div>
+
+        <ErrorAndNotificationDisplay />
 
         <div class="flex flex-col gap-8">
           <FloatLabel>

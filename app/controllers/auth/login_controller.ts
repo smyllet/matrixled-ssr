@@ -1,12 +1,13 @@
 import User from '#models/user'
-import UserToken from '#models/user_token'
-import env from '#start/env'
+import MailService from '#services/mail_service'
 import { loginValidator } from '#validators/login_validator'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import Router from '@adonisjs/core/services/router'
-import mail from '@adonisjs/mail/services/main'
 
+@inject()
 export default class LoginController {
+  constructor(protected mailService: MailService) {}
+
   /**
    * Display the login form
    */
@@ -23,23 +24,11 @@ export default class LoginController {
     const user = await User.verifyCredentials(email, password)
 
     if (!user.verified) {
-      const token = await UserToken.generateEmailVerificationToken(user)
+      await this.mailService.sendEmailVerification(user)
 
-      const verificationLink = Router.makeUrl('auth.email.verify', undefined, {
-        qs: { token: token.token },
-        prefixUrl: env.get('BASE_URL').replace(/\/$/, ''),
-      })
-
-      await mail.sendLater((message) => {
-        message
-          .to(user.email)
-          .subject('Email verification')
-          .text(`Verify your email: ${verificationLink}`)
-      })
-
-      session.flashErrors({
-        E_EMAIL_VERIFICATION_TOKEN:
-          'Email not verified, check your inbox for the verification link',
+      session.flash('notification', {
+        type: 'warn',
+        message: 'Email not verified, check your inbox for the verification link',
       })
 
       return response.redirect().back()

@@ -4,6 +4,7 @@ import Button from 'primevue/button'
 import FloatLabel from 'primevue/floatlabel'
 import InputText from 'primevue/inputtext'
 import Message from 'primevue/message'
+import ErrorAndNotificationDisplay from '~/components/ErrorAndNotificationDisplay.vue'
 import Link from '~/components/ui/link.vue'
 
 const props = defineProps<{
@@ -33,6 +34,7 @@ function submit() {
           <div class="text-3xl font-medium">Reset Password</div>
         </div>
 
+        <ErrorAndNotificationDisplay />
         <Message severity="error" v-if="form.errors.token" v-for="error of form.errors.token">
           {{ error }}
         </Message>
