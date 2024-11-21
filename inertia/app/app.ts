@@ -8,6 +8,7 @@ import PrimeVue from 'primevue/config'
 import type { DefineComponent } from 'vue'
 import { createSSRApp, h } from 'vue'
 import '../css/app.css'
+import 'primeicons/primeicons.css'
 import { updatePreset } from '@primevue/themes'
 
 const appName = import.meta.env.VITE_APP_NAME || 'AdonisJS'
