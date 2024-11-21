@@ -6,8 +6,10 @@ type Notification = {
   message: string
 }
 
+const page = usePage()
+
 export function usePageNotification() {
   return computed<Notification | undefined>(
-    () => usePage().props.notification as Notification | undefined
+    () => page.props.notification as Notification | undefined
   )
 }

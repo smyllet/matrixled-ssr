@@ -1,8 +1,16 @@
-import { DateTime } from 'luxon'
+import { DateTime, DurationLike } from 'luxon'
 import { BaseModel, column, hasOne } from '@adonisjs/lucid/orm'
 import User from './user.js'
 import string from '@adonisjs/core/helpers/string'
 import type { HasOne } from '@adonisjs/lucid/types/relations'
+
+const TOKEN_SIZE = 64
+
+const PASSWORD_RESET_TOKEN_TYPE = 'PASSWORD_RESET'
+const EMAIL_VERIFICATION_TOKEN_TYPE = 'EMAIL_VERIFICATION'
+
+const PASSWORD_RESET_TOKEN_DURATION: DurationLike = { minutes: 15 }
+const EMAIL_VERIFICATION_TOKEN_DURATION: DurationLike = { days: 1 }
 
 export default class UserToken extends BaseModel {
   @column({ isPrimary: true })
@@ -36,65 +44,62 @@ export default class UserToken extends BaseModel {
     await UserToken.query().where('expires_at', '<=', DateTime.now().toSQL()).delete()
   }
 
-  static async generatePasswordResetToken(user: User) {
-    await UserToken.deleteUserPasswordResetTokens(user)
+  static async deleteTokens(user: User, type: string) {
+    await user.related('tokens').query().where('type', type).delete()
+  }
+
+  static async generateToken(user: User, type: string, duration: DurationLike) {
+    await UserToken.deleteTokens(user, type)
     await UserToken.clearExpiredTokens()
 
-    const token = string.generateRandom(64)
+    const token = string.generateRandom(TOKEN_SIZE)
 
     const record = await user.related('tokens').create({
-      type: 'PASSWORD_RESET',
-      expiresAt: DateTime.now().plus({ minutes: 15 }),
+      type,
+      expiresAt: DateTime.now().plus(duration),
       token,
     })
 
     return record
+  }
+
+  static async getValidTokenUser(token: string, type: string) {
+    const record = await UserToken.query()
+      .preload('user')
+      .where('type', type)
+      .where('token', token)
+      .where('expires_at', '>', DateTime.now().toSQL())
+      .orderBy('created_at', 'desc')
+      .first()
+
+    return record?.user
+  }
+
+  static async generatePasswordResetToken(user: User) {
+    return this.generateToken(user, PASSWORD_RESET_TOKEN_TYPE, PASSWORD_RESET_TOKEN_DURATION)
   }
 
   static async deleteUserPasswordResetTokens(user: User) {
-    await user.related('passwordResetToken').query().delete()
+    return this.deleteTokens(user, PASSWORD_RESET_TOKEN_TYPE)
   }
 
   static async getPasswordResetUser(token: string) {
-    const record = await UserToken.query()
-      .preload('user')
-      .where('type', 'PASSWORD_RESET')
-      .where('token', token)
-      .where('expires_at', '>', DateTime.now().toSQL())
-      .orderBy('created_at', 'desc')
-      .first()
-
-    return record?.user
+    return this.getValidTokenUser(token, PASSWORD_RESET_TOKEN_TYPE)
   }
 
   static async generateEmailVerificationToken(user: User) {
-    await UserToken.deleteUserEmailVerificationTokens(user)
-    await UserToken.clearExpiredTokens()
-
-    const token = string.generateRandom(64)
-
-    const record = await user.related('tokens').create({
-      type: 'EMAIL_VERIFICATION',
-      expiresAt: DateTime.now().plus({ days: 1 }),
-      token,
-    })
-
-    return record
+    return this.generateToken(
+      user,
+      EMAIL_VERIFICATION_TOKEN_TYPE,
+      EMAIL_VERIFICATION_TOKEN_DURATION
+    )
   }
 
   static async deleteUserEmailVerificationTokens(user: User) {
-    await user.related('emailVerificationToken').query().delete()
+    return this.deleteTokens(user, EMAIL_VERIFICATION_TOKEN_TYPE)
   }
 
   static async getEmailVerificationUser(token: string) {
-    const record = await UserToken.query()
-      .preload('user')
-      .where('type', 'EMAIL_VERIFICATION')
-      .where('token', token)
-      .where('expires_at', '>', DateTime.now().toSQL())
-      .orderBy('created_at', 'desc')
-      .first()
-
-    return record?.user
+    return this.getValidTokenUser(token, EMAIL_VERIFICATION_TOKEN_TYPE)
   }
 }

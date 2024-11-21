@@ -5,9 +5,7 @@ import Router from '@adonisjs/core/services/router'
 import mail from '@adonisjs/mail/services/main'
 
 export default class MailService {
-  async sendEmailVerification(user: User) {
-    const token = await UserToken.generateEmailVerificationToken(user)
-
+  async sendEmailVerification(user: User, token: UserToken) {
     const verificationLink = Router.makeUrl('auth.email.verify', undefined, {
       qs: { token: token.token },
       prefixUrl: env.get('BASE_URL').replace(/\/$/, ''),

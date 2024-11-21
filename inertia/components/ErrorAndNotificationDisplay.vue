@@ -9,7 +9,7 @@ const notification = usePageNotification()
 
 const errors = computed(() =>
   Object.entries(errorsBag.value ?? {})
-    .filter(([key]) => key !== 'E_VALIDATION_ERROR')
+    .filter(([key]) => key !== 'E_VALIDATION_ERROR' && key !== 'E_UNAUTHORIZED_ACCESS')
     .map(([, value]) => value)
 )
 </script>
