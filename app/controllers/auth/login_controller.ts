@@ -1,4 +1,5 @@
 import User from '#models/user'
+import UserToken from '#models/user_token'
 import MailService from '#services/mail_service'
 import { loginValidator } from '#validators/login_validator'
 import { inject } from '@adonisjs/core'
@@ -24,7 +25,8 @@ export default class LoginController {
     const user = await User.verifyCredentials(email, password)
 
     if (!user.verified) {
-      await this.mailService.sendEmailVerification(user)
+      const token = await UserToken.generateEmailVerificationToken(user)
+      await this.mailService.sendEmailVerification(user, token)
 
       session.flash('notification', {
         type: 'warn',

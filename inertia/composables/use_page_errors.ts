@@ -2,5 +2,6 @@ import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 
 export function usePageErrors() {
-  return computed(() => usePage().props.errors)
+  const page = usePage()
+  return computed(() => page.props.errors)
 }

@@ -47,5 +47,5 @@ export default class User extends compose(BaseModel, AuthFinder) {
   })
   declare emailVerificationToken: HasMany<typeof UserToken>
 
-  static rememberMeTokens = DbRememberMeTokensProvider.forModel(User)
+  static readonly rememberMeTokens = DbRememberMeTokensProvider.forModel(User)
 }

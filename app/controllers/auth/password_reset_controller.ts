@@ -63,7 +63,7 @@ export default class PasswordResetController {
 
     await UserToken.deleteUserPasswordResetTokens(user)
 
-    mail.sendLater((message) => {
+    await mail.sendLater((message) => {
       message.to(user.email).subject('Password reset').text('Your password has been reset')
     })
 

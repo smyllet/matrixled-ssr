@@ -1,4 +1,5 @@
 import User from '#models/user'
+import UserToken from '#models/user_token'
 import MailService from '#services/mail_service'
 import { createRegisterValidator } from '#validators/register_validator'
 import { inject } from '@adonisjs/core'
@@ -23,7 +24,8 @@ export default class RegisterController {
 
     const user = await User.create({ fullName, email, password })
 
-    await this.mailService.sendEmailVerification(user)
+    const token = await UserToken.generateEmailVerificationToken(user)
+    await this.mailService.sendEmailVerification(user, token)
 
     session.flash('notification', {
       type: 'success',
