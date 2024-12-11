@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import type Matrix from '#models/matrix'
 import type User from '#models/user'
 import { Head, router } from '@inertiajs/vue3'
 import Button from 'primevue/button'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 defineProps<{
   user: User
+  matrices: Matrix[]
 }>()
 </script>
 
@@ -32,4 +36,11 @@ defineProps<{
       </div>
     </div>
   </div>
+
+  <DataTable :value="matrices" striped-rows class="min-w-60">
+    <Column field="name" header="Name"></Column>
+    <Column field="width" header="Width"></Column>
+    <Column field="height" header="Height"></Column>
+    <Column field="token" header="Token"></Column>
+  </DataTable>
 </template>

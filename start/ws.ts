@@ -8,8 +8,11 @@ function originIsAllowed(origin: string) {
 }
 
 app.ready(() => {
+  const nodeServer = server.getNodeServer()
+  if (!nodeServer) return
+
   const wsServer = new WebSocketServer({
-    httpServer: server.getNodeServer()!,
+    httpServer: nodeServer,
     autoAcceptConnections: false,
   })
 

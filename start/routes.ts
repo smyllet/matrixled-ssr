@@ -47,3 +47,6 @@ router.get('auth/email/verify', [EmailVerificationController, 'verify']).as('aut
 
 const TestsController = () => import('#controllers/tests_controller')
 router.get('test', [TestsController, 'index'])
+
+const MatricesController = () => import('#controllers/matrices_controller')
+router.resource('matrices', MatricesController).use('*', middleware.auth()).as('matrices')
