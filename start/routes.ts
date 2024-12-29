@@ -10,7 +10,10 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 
-router.get('', [() => import('#controllers/home_controller'), 'index']).use(middleware.auth())
+router
+  .get('', [() => import('#controllers/home_controller'), 'index'])
+  .as('home')
+  .use(middleware.auth())
 
 const LoginController = () => import('#controllers/auth/login_controller')
 router.resource('auth/login', LoginController).only(['index', 'store']).use('*', middleware.guest())
@@ -47,3 +50,10 @@ router.get('auth/email/verify', [EmailVerificationController, 'verify']).as('aut
 
 const TestsController = () => import('#controllers/tests_controller')
 router.get('test', [TestsController, 'index'])
+
+const MatricesController = () => import('#controllers/matrices_controller')
+router.resource('matrices', MatricesController).use('*', middleware.auth()).as('matrices')
+router
+  .get('matrices/:id/render', [MatricesController, 'render'])
+  .as('matrices.render')
+  .use(middleware.auth())
