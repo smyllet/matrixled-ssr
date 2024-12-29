@@ -57,6 +57,7 @@ export default defineConfig({
     () => import('#start/routes'),
     () => import('#start/kernel'),
     () => import('#start/ws'),
+    () => import('#start/renderer'),
   ],
 
   /*

@@ -6,6 +6,7 @@ import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import UserToken from './user_token.js'
+import Matrix from './matrix.js'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -46,6 +47,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
     onQuery: (query) => query.where('type', 'EMAIL_VERIFICATION'),
   })
   declare emailVerificationToken: HasMany<typeof UserToken>
+
+  @hasMany(() => Matrix)
+  declare matrices: HasMany<typeof Matrix>
 
   static readonly rememberMeTokens = DbRememberMeTokensProvider.forModel(User)
 }

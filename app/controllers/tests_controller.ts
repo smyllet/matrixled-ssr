@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
+import fs from 'node:fs'
 
 export default class TestsController {
   /**
@@ -23,7 +24,12 @@ export default class TestsController {
         break
     }
 
-    response.download(filePath)
+    const gif = fs.readFileSync(filePath)
+
+    response.header('Content-Type', 'image/gif')
+    response.send(gif)
+
+    // response.download(filePath)
   }
 
   /**
