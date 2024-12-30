@@ -52,8 +52,12 @@ const TestsController = () => import('#controllers/tests_controller')
 router.get('test', [TestsController, 'index'])
 
 const MatricesController = () => import('#controllers/matrices_controller')
-router.resource('matrices', MatricesController).use('*', middleware.auth()).as('matrices')
 router
   .get('matrices/:id/render', [MatricesController, 'render'])
-  .as('matrices.render')
+  .as('matrices.id.render')
   .use(middleware.auth())
+router
+  .get('matrices/render', [MatricesController, 'renderToken'])
+  .as('matrices.render')
+  .use(middleware.guest())
+router.resource('matrices', MatricesController).use('*', middleware.auth()).as('matrices')
