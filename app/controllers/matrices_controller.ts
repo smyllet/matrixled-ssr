@@ -8,7 +8,7 @@ export default class MatricesController {
   /**
    * Display a list of resource
    */
-  async index({ inertia }: HttpContext) {}
+  async index({}: HttpContext) {}
 
   /**
    * Display form to create a new record
@@ -72,7 +72,7 @@ export default class MatricesController {
   /**
    * Delete record
    */
-  async destroy({ params }: HttpContext) {}
+  async destroy({}: HttpContext) {}
 
   /**
    * Render matrix
@@ -84,6 +84,24 @@ export default class MatricesController {
       .query()
       .where('id', params.id)
       .firstOrFail()
+
+    const gif = RendererService.getRender(matrix)
+
+    response.header('Content-Type', 'image/gif')
+    response.send(gif)
+  }
+
+  /**
+   * Render matrix of token
+   */
+  async renderToken({ request, response }: HttpContext) {
+    const token = request.header('token')
+
+    if (!token) {
+      return 'Token not found'
+    }
+
+    const matrix = await Matrix.query().where('token', token).firstOrFail()
 
     const gif = RendererService.getRender(matrix)
 

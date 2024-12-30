@@ -5,6 +5,7 @@
 #include <AnimatedGIF.h>
 #include <Adafruit_NeoPixel.h>
 #include <ArduinoWebsockets.h>
+#include <ArduinoJson.h>
 #include "secrets.h"
 
 #define DEBUG true // REMINDER: set to "false" before uploading as standalone
@@ -228,6 +229,7 @@ void setup()
   GIF.begin(LITTLE_ENDIAN_PIXELS);
 
   // try to connect to Websockets server
+  client.addHeader("token", RENDERER_TOKEN);
   bool connected = client.connect(RENDERER_HOST, RENDERER_PORT, "/");
   if (connected)
   {
@@ -246,7 +248,10 @@ void setup()
         Serial.print("Got Message: ");
         Serial.println(message.data());
 
-        if (message.data() == "newRender")
+        JsonDocument doc;
+        deserializeJson(doc, message.data());
+
+        if (doc["type"] == "matrix:render:updated")
         {
           gifData = downloadGIF(RENDERER_URL);
         }
@@ -335,6 +340,9 @@ GIFData downloadGIF(const char *url)
 
   // Start the HTTP request
   http.begin(url);
+
+  // Start set token
+  http.addHeader("token", RENDERER_TOKEN);
 
   // Perform the request and handle the response
   int httpCode = http.GET();
