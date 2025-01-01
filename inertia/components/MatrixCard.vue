@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Matrix from '#models/matrix'
+import type Matrix from '#models/matrix'
 import { router } from '@inertiajs/vue3'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
