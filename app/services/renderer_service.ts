@@ -139,4 +139,4 @@ class RendererService {
   }
 }
 
-export default new RendererService()
+export { RendererService }
