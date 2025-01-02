@@ -9,6 +9,15 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
+import transmit from '@adonisjs/transmit/services/main'
+
+transmit.registerRoutes((route) => {
+  // Ensure you are authenticated to register your client
+  if (route.getPattern() === '__transmit/events') {
+    route.middleware(middleware.auth())
+    return
+  }
+})
 
 router
   .get('', [() => import('#controllers/home_controller'), 'index'])
