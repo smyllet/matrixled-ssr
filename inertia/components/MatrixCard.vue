@@ -3,8 +3,8 @@ import type Matrix from '#models/matrix'
 import { router } from '@inertiajs/vue3'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
-import { ref } from 'vue'
-import { useWebsocket } from '~/composables/use_websocket'
+import { onMounted, onUnmounted, ref } from 'vue'
+import { useTransmit } from '~/composables/use_transmit'
 
 const props = defineProps<{
   matrix: Matrix
@@ -28,11 +28,22 @@ const fetchGif = async () => {
 
 fetchGif()
 
-const websocket = useWebsocket()
+const transmit = useTransmit()
 
-websocket.addEventListener('message', (event) => {
-  if (JSON.parse(event.data).matrixId === props.matrix.id) {
+const subscription = transmit.subscription(`matrix/${props.matrix.id}/render`)
+let stopListening: () => void
+
+onMounted(async () => {
+  await subscription.create()
+  stopListening = subscription.onMessage(() => {
     fetchGif()
+  })
+})
+
+onUnmounted(async () => {
+  await subscription.delete()
+  if (stopListening) {
+    stopListening()
   }
 })
 </script>

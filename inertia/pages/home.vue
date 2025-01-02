@@ -5,18 +5,11 @@ import { Head, router } from '@inertiajs/vue3'
 import Button from 'primevue/button'
 import ErrorAndNotificationDisplay from '~/components/ErrorAndNotificationDisplay.vue'
 import MatrixCard from '~/components/MatrixCard.vue'
-import { useWebsocket } from '~/composables/use_websocket'
 
 defineProps<{
   user: User
   matrices: Matrix[]
 }>()
-
-const websocket = useWebsocket()
-
-websocket.addEventListener('message', (event) => {
-  console.log('Websocket message received:', JSON.parse(event.data))
-})
 </script>
 
 <template>
