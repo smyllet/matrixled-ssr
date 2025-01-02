@@ -43,6 +43,10 @@ export default defineConfig({
     () => import('@adonisjs/auth/auth_provider'),
     () => import('@adonisjs/inertia/inertia_provider'),
     () => import('@adonisjs/mail/mail_provider'),
+    {
+      file: () => import('./providers/renderer_provider.js'),
+      environment: ['web'],
+    },
   ],
 
   /*
@@ -57,7 +61,6 @@ export default defineConfig({
     () => import('#start/routes'),
     () => import('#start/kernel'),
     () => import('#start/ws'),
-    () => import('#start/renderer'),
   ],
 
   /*

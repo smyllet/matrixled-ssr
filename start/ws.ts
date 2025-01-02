@@ -30,7 +30,7 @@ app.ready(async () => {
 
     if (matrix === null) {
       request.reject()
-      logger.info('WebSocket connection from origin ' + request.remoteAddress + ' rejected.')
+      logger.warn('WebSocket connection from origin ' + request.remoteAddress + ' rejected.')
       return
     }
 

@@ -1,10 +1,14 @@
 import Matrix from '#models/matrix'
-import RendererService from '#services/renderer_service'
+import { RendererService } from '#services/renderer_service'
 import { createMatrixValidator } from '#validators/create_matrix_validator'
 import { editMatrixValidator } from '#validators/edit_matrix_validator'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export default class MatricesController {
+  constructor(private renderer: RendererService) {}
+
   /**
    * Display a list of resource
    */
@@ -85,7 +89,7 @@ export default class MatricesController {
       .where('id', params.id)
       .firstOrFail()
 
-    const gif = RendererService.getRender(matrix)
+    const gif = this.renderer.getRender(matrix)
 
     response.header('Content-Type', 'image/gif')
     response.send(gif)
@@ -103,7 +107,7 @@ export default class MatricesController {
 
     const matrix = await Matrix.query().where('token', token).firstOrFail()
 
-    const gif = RendererService.getRender(matrix)
+    const gif = this.renderer.getRender(matrix)
 
     response.header('Content-Type', 'image/gif')
     response.send(gif)

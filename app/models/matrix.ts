@@ -1,5 +1,5 @@
-import RendererService from '#services/renderer_service'
 import string from '@adonisjs/core/helpers/string'
+import emitter from '@adonisjs/core/services/emitter'
 import {
   afterCreate,
   afterDelete,
@@ -71,17 +71,16 @@ export default class Matrix extends BaseModel {
 
   @afterCreate()
   static async afterCreate(matrix: Matrix) {
-    await RendererService.addMatrix(matrix)
+    emitter.emit('matrix:model:created', matrix)
   }
 
   @afterUpdate()
   static async afterUpdate(matrix: Matrix) {
-    RendererService.deleteMatrix(matrix)
-    await RendererService.addMatrix(matrix)
+    emitter.emit('matrix:model:updated', matrix)
   }
 
   @afterDelete()
   static async afterDelete(matrix: Matrix) {
-    RendererService.deleteMatrix(matrix)
+    emitter.emit('matrix:model:deleted', matrix)
   }
 }
