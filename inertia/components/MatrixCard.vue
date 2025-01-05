@@ -52,7 +52,7 @@ onUnmounted(async () => {
 <template>
   <Card class="w-96 overflow-hidden">
     <template #header>
-      <img class="w-full aspect-video object-contain" :src="gif" />
+      <img class="w-full aspect-video object-contain" :src="gif" alt="Matrix render" />
     </template>
     <template #title>
       {{ matrix.name }}

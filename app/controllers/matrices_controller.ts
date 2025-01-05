@@ -7,7 +7,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class MatricesController {
-  constructor(private renderer: RendererService) {}
+  constructor(private readonly renderer: RendererService) {}
 
   /**
    * Display a list of resource
