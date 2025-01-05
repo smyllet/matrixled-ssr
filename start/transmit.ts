@@ -11,7 +11,7 @@ transmit.authorize<{ id: string }>('matrix/:id/render', async (ctx: HttpContext,
   return matrix.userId === user.id
 })
 
-app.start(async () => {
+app.ready(async () => {
   emitter.on('matrix:render:updated', (matrix) => {
     transmit.broadcast(`matrix/${matrix.id}/render`, {
       matrixId: matrix.id,
