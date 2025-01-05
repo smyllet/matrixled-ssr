@@ -2,6 +2,7 @@ import { createInertiaApp } from '@inertiajs/vue3'
 import { renderToString } from '@vue/server-renderer'
 import PrimeVue from 'primevue/config'
 import { createSSRApp, h, type DefineComponent } from 'vue'
+import ConfirmationService from 'primevue/confirmationservice'
 
 export default function render(page: any) {
   return createInertiaApp({
@@ -16,6 +17,7 @@ export default function render(page: any) {
       return createSSRApp({ render: () => h(App, props) })
         .use(plugin)
         .use(PrimeVue)
+        .use(ConfirmationService)
     },
   })
 }
