@@ -3,6 +3,7 @@ import type Matrix from '#models/matrix'
 import { router } from '@inertiajs/vue3'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
+import { useConfirm } from 'primevue/useconfirm'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useTransmit } from '~/composables/use_transmit'
 
@@ -11,6 +12,7 @@ const props = defineProps<{
 }>()
 
 const gif = ref<string>('')
+const confirmDelete = useConfirm()
 
 const fetchGif = async () => {
   const response = await fetch(`http://localhost:3333/matrices/${props.matrix.id}/render`)
@@ -58,6 +60,24 @@ onUnmounted(async () => {
     <template #subtitle> {{ matrix.width }} x {{ matrix.height }} </template>
     <template #footer>
       <div class="flex gap-4 mt-1">
+        <Button
+          label="Delete"
+          icon="pi pi-trash"
+          class="w-full"
+          severity="danger"
+          outlined
+          @click="
+            confirmDelete.require({
+              header: 'Delete Matrix',
+              message: `Are you sure you want to delete '${matrix.name}' ?`,
+              acceptClass: 'p-button-danger',
+              acceptLabel: 'Delete',
+              rejectClass: 'p-button-secondary',
+              rejectLabel: 'Cancel',
+              accept: () => router.delete(`/matrices/${matrix.id}`),
+            })
+          "
+        />
         <Button
           label="Edit"
           icon="pi pi-cog"
