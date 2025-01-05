@@ -18,7 +18,10 @@ async function getMatrixFromConnection(request: WebSocketRequest) {
 
 app.ready(async () => {
   const nodeServer = server.getNodeServer()
-  if (!nodeServer) return
+  if (!nodeServer) {
+    logger.error("Can't start WebSocket server without HTTP server.")
+    return
+  }
 
   const wsServer = new WebSocketServer({
     httpServer: nodeServer,
@@ -48,4 +51,6 @@ app.ready(async () => {
       logger.info('Peer ' + request.remoteAddress + ' disconnected.')
     })
   })
+
+  logger.info('WebSocket server started.')
 })
