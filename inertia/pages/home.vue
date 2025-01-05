@@ -5,6 +5,7 @@ import { Head, router } from '@inertiajs/vue3'
 import Button from 'primevue/button'
 import ErrorAndNotificationDisplay from '~/components/ErrorAndNotificationDisplay.vue'
 import MatrixCard from '~/components/MatrixCard.vue'
+import ConfirmDialog from 'primevue/confirmdialog'
 
 defineProps<{
   user: User
@@ -14,6 +15,8 @@ defineProps<{
 
 <template>
   <Head title="Homepage" />
+
+  <ConfirmDialog> </ConfirmDialog>
 
   <div class="flex lg:flex-row flex-col gap-4 bg-surface-0 dark:bg-surface-900">
     <div class="flex-1 flex items-center justify-center">

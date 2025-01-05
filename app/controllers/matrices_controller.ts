@@ -86,7 +86,18 @@ export default class MatricesController {
   /**
    * Delete record
    */
-  async destroy({}: HttpContext) {}
+  async destroy({ params, response, auth }: HttpContext) {
+    const matrix = await auth
+      .getUserOrFail()
+      .related('matrices')
+      .query()
+      .where('id', params.id)
+      .firstOrFail()
+
+    await matrix.delete()
+
+    return response.redirect().toRoute('home')
+  }
 
   /**
    * Render matrix
