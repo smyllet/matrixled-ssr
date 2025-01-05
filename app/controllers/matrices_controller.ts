@@ -47,8 +47,13 @@ export default class MatricesController {
   /**
    * Edit individual record
    */
-  async edit({ inertia, params }: HttpContext) {
-    const matrix = await Matrix.findOrFail(params.id)
+  async edit({ inertia, params, auth }: HttpContext) {
+    const matrix = await auth
+      .getUserOrFail()
+      .related('matrices')
+      .query()
+      .where('id', params.id)
+      .firstOrFail()
 
     return inertia.render('matrices/edit', { matrix: matrix.serialize() })
   }
@@ -56,10 +61,15 @@ export default class MatricesController {
   /**
    * Handle form submission for the edit action
    */
-  async update({ params, request, response, session }: HttpContext) {
+  async update({ params, request, response, session, auth }: HttpContext) {
     const { name, width, height, config } = await request.validateUsing(editMatrixValidator)
 
-    const matrix = await Matrix.findOrFail(params.id)
+    const matrix = await auth
+      .getUserOrFail()
+      .related('matrices')
+      .query()
+      .where('id', params.id)
+      .firstOrFail()
 
     matrix.merge({ name, width, height, config: JSON.stringify(config, null, 2) })
 
