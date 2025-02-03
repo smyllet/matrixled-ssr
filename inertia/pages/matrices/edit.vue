@@ -8,10 +8,13 @@ import Message from 'primevue/message'
 import ErrorAndNotificationDisplay from '~/components/ErrorAndNotificationDisplay.vue'
 import type Matrix from '#models/matrix'
 import Textarea from 'primevue/textarea'
+import { useBack } from '~/composables/use_back'
 
 const props = defineProps<{
   matrix: Matrix
 }>()
+
+const back = useBack()
 
 const form = useForm({
   name: props.matrix.name,
@@ -140,7 +143,15 @@ function submit() {
           </FloatLabel>
         </div>
 
-        <div class="text-center flex flex-col gap-4">
+        <div class="text-center flex gap-4">
+          <Button
+            label="Cancel"
+            icon="pi pi-times"
+            class="w-full"
+            type="button"
+            variant="outlined"
+            @click="back"
+          />
           <Button
             label="Edit"
             icon="pi pi-pencil"
