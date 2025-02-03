@@ -28,14 +28,13 @@ const fetchGif = async () => {
   }
 }
 
-fetchGif()
-
 const transmit = useTransmit()
 
 const subscription = transmit.subscription(`matrix/${props.matrix.id}/render`)
-let stopListening: () => void
+let stopListening: (() => void) | undefined = undefined
 
 onMounted(async () => {
+  await fetchGif()
   await subscription.create()
   stopListening = subscription.onMessage(() => {
     fetchGif()
@@ -79,10 +78,11 @@ onUnmounted(async () => {
           "
         />
         <Button
+          as="a"
           label="Edit"
           icon="pi pi-cog"
           class="w-full"
-          @click="router.get(`/matrices/${matrix.id}/edit`)"
+          :href="`/matrices/${matrix.id}/edit`"
         />
       </div>
     </template>

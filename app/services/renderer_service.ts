@@ -3,7 +3,14 @@ import { RenderConfig, renderConfigValidator } from '#validators/render_config_v
 import app from '@adonisjs/core/services/app'
 import emitter from '@adonisjs/core/services/emitter'
 import logger from '@adonisjs/core/services/logger'
-import fs from 'node:fs'
+import { readFile } from 'node:fs/promises'
+
+const GIF_PATHS = {
+  pacman: app.makePath(`testFiles/pacman.gif`),
+  tardis: app.makePath(`testFiles/tardis.gif`),
+  life: app.makePath(`testFiles/life.gif`),
+  homer: app.makePath(`testFiles/homer.gif`),
+}
 
 class RendererService {
   private renders: Record<
@@ -100,33 +107,20 @@ class RendererService {
     const { config } = this.renders[matrix.id]
 
     for (const panel of config.panels) {
-      const gif = await new Promise<Buffer | undefined>((resolve) => {
-        let filePath = app.makePath(`testFiles/pacman.gif`)
+      type GifNames = keyof typeof GIF_PATHS
+      function isGifName(gifName: string): gifName is GifNames {
+        return gifName in GIF_PATHS
+      }
 
-        switch (panel.gifName) {
-          case 'tardis':
-            filePath = app.makePath(`testFiles/tardis.gif`)
-            break
-          case 'life':
-            filePath = app.makePath(`testFiles/life.gif`)
-            break
-          case 'homer':
-            filePath = app.makePath(`testFiles/homer.gif`)
-            break
-          case 'pacman':
-            filePath = app.makePath(`testFiles/pacman.gif`)
-            break
-        }
+      const gifName = isGifName(panel.gifName) ? panel.gifName : 'pacman'
+      const filePath = GIF_PATHS[gifName]
 
-        return fs.readFile(filePath, (err, data) => {
-          if (err) {
-            logger.error(err)
-            return
-          }
-
-          resolve(data)
-        })
-      })
+      let gif
+      try {
+        gif = await readFile(filePath)
+      } catch (error) {
+        logger.error(error)
+      }
 
       this.renders[matrix.id].gifs.push(gif || Buffer.from([]))
     }

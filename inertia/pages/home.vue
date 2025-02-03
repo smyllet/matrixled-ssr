@@ -43,7 +43,7 @@ defineProps<{
   <ErrorAndNotificationDisplay class="p-4 pb-0" />
 
   <div class="flex flex-row items-center mt-8 ml-4 gap-4">
-    <Button icon="pi pi-plus" aria-label="New matrix" @click="router.get('/matrices/create')" />
+    <Button as="a" icon="pi pi-plus" aria-label="New matrix" href="/matrices/create" />
     <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0">Matrices</h2>
   </div>
 
