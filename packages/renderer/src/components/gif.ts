@@ -13,7 +13,7 @@ export class Gif extends BaseComponent {
 
   constructor(
     public renderer: Renderer,
-    gif: ArrayBuffer
+    gif: ArrayBufferLike
   ) {
     super(renderer)
 

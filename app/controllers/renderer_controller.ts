@@ -22,7 +22,7 @@ export default class RendererController {
     const canvas = createCanvas(64, 32)
 
     const renderer = new Renderer(canvas, fonts, (width, height) => createCanvas(width, height))
-    const gifComponent = new Gif(renderer, gif)
+    const gifComponent = new Gif(renderer, gif.buffer)
 
     for (let i = 0; i <= frame; i++) {
       renderer.clear()
