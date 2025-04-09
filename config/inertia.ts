@@ -12,13 +12,17 @@ const inertiaConfig = defineConfig({
    */
   sharedData: {
     errors: (ctx) => ctx.session?.flashMessages.get('errors'),
+    errorsBag: (ctx) => ctx.session?.flashMessages.get('errorsBag'),
+    success: (ctx) => ctx.session?.flashMessages.get('success'),
+    notification: (ctx) => ctx.session?.flashMessages.get('notification'),
+    user: (ctx) => ctx.auth.user,
   },
 
   /**
    * Options for the server-side rendering
    */
   ssr: {
-    enabled: true,
+    enabled: false,
     entrypoint: 'inertia/app/ssr.ts',
   },
 })
