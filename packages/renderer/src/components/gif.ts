@@ -41,6 +41,16 @@ export class Gif extends BaseComponent {
     this._drawFrame(frameToDraw)
   }
 
+  renderFrame(frameNumber: number) {
+    if (frameNumber >= this.frames.length) {
+      throw new Error(`Frame number ${frameNumber} is out of bounds`)
+    }
+    this._currentFrame = frameNumber
+    this._timeSinceLastGifFrame = 0
+    const frameToDraw = this.frames[this._currentFrame]
+    this._drawFrame(frameToDraw)
+  }
+
   private _drawFrame(frame: ParsedFrame) {
     // this._internalContext.clearRect(0, 0, this._internalCanvas.width, this._internalCanvas.height)
 
@@ -53,5 +63,9 @@ export class Gif extends BaseComponent {
     this.renderer.drawImage(this._internalCanvas, 0, 0, { scale: { x: scale, y: scale } })
 
     return imageData
+  }
+
+  getCurrentFrameCount() {
+    return this._currentFrame
   }
 }

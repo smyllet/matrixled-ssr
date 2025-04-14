@@ -26,29 +26,41 @@ export default class RendererController {
 
     const processDir = await mkdtemp(join(tmpdir(), 'frames-'))
 
-    const renders = []
+    const renders: Promise<void>[] = []
+    const inputFileContent: string[] = []
 
-    for (let i = 0; i < gifComponent.frames.length; i++) {
+    gifComponent.frames.forEach((frame, i) => {
       renderer.clear()
-      gifComponent.render(i)
+      gifComponent.renderFrame(i)
       renderer.drawBitmapText(font, getDisplayTime(), 17, 1, {
         color: '#ffffff',
       })
 
+      const imagePath = join(processDir, `frame-${i}.png`)
+
       const imageData = canvas.toBuffer('image/png')
       renders.push(
         new Promise((resolve) => {
-          writeFile(join(processDir, `frame-${i}.png`), imageData).then(() => {
-            resolve(true)
+          writeFile(imagePath, imageData).then(() => {
+            resolve()
           })
         })
       )
-    }
+      inputFileContent.push(`file '${imagePath}'`)
+      inputFileContent.push(`duration ${frame.delay / 1000}`)
+    })
 
     await Promise.all(renders)
 
+    inputFileContent.push(inputFileContent[inputFileContent.length - 2])
+    const inputFilePath = join(processDir, 'input.txt')
+    await writeFile(inputFilePath, inputFileContent.join('\n'), { encoding: 'utf-8', flag: 'w' })
+
     const g = ffmpeg()
-      .input(join(processDir, 'frame-%d.png'))
+      .input(inputFilePath)
+      .inputFormat('concat')
+      .inputOptions('-safe 0')
+      .complexFilter('scale=64:32')
       .output(join(processDir, 'output.gif'))
 
     const buffer = await new Promise<Buffer>((resolve, reject) => {
