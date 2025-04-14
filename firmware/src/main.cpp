@@ -181,7 +181,7 @@ void span(uint16_t *src, int16_t x, int16_t y, int16_t width)
 }
 
 // SETUP RUNS ONCE AT PROGRAM START --------------------------------------
-void(* resetFunc) (void) = 0;
+void (*resetFunc)(void) = 0;
 void err(const char *message)
 {
   setStatus(message, RED);
@@ -192,10 +192,8 @@ void err(const char *message)
 GIFData gifData = {nullptr, 0};
 bool GIFisOpen = false; // True if GIF is currently open
 
-void setup()
+void setupWifi()
 {
-  Serial.begin(9600);
-
   // Connect to Wi-Fi
   setStatus("Initializing Wi-Fi", YELLOW);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -210,6 +208,13 @@ void setup()
 
   Serial.println("Connected to WiFi");
   printWifiStatus();
+}
+
+void setup()
+{
+  Serial.begin(9600);
+
+  setupWifi();
 
   // Protomatter (RGB Matrix) setup
   setStatus("Initializing Protomatter", GREEN);
