@@ -11,6 +11,8 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 import transmit from '@adonisjs/transmit/services/main'
 
+router.get('renderer', [() => import('#controllers/renderer_controller'), 'render'])
+
 transmit.registerRoutes((route) => {
   route.middleware(middleware.auth())
 })
