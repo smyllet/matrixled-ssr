@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
-import { Fonts, Gif, Renderer } from '@matrixled-ssr/renderer'
+import { Fonts, Gif, GifRenderer, Renderer } from '@matrixled-ssr/renderer'
 import { createCanvas } from 'canvas'
 import ffmpeg from 'fluent-ffmpeg'
 import { mkdtemp, readFile, rmdir, writeFile } from 'node:fs/promises'
@@ -16,12 +16,42 @@ function getDisplayTime() {
 export default class RendererController {
   public async render({ response }: HttpContext) {
     const fonts = new Fonts(readlineiter)
-    const gif = await readFile(app.publicPath('pacman-small.gif'))
-    const font = await fonts.get(app.publicPath('bitbuntu-full.bdf'))
-
     const canvas = createCanvas(64, 32)
-
     const renderer = new Renderer(canvas, fonts, (width, height) => createCanvas(width, height))
+
+    const gif = await readFile(app.publicPath('pacman-small.gif'))
+
+    const gifRenderer = new GifRenderer(
+      {
+        canvas,
+        fonts,
+        renderer,
+      },
+      {
+        fontPath: app.publicPath('bitbuntu-full.bdf'),
+        background: {
+          type: 'gif',
+          base64: gif.toString('base64'),
+        },
+        layers: [
+          {
+            type: 'text',
+            text: getDisplayTime(),
+            x: 17,
+            y: 10,
+          },
+          {
+            type: 'text',
+            text: 'MatrixLED',
+            x: 0,
+            y: 0,
+          },
+        ],
+      }
+    )
+    await gifRenderer.loadResources()
+
+    const font = await fonts.get(app.publicPath('bitbuntu-full.bdf'))
     const gifComponent = new Gif(renderer, gif.buffer)
 
     const processDir = await mkdtemp(join(tmpdir(), 'frames-'))
@@ -30,11 +60,12 @@ export default class RendererController {
     const inputFileContent: string[] = []
 
     gifComponent.frames.forEach((frame, i) => {
-      renderer.clear()
-      gifComponent.renderFrame(i)
-      renderer.drawBitmapText(font, getDisplayTime(), 17, 1, {
-        color: '#ffffff',
-      })
+      // renderer.clear()
+      // // gifComponent.renderFrame(i)
+      // renderer.drawBitmapText(font, getDisplayTime(), 17, 1, {
+      //   color: '#ffffff',
+      // })
+      gifRenderer.renderFrame(i)
 
       const imagePath = join(processDir, `frame-${i}.png`)
 
