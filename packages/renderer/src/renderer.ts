@@ -1,11 +1,17 @@
 import { type Font } from 'bdfparser'
 import { type Fonts } from './fonts.ts'
 
+export type CanvasElementLike = {
+  width: number
+  height: number
+  getContext: (contextId: '2d') => CanvasRenderingContext2D | null
+}
+
 export class Renderer {
   private _context: CanvasRenderingContext2D
 
   constructor(
-    public canvas: HTMLCanvasElement,
+    public canvas: CanvasElementLike,
     public fonts: Fonts,
     private _createCanvas: (width: number, height: number) => HTMLCanvasElement
   ) {
@@ -74,7 +80,7 @@ export class Renderer {
   }
 }
 
-function get2DContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+function get2DContext(canvas: CanvasElementLike): CanvasRenderingContext2D {
   const context = canvas.getContext('2d')
   if (!context) {
     throw new Error('2d context not supported')
