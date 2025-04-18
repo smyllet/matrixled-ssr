@@ -70,6 +70,19 @@ export class Renderer {
     this.context.resetTransform()
   }
 
+  fillRect(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    options: { color?: string; alpha?: number }
+  ) {
+    this.context.fillStyle = options?.color ?? 'black'
+    this.context.globalAlpha = options?.alpha ?? 1
+    this.context.fillRect(x, y, width, height)
+    this.context.globalAlpha = 1
+  }
+
   clear() {
     this.context.fillStyle = 'black'
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)

@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
-import { Fonts, Gif, Renderer } from '@matrixled-ssr/renderer'
+import { Fonts, GifRenderer, Renderer } from '@matrixled-ssr/renderer'
 import { createCanvas } from 'canvas'
 import ffmpeg from 'fluent-ffmpeg'
 import { mkdtemp, readFile, rmdir, writeFile } from 'node:fs/promises'
@@ -16,25 +16,52 @@ function getDisplayTime() {
 export default class RendererController {
   public async render({ response }: HttpContext) {
     const fonts = new Fonts(readlineiter)
-    const gif = await readFile(app.publicPath('pacman-small.gif'))
-    const font = await fonts.get(app.publicPath('bitbuntu-full.bdf'))
-
     const canvas = createCanvas(64, 32)
-
     const renderer = new Renderer(canvas, fonts, (width, height) => createCanvas(width, height))
-    const gifComponent = new Gif(renderer, gif.buffer)
+
+    const gifRenderer = new GifRenderer(
+      {
+        canvas,
+        fonts,
+        renderer,
+        getFont: (_fonts, fontPath) => _fonts.get(app.publicPath(fontPath)),
+        getAsset: (assetPath) => readFile(app.publicPath(assetPath)),
+      },
+      {
+        template: {
+          background: {
+            type: 'gif',
+            color: '#FF0000',
+            asset: '@system/gif/pacman',
+          },
+          layers: [
+            {
+              type: 'text',
+              text: 'MatrixLED',
+              x: 6,
+              y: 0,
+            },
+            {
+              type: 'text',
+              text: getDisplayTime(),
+              x: 17,
+              y: 22,
+            },
+          ],
+        },
+      }
+    )
+    await gifRenderer.load()
 
     const processDir = await mkdtemp(join(tmpdir(), 'frames-'))
 
     const renders: Promise<void>[] = []
     const inputFileContent: string[] = []
 
-    gifComponent.frames.forEach((frame, i) => {
-      renderer.clear()
-      gifComponent.renderFrame(i)
-      renderer.drawBitmapText(font, getDisplayTime(), 17, 1, {
-        color: '#ffffff',
-      })
+    for (let i = 0; i < gifRenderer.frames.length; i++) {
+      const frame = gifRenderer.frames[i]
+
+      await gifRenderer.renderFrame(i)
 
       const imagePath = join(processDir, `frame-${i}.png`)
 
@@ -48,7 +75,7 @@ export default class RendererController {
       )
       inputFileContent.push(`file '${imagePath}'`)
       inputFileContent.push(`duration ${frame.delay / 1000}`)
-    })
+    }
 
     await Promise.all(renders)
 
