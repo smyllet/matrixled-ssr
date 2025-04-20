@@ -1,13 +1,17 @@
 import { type Font } from 'bdfparser'
-import { Fonts } from './fonts'
-import { RendererTemplate } from './render_config'
-import { CanvasElementLike, Renderer } from './renderer'
 import { Gif } from './components/gif.ts'
+import { Fonts } from './fonts'
+import { RendererAsset, RendererTemplate } from './render_config'
+import { CanvasElementLike, Renderer } from './renderer'
 
 const ASSETS_PATHS = [
   {
     id: '@system/gif/pacman',
     path: 'gif/pacman.gif',
+  },
+  {
+    id: '@system/gif/pacman2',
+    path: 'gif/pacman2.gif',
   },
   {
     id: '@system/gif/tardis',
@@ -31,7 +35,8 @@ export class GifRenderer {
   private _getAsset: (assetPath: string) => Promise<Buffer>
 
   private _template: RendererTemplate
-  private assets: Record<string, Buffer | undefined> = {}
+  private _assetToLoad: RendererAsset[]
+  private _assets: Record<string, Buffer | undefined> = {}
 
   private _font?: Font
   private _backgroundGif?: Gif
@@ -50,13 +55,14 @@ export class GifRenderer {
       getFont: (fonts: Fonts, fontPath: string) => Promise<Font>
       getAsset: (assetPath: string) => Promise<Buffer>
     },
-    config: { template: RendererTemplate }
+    config: { assets: RendererAsset[]; template: RendererTemplate }
   ) {
     this._renderer = settings.renderer
     this._fonts = settings.fonts
     this._getFont = settings.getFont
     this._getAsset = settings.getAsset
 
+    this._assetToLoad = config.assets
     this._template = config.template
 
     this.frames = [
@@ -71,11 +77,15 @@ export class GifRenderer {
 
     for (const { id, path } of ASSETS_PATHS) {
       const assetBuffer = await this._getAsset(path)
-      this.assets[id] = assetBuffer
+      this._assets[id] = assetBuffer
+    }
+
+    for (const asset of this._assetToLoad) {
+      this._assets[asset.id] = Buffer.from(asset.base64, 'base64')
     }
 
     if (this._template.background.type === 'gif') {
-      let gifBuffer = this.assets[this._template.background.asset]
+      let gifBuffer = this._assets[this._template.background.asset]
 
       if (gifBuffer) {
         this._backgroundGif = new Gif(this._renderer, gifBuffer)
@@ -102,7 +112,9 @@ export class GifRenderer {
       })
     }
 
-    this._backgroundGif?.renderFrame(frame)
+    if (this._backgroundGif) {
+      this._backgroundGif?.renderFrame(frame)
+    }
     this._template.layers.forEach((layer) => {
       if (layer.type === 'text') {
         this._renderer.drawBitmapText(this._font!, layer.text, layer.x, layer.y, {

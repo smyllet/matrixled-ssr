@@ -47,8 +47,10 @@ export class Gif extends BaseComponent {
     }
     this._currentFrame = frameNumber
     this._timeSinceLastGifFrame = 0
-    const frameToDraw = this.frames[this._currentFrame]
-    this._drawFrame(frameToDraw)
+    for (let i = 0; i <= frameNumber; i++) {
+      const frameToDraw = this.frames[i]
+      this._drawFrame(frameToDraw)
+    }
   }
 
   private _drawFrame(frame: ParsedFrame) {

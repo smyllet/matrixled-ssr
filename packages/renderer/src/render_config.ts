@@ -34,6 +34,18 @@ export const rendererTemplateSchema = vine.object({
   ),
 })
 
-export const rendererTemplateValidator = vine.compile(rendererTemplateSchema)
-
 export type RendererTemplate = Infer<typeof rendererTemplateSchema>
+
+export const rendererAssetIdSchema = vine
+  .string()
+  .regex(/^@(system|local|matrix|panel)\/(gif|img)\/([a-z][a-zA-Z0-9]+)$/)
+
+export const rendererAssetBase64Schema = vine.string().maxLength(2 ** 20)
+export const rendererAssetSchema = vine.object({
+  id: rendererAssetIdSchema,
+  base64: rendererAssetBase64Schema,
+})
+export type RendererAsset = Infer<typeof rendererAssetSchema>
+export const rendererAssetsSchema = vine.record(vine.string())
+
+export type RendererAssets = Infer<typeof rendererAssetsSchema>
