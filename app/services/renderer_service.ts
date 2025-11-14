@@ -3,13 +3,42 @@ import { RenderConfig, renderConfigValidator } from '#validators/render_config_v
 import app from '@adonisjs/core/services/app'
 import emitter from '@adonisjs/core/services/emitter'
 import logger from '@adonisjs/core/services/logger'
-import { Fonts, GifRenderer, Renderer } from '@matrixled-ssr/renderer'
+import {
+  Fonts,
+  GifRenderer,
+  ProcessedTemplate,
+  Renderer,
+  RendererTemplate,
+} from '@matrixled-ssr/renderer'
 import { createCanvas } from 'canvas'
+import ffmpeg from 'fluent-ffmpeg'
 import { mkdtemp, readFile, rmdir, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import readlineiter from 'readlineiter'
-import ffmpeg from 'fluent-ffmpeg'
+
+const ASSETS_PATHS = [
+  {
+    id: '@system/gif/pacman',
+    path: 'gif/pacman.gif',
+  },
+  {
+    id: '@system/gif/pacman2',
+    path: 'gif/pacman2.gif',
+  },
+  {
+    id: '@system/gif/tardis',
+    path: 'gif/tardis.gif',
+  },
+  {
+    id: '@system/gif/homer',
+    path: 'gif/homer.gif',
+  },
+  {
+    id: '@system/gif/life',
+    path: 'gif/life.gif',
+  },
+]
 
 const GIF_PATHS = {
   pacman: app.publicPath(`gif/pacman.gif`),
@@ -104,6 +133,66 @@ class RendererService {
     delete this.renders[matrix.id]
   }
 
+  private async processTemplate(
+    config: RenderConfig,
+    template: RendererTemplate
+  ): Promise<{
+    processedTemplate: ProcessedTemplate
+  }> {
+    const assets: Record<string, string> = {}
+
+    const processedTemplate: ProcessedTemplate = {
+      background: { type: 'color', color: '#000000' },
+      layers: [],
+    }
+
+    // Process background
+    if (template.background.type === 'color') {
+      processedTemplate.background = {
+        type: 'color',
+        color: template.background.color,
+      }
+    }
+
+    if (template.background.type === 'gif' && template.background.asset) {
+      const assetName = template.background.asset
+      if (!assets[assetName]) {
+        const systemAsset = ASSETS_PATHS.find((a) => a.id === assetName)
+
+        if (systemAsset) {
+          const file = await readFile(app.publicPath(systemAsset.path))
+          assets[assetName] = file.toString('base64')
+        } else {
+          const matrixAsset = config.assets?.find((a) => a.id === assetName)
+          if (matrixAsset) {
+            assets[assetName] = matrixAsset.base64
+          }
+        }
+      }
+
+      if (assets[assetName]) {
+        processedTemplate.background = {
+          type: template.background.type,
+          base64: assets[assetName],
+        }
+      }
+    }
+
+    // Process layers
+    for (const layer of template.layers) {
+      if (layer.type === 'text') {
+        processedTemplate.layers.push({
+          type: 'text',
+          text: layer.text,
+          x: layer.x ?? 0,
+          y: layer.y ?? 0,
+        })
+      }
+    }
+
+    return { processedTemplate }
+  }
+
   private async renderMatrix(matrix: Matrix) {
     if (!this.renders[matrix.id]) {
       return
@@ -136,17 +225,17 @@ class RendererService {
         const canvas = createCanvas(matrix.width, matrix.height)
         const renderer = new Renderer(canvas, fonts, (width, height) => createCanvas(width, height))
 
+        const { processedTemplate } = await this.processTemplate(config, panel.template)
+
         const gifRenderer = new GifRenderer(
           {
             canvas,
             fonts,
             renderer,
             getFont: (_fonts, fontPath) => _fonts.get(app.publicPath(fontPath)),
-            getAsset: (assetPath) => readFile(app.publicPath(assetPath)),
           },
           {
-            assets: [...(panel.assets || []), ...(config.assets || [])],
-            template: panel.template,
+            template: processedTemplate,
           }
         )
         await gifRenderer.load()

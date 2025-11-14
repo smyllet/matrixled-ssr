@@ -1,5 +1,29 @@
 import vine from '@vinejs/vine'
 import { Infer } from '@vinejs/vine/types'
+import z from 'zod'
+
+const processedTemplateBackgroundSchema = z.union([
+  z.object({ type: z.literal('gif'), base64: z.string() }),
+  z.object({ type: z.literal('color'), color: z.string() }),
+])
+
+export type ProcessedTemplateBackground = z.infer<typeof processedTemplateBackgroundSchema>
+
+const processedTemplateLayerSchema = z.object({
+  type: z.literal('text'),
+  text: z.string(),
+  x: z.number(),
+  y: z.number(),
+})
+
+export type ProcessedTemplateLayer = z.infer<typeof processedTemplateLayerSchema>
+
+export const processedTemplateSchema = z.object({
+  background: processedTemplateBackgroundSchema,
+  layers: z.array(processedTemplateLayerSchema),
+})
+
+export type ProcessedTemplate = z.infer<typeof processedTemplateSchema>
 
 const rendererTemplateSchemaBackground = vine
   .object({

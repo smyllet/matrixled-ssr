@@ -9,6 +9,7 @@ import ErrorAndNotificationDisplay from '~/components/ErrorAndNotificationDispla
 import type Matrix from '#models/matrix'
 import Textarea from 'primevue/textarea'
 import { useBack } from '~/composables/use_back'
+import MatrixGif from '~/components/MatrixGif.vue'
 
 const props = defineProps<{
   matrix: Matrix
@@ -40,6 +41,8 @@ function submit() {
         </div>
 
         <ErrorAndNotificationDisplay />
+
+        <MatrixGif :matrix="matrix" />
 
         <div class="flex flex-col gap-8">
           <FloatLabel>
