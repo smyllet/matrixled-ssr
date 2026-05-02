@@ -1,8 +1,7 @@
 {
-  "name": "@api-starter-kit/backend",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@matrixled-ssr/backend",
   "type": "module",
+  "private": true,
   "license": "MIT",
   "exports": {
     "./data": "./.adonisjs/client/data.d.ts",
@@ -64,6 +63,7 @@
     "@adonisjs/shield": "^9.0.0",
     "@japa/api-client": "^3.2.1",
     "@tuyau/core": "^1.2.2",
+    "@tuyau/superjson": "^1.0.0",
     "@vinejs/vine": "^4.3.1",
     "better-sqlite3": "^12.9.0",
     "luxon": "^3.7.2",
