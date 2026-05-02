@@ -7,11 +7,9 @@ export default defineNuxtConfig({
       apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:3333',
     },
   },
-  vite: {
-    resolve: {
-      alias: {
-        '@generated': `${import.meta.dirname}/../backend/.adonisjs/client`,
-      },
-    },
-  },
+  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt'],
+  shadcn: {
+    prefix: 'Ui',
+    componentDir: '@/components/ui',
+  }
 })

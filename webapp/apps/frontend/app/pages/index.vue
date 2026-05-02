@@ -6,18 +6,13 @@ const { data: user } = await useAsyncData('user', async () => {
   return response.data
 })
 
-$api.api.auth.newAccount.store({
-  body: {
-    email: '',
-    password: '',
-    passwordConfirmation: '',
-    fullName: '',
-  },
-})
-$api.request('profile.profile.show', {})
+
 </script>
 
 <template>
+  <UiButton>
+    HelloWorld
+  </UiButton>
   <div>
     <div v-if="user">
       {{ user.fullName }}
