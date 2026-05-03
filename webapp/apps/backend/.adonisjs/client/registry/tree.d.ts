@@ -6,8 +6,8 @@ export interface ApiDefinition {
     newAccount: {
       store: typeof routes['auth.new_account.store']
     }
-    accessTokens: {
-      store: typeof routes['auth.access_tokens.store']
+    session: {
+      store: typeof routes['auth.session.store']
     }
   }
   profile: {

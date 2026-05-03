@@ -4,12 +4,42 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   runtimeConfig: {
     public: {
-      apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:3333',
+      apiUrl: process.env.NUXT_PUBLIC_API_URL || '/',
     },
   },
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt'],
+  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/i18n'],
   shadcn: {
     prefix: 'Ui',
     componentDir: '@/components/ui',
-  }
+  },
+  i18n: {
+    locales: [
+      {
+        code: 'en',
+        file: 'en.json',
+        name: 'English',
+      },
+      {
+        code: 'fr',
+        file: 'fr.json',
+        name: 'Français',
+      },
+    ],
+    defaultLocale: 'en',
+    strategy: 'no_prefix',
+  },
+  typescript: {
+    tsConfig: {
+      vueCompilerOptions: {
+        checkUnknownComponents: true,
+      },
+    },
+  },
+  nitro: {
+    devProxy: {
+      '/api': {
+        target: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:3333/api',
+      },
+    },
+  },
 })

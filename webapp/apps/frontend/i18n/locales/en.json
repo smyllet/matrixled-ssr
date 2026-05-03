@@ -1,0 +1,47 @@
+{
+  "pages": {
+    "register": {
+      "title": "Create an account",
+      "submit": "Sign up",
+      "fields": {
+        "fullName": "Full name",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm password",
+        "fullNamePlaceholder": "John Doe",
+        "emailPlaceholder": "john\\@example.com"
+      },
+      "validation": {
+        "pwd_mismatch": "Password and confirmation do not match",
+        "email_taken": "An account with this email already exists"
+      },
+      "success": "Account created successfully",
+      "successDescription": "Your account has been created successfully. You can now log in with your email address {email}.",
+      "alreadyHaveAccount": "Already have an account? Log in",
+      "failure": {
+        "title": "Registration failed",
+        "unknownDescription": "An unknown error occurred while trying to create an account. Please try"
+      }
+    },
+    "login": {
+      "title": "Log in",
+      "submit": "Log in",
+      "fields": {
+        "email": "Email",
+        "password": "Password"
+      },
+      "failure": {
+        "title": "Login failed",
+        "unknownDescription": "An unknown error occurred while trying to log in. Please try again later.",
+        "invalidCredentialsDescription": "Invalid email or password. Please check your login information and try again."
+      },
+      "noAccount": "Don't have an account? Sign up"
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "min": "The field must be at least {min} characters",
+    "max": "The field must be at most {max} characters",
+    "email": "The field must be a valid email"
+  }
+}

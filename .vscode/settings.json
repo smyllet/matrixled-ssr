@@ -1,0 +1,15 @@
+{
+    "[typescript][javascript][json][vue]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        },
+    },
+    "vue.suggest.propNameCasing": "preferCamelCase",
+    "i18n-ally.localesPaths": "webapp/apps/frontend/i18n/locales",
+    "i18n-ally.sourceLanguage": "en",
+    "i18n-ally.displayLanguage": "en",
+    "i18n-ally.enabledFrameworks": ["vue"],
+    "i18n-ally.keystyle": "nested" 
+}

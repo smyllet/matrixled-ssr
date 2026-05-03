@@ -1,0 +1,43 @@
+{
+  "pages": {
+    "register": {
+      "title": "Créer un compte",
+      "submit": "S'inscrire",
+      "fields": {
+        "fullName": "Nom complet",
+        "email": "Email",
+        "password": "Mot de passe",
+        "confirmPassword": "Confirmer le mot de passe",
+        "fullNamePlaceholder": "John Doe",
+        "emailPlaceholder": "john\\@example.com"
+      },
+      "validation": {
+        "pwd_mismatch": "Le mot de passe et la confirmation ne correspondent pas",
+        "email_taken": "Un compte avec cet email existe déjà"
+      },
+      "success": "Compte créé avec succès",
+      "successDescription": "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter avec votre adresse email {email}.",
+      "alreadyHaveAccount": "Vous avez déjà un compte ? Connectez-vous"
+    },
+    "login": {
+      "title": "Se connecter",
+      "submit": "Se connecter",
+      "fields": {
+        "email": "Email",
+        "password": "Mot de passe"
+      },
+      "failure": {
+        "title": "Échec de la connexion",
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de connexion. Veuillez réessayer plus tard.",
+        "invalidCredentialsDescription": "Email ou mot de passe invalide. Veuillez vérifier vos informations de connexion et réessayer."
+      },
+      "noAccount": "Vous n'avez pas de compte ? Inscrivez-vous"
+    }
+  },
+  "validation": {
+    "required": "Ce champ est requis",
+    "min": "Le champ doit contenir au moins {min} caractères",
+    "max": "Le champ doit contenir au plus {max} caractères",
+    "email": "Le champ doit être un email valide"
+  }
+}

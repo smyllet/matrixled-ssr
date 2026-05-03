@@ -1,21 +1,19 @@
 <script setup lang="ts">
 const { $api } = useNuxtApp()
 
-const { data: user } = await useAsyncData('user', async () => {
-  const response = await $api.api.profile.profile.show({})
-  return response.data
+const user = useAsyncData('user', async () => {
+  const [data, error] = await $api.request('profile.profile.show', {}).safe()
+
+  if (error) {
+    return null
+  }
+
+  return data.data
 })
-
-
 </script>
 
 <template>
-  <UiButton>
-    HelloWorld
-  </UiButton>
-  <div>
-    <div v-if="user">
-      {{ user.fullName }}
-    </div>
-  </div>
+  <p>
+    {{ user.data?.value?.fullName ?? 'unknown' }}
+  </p>
 </template>

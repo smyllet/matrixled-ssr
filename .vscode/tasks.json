@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run WebApp",
+            "type": "shell",
+            "command": "cd webapp && pnpm dev",
+            "problemMatcher": []
+        },
+        {
+            "label": "Format WebApp",
+            "type": "shell",
+            "command": "cd webapp && pnpm format",
+            "problemMatcher": []
+        }
+    ]
+}

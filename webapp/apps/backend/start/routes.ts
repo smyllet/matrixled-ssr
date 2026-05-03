@@ -20,7 +20,7 @@ router
     router
       .group(() => {
         router.post('signup', [controllers.NewAccount, 'store'])
-        router.post('login', [controllers.AccessTokens, 'store'])
+        router.post('login', [controllers.Session, 'store'])
       })
       .prefix('auth')
       .as('auth')
