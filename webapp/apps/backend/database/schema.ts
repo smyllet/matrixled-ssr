@@ -7,6 +7,36 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class MatrixSchema extends BaseModel {
+  static $columns = [
+    'config',
+    'createdAt',
+    'height',
+    'id',
+    'name',
+    'updatedAt',
+    'userId',
+    'width',
+  ] as const
+  $columns = MatrixSchema.$columns
+  @column()
+  declare config: any
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column()
+  declare height: number
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+  @column()
+  declare width: number
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
   $columns = UserSchema.$columns

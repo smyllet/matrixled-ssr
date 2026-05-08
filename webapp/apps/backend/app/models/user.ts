@@ -2,8 +2,10 @@ import { UserSchema } from '#database/schema'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { compose } from '@adonisjs/core/helpers'
 import hash from '@adonisjs/core/services/hash'
-import { beforeCreate } from '@adonisjs/lucid/orm'
+import { beforeCreate, hasMany } from '@adonisjs/lucid/orm'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { randomUUID } from 'node:crypto'
+import Matrix from './matrix.ts'
 
 export default class User extends compose(UserSchema, withAuthFinder(hash)) {
   static selfAssignPrimaryKey = true
@@ -15,6 +17,9 @@ export default class User extends compose(UserSchema, withAuthFinder(hash)) {
     }
     return `${first.slice(0, 2)}`.toUpperCase()
   }
+
+  @hasMany(() => Matrix)
+  declare matrices: HasMany<typeof Matrix>
 
   @beforeCreate()
   static assignUuid(user: User) {
