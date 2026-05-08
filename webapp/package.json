@@ -18,8 +18,8 @@
   },
   "devDependencies": {
     "@adonisjs/prettier-config": "^1.4.5",
-    "prettier": "^3.8.2",
-    "turbo": "^2.9.6"
+    "prettier": "^3.8.3",
+    "turbo": "^2.9.10"
   },
   "packageManager": "pnpm@10.33.2",
   "prettier": "@adonisjs/prettier-config"

@@ -9,7 +9,7 @@ import z from 'zod'
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 
-let createdAccount = ref<Route.Response<'auth.new_account.store'>['data']['user'] | null>(null)
+let createdAccount = ref<Route.Response<'auth.new_account.store'>['data'] | null>(null)
 let registerError = ref<string | null>(null)
 
 const formSchema = computed(() =>
@@ -53,7 +53,7 @@ const onSubmit = form.handleSubmit(async (values) => {
     return
   }
 
-  createdAccount.value = data.data.user
+  createdAccount.value = data.data
   form.resetForm()
 })
 </script>
