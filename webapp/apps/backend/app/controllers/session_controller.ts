@@ -13,4 +13,12 @@ export default class SessionController {
 
     return serialize(UserTransformer.transform(user))
   }
+
+  async destroy({ auth }: HttpContext) {
+    auth.use('web').logout()
+
+    return {
+      message: 'Logged out successfully',
+    }
+  }
 }

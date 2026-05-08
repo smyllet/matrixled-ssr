@@ -14,8 +14,8 @@ export interface ApiDefinition {
     profile: {
       show: typeof routes['profile.profile.show']
     }
-    accessTokens: {
-      destroy: typeof routes['profile.access_tokens.destroy']
+    session: {
+      destroy: typeof routes['profile.session.destroy']
     }
   }
 }
