@@ -18,4 +18,10 @@ export interface ApiDefinition {
       destroy: typeof routes['profile.session.destroy']
     }
   }
+  matrices: {
+    index: typeof routes['matrices.index']
+    show: typeof routes['matrices.show']
+    store: typeof routes['matrices.store']
+    patch: typeof routes['matrices.patch']
+  }
 }

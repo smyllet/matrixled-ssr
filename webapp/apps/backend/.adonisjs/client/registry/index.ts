@@ -30,6 +30,30 @@ const routes = {
     tokens: [{"old":"/api/v1/account/logout","type":0,"val":"api","end":""},{"old":"/api/v1/account/logout","type":0,"val":"v1","end":""},{"old":"/api/v1/account/logout","type":0,"val":"account","end":""},{"old":"/api/v1/account/logout","type":0,"val":"logout","end":""}],
     types: placeholder as Registry['profile.session.destroy']['types'],
   },
+  'matrices.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/matrices',
+    tokens: [{"old":"/api/v1/matrices","type":0,"val":"api","end":""},{"old":"/api/v1/matrices","type":0,"val":"v1","end":""},{"old":"/api/v1/matrices","type":0,"val":"matrices","end":""}],
+    types: placeholder as Registry['matrices.index']['types'],
+  },
+  'matrices.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/matrices/:id',
+    tokens: [{"old":"/api/v1/matrices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/matrices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/matrices/:id","type":0,"val":"matrices","end":""},{"old":"/api/v1/matrices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['matrices.show']['types'],
+  },
+  'matrices.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/matrices',
+    tokens: [{"old":"/api/v1/matrices","type":0,"val":"api","end":""},{"old":"/api/v1/matrices","type":0,"val":"v1","end":""},{"old":"/api/v1/matrices","type":0,"val":"matrices","end":""}],
+    types: placeholder as Registry['matrices.store']['types'],
+  },
+  'matrices.patch': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/matrices/:id',
+    tokens: [{"old":"/api/v1/matrices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/matrices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/matrices/:id","type":0,"val":"matrices","end":""},{"old":"/api/v1/matrices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['matrices.patch']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }
