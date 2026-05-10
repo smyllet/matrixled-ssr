@@ -3,8 +3,11 @@ import type { Route } from '@tuyau/core/types'
 import { toTypedSchema } from '@vee-validate/zod'
 import { AlertCircleIcon, CheckCircle2Icon } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
-import type { Reactive } from 'vue'
 import z from 'zod'
+
+definePageMeta({
+  layout: 'empty',
+})
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()

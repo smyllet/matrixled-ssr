@@ -20,7 +20,7 @@
       "alreadyHaveAccount": "Already have an account? Log in",
       "failure": {
         "title": "Registration failed",
-        "unknownDescription": "An unknown error occurred while trying to create an account. Please try"
+        "unknownDescription": "An unknown error occurred while trying to create an account. Please try again later."
       }
     },
     "login": {
@@ -36,6 +36,21 @@
         "invalidCredentialsDescription": "Invalid email or password. Please check your login information and try again."
       },
       "noAccount": "Don't have an account? Sign up"
+    },
+    "home": {
+      "modules": {
+        "matrices": {
+          "title": "My matrices",
+          "table": {
+            "name": "Name",
+            "size": "Size (h x w)"
+          },
+          "actions": {
+            "create": "New matrix",
+            "delete": "Delete"
+          }
+        }
+      }
     }
   },
   "validation": {
@@ -43,5 +58,39 @@
     "min": "The field must be at least {min} characters",
     "max": "The field must be at most {max} characters",
     "email": "The field must be a valid email"
+  },
+  "nav": {
+    "logout": "Log out"
+  },
+  "app": {
+    "name": "Matrix Led SSR",
+    "tagline": "v0.0.0"
+  },
+  "sheets": {
+    "createMatrix": {
+      "title": "Create a matrix",
+      "failure": {
+        "unknownDescription": "An unknown error occurred while trying to create a matrix."
+      },
+      "fields": {
+        "name": "Name",
+        "width": "Width (px)",
+        "height": "Height (px)"
+      },
+      "submit": "Create",
+      "cancel": "Cancel"
+    }
+  },
+  "dialogs": {
+    "deleteMatrix": {
+      "failure": {
+        "title": "Deletion failed",
+        "unknownDescription": "An unknown error occurred while trying to delete the matrix."
+      },
+      "title": "Delete matrix",
+      "description": "Are you sure you want to delete {0} matrix? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
   }
 }

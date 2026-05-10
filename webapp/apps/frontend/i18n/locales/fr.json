@@ -36,6 +36,21 @@
         "invalidCredentialsDescription": "Email ou mot de passe invalide. Veuillez vérifier vos informations de connexion et réessayer."
       },
       "noAccount": "Vous n'avez pas de compte ? Inscrivez-vous"
+    },
+    "home": {
+      "modules": {
+        "matrices": {
+          "title": "Mes matrices",
+          "table": {
+            "name": "Nom",
+            "size": "Taille (h x l)"
+          },
+          "actions": {
+            "create": "Nouvelle matrice",
+            "delete": "Supprimer"
+          }
+        }
+      }
     }
   },
   "validation": {
@@ -43,5 +58,39 @@
     "min": "Le champ doit contenir au moins {min} caractères",
     "max": "Le champ doit contenir au plus {max} caractères",
     "email": "Le champ doit être un email valide"
+  },
+  "nav": {
+    "logout": "Se déconnecter"
+  },
+  "app": {
+    "name": "Matrix Led SSR",
+    "tagline": "v0.0.0"
+  },
+  "sheets": {
+    "createMatrix": {
+      "title": "Créer une matrice",
+      "failure": {
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de création d'une matrice."
+      },
+      "fields": {
+        "name": "Nom",
+        "width": "Largeur (px)",
+        "height": "Hauteur (px)"
+      },
+      "submit": "Créer",
+      "cancel": "Annuler"
+    }
+  },
+  "dialogs": {
+    "deleteMatrix": {
+      "failure": {
+        "title": "Échec de la suppression",
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de suppression de la matrice."
+      },
+      "title": "Supprimer la matrice",
+      "description": "Êtes-vous sûr de vouloir supprimer la matrice {0} ? Cette action est irréversible.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
+    }
   }
 }

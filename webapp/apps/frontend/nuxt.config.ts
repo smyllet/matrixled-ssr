@@ -8,7 +8,7 @@ export default defineNuxtConfig({
       apiUrl: process.env.NUXT_PUBLIC_API_URL || '/',
     },
   },
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/i18n'],
+  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/i18n', '@nuxtjs/color-mode'],
   shadcn: {
     prefix: 'Ui',
     componentDir: '@/components/ui',
