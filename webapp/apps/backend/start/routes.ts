@@ -40,6 +40,7 @@ router
         router.get('/:id', [controllers.Matrices, 'show']).as('show')
         router.post('/', [controllers.Matrices, 'store']).as('store')
         router.patch('/:id', [controllers.Matrices, 'patch']).as('patch')
+        router.delete('/:id', [controllers.Matrices, 'delete']).as('delete')
       })
       .prefix('matrices')
       .as('matrices')

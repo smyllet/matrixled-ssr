@@ -23,5 +23,6 @@ export interface ApiDefinition {
     show: typeof routes['matrices.show']
     store: typeof routes['matrices.store']
     patch: typeof routes['matrices.patch']
+    delete: typeof routes['matrices.delete']
   }
 }

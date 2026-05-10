@@ -12,6 +12,7 @@ export type ScannedRoutes = {
     'matrices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'matrices.store': { paramsTuple?: []; params?: {} }
     'matrices.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'matrices.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
@@ -31,6 +32,9 @@ export type ScannedRoutes = {
   }
   PATCH: {
     'matrices.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
+  DELETE: {
+    'matrices.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

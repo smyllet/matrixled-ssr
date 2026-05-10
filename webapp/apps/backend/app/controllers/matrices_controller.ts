@@ -33,14 +33,14 @@ export default class MatricesController {
     return serialize(MatrixTransformer.transform(matrix))
   }
 
-  async store({ auth, request, serialize }: HttpContext) {
+  async store({ auth, request, serialize, response }: HttpContext) {
     const { name, width, height } = await request.validateUsing(createMatrixValidator)
 
     const user = auth.getUserOrFail()
 
     const matrix = await this.matrixService.createMatrix({ name, width, height, userId: user.id })
 
-    return serialize(MatrixTransformer.transform(matrix))
+    return response.created(await serialize(MatrixTransformer.transform(matrix)))
   }
 
   async patch({ request, serialize, bouncer }: HttpContext) {
@@ -59,7 +59,7 @@ export default class MatricesController {
     return serialize(MatrixTransformer.transform(updatedMatrix))
   }
 
-  async delete({ request, bouncer }: HttpContext) {
+  async delete({ request, bouncer, response }: HttpContext) {
     const {
       params: { id: matrixId },
     } = await request.validateUsing(deleteMatrixValidator)
@@ -69,5 +69,7 @@ export default class MatricesController {
     await bouncer.with(MatrixPolicy).authorize('delete', matrix)
 
     await this.matrixService.deleteMatrix(matrix)
+
+    return response.noContent()
   }
 }

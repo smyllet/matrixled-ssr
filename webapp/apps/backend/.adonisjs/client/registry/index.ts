@@ -54,6 +54,12 @@ const routes = {
     tokens: [{"old":"/api/v1/matrices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/matrices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/matrices/:id","type":0,"val":"matrices","end":""},{"old":"/api/v1/matrices/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['matrices.patch']['types'],
   },
+  'matrices.delete': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/matrices/:id',
+    tokens: [{"old":"/api/v1/matrices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/matrices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/matrices/:id","type":0,"val":"matrices","end":""},{"old":"/api/v1/matrices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['matrices.delete']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

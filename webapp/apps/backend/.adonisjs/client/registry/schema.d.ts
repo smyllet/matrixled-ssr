@@ -103,4 +103,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['patch']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'matrices.delete': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/matrices/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/matrix').deleteMatrixValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/matrix').deleteMatrixValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['delete']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['delete']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
 }
