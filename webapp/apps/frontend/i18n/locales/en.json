@@ -51,6 +51,30 @@
           }
         }
       }
+    },
+    "renderers": {
+      "title": "My renderers",
+      "never": "Never",
+      "table": {
+        "name": "Name",
+        "kind": "Kind",
+        "status": "Status",
+        "tokenPrefix": "Token prefix",
+        "lastSeenAt": "Last seen"
+      },
+      "kind": {
+        "platform": "Platform",
+        "own": "Self-hosted"
+      },
+      "status": {
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "actions": {
+        "create": "New renderer",
+        "delete": "Delete",
+        "rotateToken": "Rotate token"
+      }
     }
   },
   "validation": {
@@ -60,7 +84,10 @@
     "email": "The field must be a valid email"
   },
   "nav": {
-    "logout": "Log out"
+    "logout": "Log out",
+    "platform": "Platform",
+    "matrices": "Matrices",
+    "renderers": "Renderers"
   },
   "app": {
     "name": "Matrix Led SSR",
@@ -79,6 +106,19 @@
       },
       "submit": "Create",
       "cancel": "Cancel"
+    },
+    "createRenderer": {
+      "title": "Create a renderer",
+      "failure": {
+        "title": "Creation failed",
+        "unknownDescription": "An unknown error occurred while trying to create a renderer."
+      },
+      "fields": {
+        "name": "Name"
+      },
+      "submit": "Create",
+      "cancel": "Cancel",
+      "done": "Done"
     }
   },
   "dialogs": {
@@ -91,6 +131,35 @@
       "description": "Are you sure you want to delete {0} matrix? This action cannot be undone.",
       "cancel": "Cancel",
       "confirm": "Delete"
+    },
+    "deleteRenderer": {
+      "title": "Delete the renderer",
+      "description": "Are you sure you want to delete the renderer {0}? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "failure": {
+        "title": "Deletion failed",
+        "unknownDescription": "An unknown error occurred while trying to delete the renderer."
+      }
+    },
+    "rotateRendererToken": {
+      "title": "Rotate the token",
+      "description": "Rotating the token of the renderer {0} invalidates the current one immediately. The renderer will have to be reconfigured.",
+      "cancel": "Cancel",
+      "confirm": "Rotate",
+      "done": "Done",
+      "failure": {
+        "title": "Rotation failed",
+        "unknownDescription": "An unknown error occurred while trying to rotate the token."
+      }
+    }
+  },
+  "components": {
+    "tokenReveal": {
+      "title": "Renderer token",
+      "description": "This token is shown once. Copy it now: it cannot be retrieved again.",
+      "copy": "Copy",
+      "copied": "Copied"
     }
   }
 }

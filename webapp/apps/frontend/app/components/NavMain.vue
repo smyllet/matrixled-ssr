@@ -29,10 +29,22 @@ defineProps<{
 
 <template>
   <SidebarGroup>
-    <SidebarGroupLabel>Platform</SidebarGroupLabel>
+    <SidebarGroupLabel>{{ $t('nav.platform') }}</SidebarGroupLabel>
     <SidebarMenu>
+      <SidebarMenuItem
+        v-for="item in items.filter((entry) => !entry.items?.length)"
+        :key="item.title"
+      >
+        <SidebarMenuButton :tooltip="item.title" as-child>
+          <NuxtLink :to="item.url">
+            <component :is="item.icon" v-if="item.icon" />
+            <span>{{ item.title }}</span>
+          </NuxtLink>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
       <Collapsible
-        v-for="item in items"
+        v-for="item in items.filter((entry) => entry.items?.length)"
         :key="item.title"
         as-child
         :default-open="item.isActive"
