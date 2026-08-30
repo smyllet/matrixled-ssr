@@ -55,7 +55,8 @@ pnpm format
 ```
 
 Note that `lint`, `typecheck` and `test` only exercise the **backend** — the frontend package defines no such
-scripts. A green `pnpm typecheck` says nothing about the Nuxt app.
+scripts. A green `pnpm typecheck` says nothing about the Nuxt app, and neither does a green CI:
+`.github/workflows/ci.yml` runs exactly these three commands on every pull request.
 
 ### Backend
 
