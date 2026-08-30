@@ -25,4 +25,12 @@ export interface ApiDefinition {
     patch: typeof routes['matrices.patch']
     delete: typeof routes['matrices.delete']
   }
+  renderers: {
+    index: typeof routes['renderers.index']
+    show: typeof routes['renderers.show']
+    store: typeof routes['renderers.store']
+    patch: typeof routes['renderers.patch']
+    delete: typeof routes['renderers.delete']
+    token: typeof routes['renderers.token']
+  }
 }

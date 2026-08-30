@@ -60,6 +60,42 @@ const routes = {
     tokens: [{"old":"/api/v1/matrices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/matrices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/matrices/:id","type":0,"val":"matrices","end":""},{"old":"/api/v1/matrices/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['matrices.delete']['types'],
   },
+  'renderers.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/renderers',
+    tokens: [{"old":"/api/v1/renderers","type":0,"val":"api","end":""},{"old":"/api/v1/renderers","type":0,"val":"v1","end":""},{"old":"/api/v1/renderers","type":0,"val":"renderers","end":""}],
+    types: placeholder as Registry['renderers.index']['types'],
+  },
+  'renderers.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/renderers/:id',
+    tokens: [{"old":"/api/v1/renderers/:id","type":0,"val":"api","end":""},{"old":"/api/v1/renderers/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/renderers/:id","type":0,"val":"renderers","end":""},{"old":"/api/v1/renderers/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['renderers.show']['types'],
+  },
+  'renderers.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/renderers',
+    tokens: [{"old":"/api/v1/renderers","type":0,"val":"api","end":""},{"old":"/api/v1/renderers","type":0,"val":"v1","end":""},{"old":"/api/v1/renderers","type":0,"val":"renderers","end":""}],
+    types: placeholder as Registry['renderers.store']['types'],
+  },
+  'renderers.patch': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/renderers/:id',
+    tokens: [{"old":"/api/v1/renderers/:id","type":0,"val":"api","end":""},{"old":"/api/v1/renderers/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/renderers/:id","type":0,"val":"renderers","end":""},{"old":"/api/v1/renderers/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['renderers.patch']['types'],
+  },
+  'renderers.delete': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/renderers/:id',
+    tokens: [{"old":"/api/v1/renderers/:id","type":0,"val":"api","end":""},{"old":"/api/v1/renderers/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/renderers/:id","type":0,"val":"renderers","end":""},{"old":"/api/v1/renderers/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['renderers.delete']['types'],
+  },
+  'renderers.token': {
+    methods: ["POST"],
+    pattern: '/api/v1/renderers/:id/token',
+    tokens: [{"old":"/api/v1/renderers/:id/token","type":0,"val":"api","end":""},{"old":"/api/v1/renderers/:id/token","type":0,"val":"v1","end":""},{"old":"/api/v1/renderers/:id/token","type":0,"val":"renderers","end":""},{"old":"/api/v1/renderers/:id/token","type":1,"val":"id","end":""},{"old":"/api/v1/renderers/:id/token","type":0,"val":"token","end":""}],
+    types: placeholder as Registry['renderers.token']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

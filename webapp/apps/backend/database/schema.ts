@@ -37,6 +37,51 @@ export class MatrixSchema extends BaseModel {
   declare width: number
 }
 
+export class RendererSchema extends BaseModel {
+  static $columns = [
+    'capabilities',
+    'createdAt',
+    'endpoint',
+    'id',
+    'isDefault',
+    'lastSeenAt',
+    'name',
+    'ownerId',
+    'status',
+    'tokenHash',
+    'tokenPrefix',
+    'updatedAt',
+    'version',
+  ] as const
+  $columns = RendererSchema.$columns
+  @column()
+  declare capabilities: any | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare endpoint: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isDefault: boolean
+  @column.dateTime()
+  declare lastSeenAt: DateTime | null
+  @column()
+  declare name: string
+  @column()
+  declare ownerId: string | null
+  @column()
+  declare status: 'online' | 'offline'
+  @column({ serializeAs: null })
+  declare tokenHash: string
+  @column()
+  declare tokenPrefix: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare version: string | null
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
   $columns = UserSchema.$columns
