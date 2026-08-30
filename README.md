@@ -98,6 +98,9 @@ pnpm dev
 - API : http://localhost:3333
 - Dashboard : http://localhost:3000
 
+La suite de tests vise une base dédiée, `matrixled_test`, créée par `compose.yml` au premier démarrage. Si elle
+manque — volume créé avant l'ajout du script d'initialisation — la recréer avec `docker compose down -v && docker compose up -d`.
+
 ## Licence
 
 MIT.

@@ -40,7 +40,8 @@ the issue it points at. An entry that stays after the problem is gone is worse t
 ## Commands
 
 **There is no `package.json` at the repository root.** Everything lives under `webapp/`, a pnpm + Turbo
-workspace. Run every command from `webapp/`.
+workspace. Run every command from `webapp/` — the only exception is `docker compose up -d`, which starts
+PostgreSQL from the `compose.yml` at the root and is a prerequisite to everything below.
 
 ```bash
 cd webapp
@@ -73,6 +74,10 @@ node ace test --tests="creates a matrix"   # a single test by title
 
 Suites are declared in `adonisrc.ts`: `unit` (`tests/unit/**`, 2s timeout) and `functional`
 (`tests/functional/**`, 30s timeout).
+
+Tests run against `matrixled_test`, configured by `.env.test` — deliberately self-contained so the suite needs
+no local `.env`. `tests/bootstrap.ts` refuses to start against a database whose name does not end in `_test`,
+migrates once in `runnerHooks.setup` and truncates before every test.
 
 Node 24 (`.nvmrc`), pnpm 10.
 
@@ -133,9 +138,6 @@ transformers in `app/transformers/` control which fields are exposed.
 
 ## Known hazards
 
-- **Tests currently target the development database.** `tests/bootstrap.ts` declares `setup: []` and `.env.test`
-  only overrides `SESSION_DRIVER`. Harmless while no tests exist, destructive once the project moves to
-  PostgreSQL. Tracked in issue #14; see `docs/adr/0010-postgresql-partout.md`.
 - **Devices cannot authenticate.** The token guard was deliberately removed in `59e299f`, leaving only the
   session guard. Anything requiring non-browser authentication needs it reintroduced first (issue #21).
 - `Matrix.config` is `vine.record(vine.any())` typed `any` — validated by nothing today.

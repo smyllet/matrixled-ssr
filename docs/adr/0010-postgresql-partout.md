@@ -35,13 +35,18 @@ et interdirait de fait tout SQL spécifique à PostgreSQL. L'argument de vitesse
 - Stratégie de réinitialisation entre tests :
   - `testUtils.db().migrate()` dans `runnerHooks.setup` — migre une fois, annule au démontage ;
   - `testUtils.db().truncate()` dans `group.each.setup` — vide les tables, conserve le schéma ;
-  - `testUtils.db().withGlobalTransaction()` réservé aux groupes dont le code testé **n'ouvre pas lui-même de
-    transaction**, les transactions ne se nestant pas.
+  - `testUtils.db().wrapInGlobalTransaction()` réservé aux groupes dont le code testé **n'ouvre pas lui-même
+    de transaction**, les transactions ne se nestant pas. C'est bien ce nom qui est en vigueur dans Lucid 22 —
+    `withGlobalTransaction()` existe encore mais est marqué `@deprecated`.
 - Le projet s'autorise le SQL spécifique à PostgreSQL.
 
-## Écart connu avec le code actuel
+## Mise en oeuvre
 
-`tests/bootstrap.ts` déclare `setup: []` et `.env.test` ne surcharge que `SESSION_DRIVER`. **Les tests visent
-donc aujourd'hui la base de développement.** Le défaut est latent tant qu'aucun test n'existe, mais devient
-destructeur dès le passage à PostgreSQL en développement. Sa correction relève du code et n'entre pas dans le
-périmètre de cette refonte documentaire.
+Le défaut décrit à la rédaction de cet ADR — `tests/bootstrap.ts` déclarant `setup: []` et `.env.test` ne
+surchargeant que `SESSION_DRIVER`, donc une suite visant la base de développement — est corrigé.
+
+`.env.test` est **autonome** plutôt que réduit à des surcharges : il porte l'ensemble des variables, y compris
+une `APP_KEY` jetable, de sorte que la suite tourne sans `.env` local — ce dont la CI a besoin.
+
+`tests/bootstrap.ts` **refuse de démarrer** si le nom de la base configurée ne se termine pas par `_test`. La
+garantie ne repose donc pas sur la seule discipline de configuration.
