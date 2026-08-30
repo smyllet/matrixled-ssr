@@ -51,12 +51,14 @@ pnpm build
 pnpm lint
 pnpm typecheck
 pnpm test
-pnpm format
+pnpm format        # rewrites
+pnpm format:check  # reports, exits 1 — this is what CI runs
 ```
 
 Note that `lint`, `typecheck` and `test` only exercise the **backend** — the frontend package defines no such
-scripts. A green `pnpm typecheck` says nothing about the Nuxt app, and neither does a green CI:
-`.github/workflows/ci.yml` runs exactly these three commands on every pull request.
+scripts. A green `pnpm typecheck` says nothing about the Nuxt app. `format:check` is the one check that covers
+both packages. `.github/workflows/ci.yml` runs these four commands on every pull request, so a green CI still
+says nothing about whether the frontend compiles or works.
 
 ### Backend
 

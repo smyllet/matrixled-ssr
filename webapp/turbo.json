@@ -55,6 +55,9 @@
       "outputs": [],
       "cache": false
     },
+    "format:check": {
+      "outputs": []
+    },
     "typecheck": {
       "dependsOn": [
         "^build"
