@@ -40,8 +40,24 @@ export const plugins: Config['plugins'] = [
  * The setup functions are executed before all the tests
  * The teardown functions are executed after all the tests
  */
+/**
+ * The suite migrates and truncates: pointing it at the development database
+ * would destroy it. Guard against a misconfigured `.env.test` rather than
+ * discovering the mistake afterwards.
+ */
+async function assertDedicatedTestDatabase() {
+  const database = app.config.get<string>('database.connections.postgres.connection.database')
+
+  if (!database?.endsWith('_test')) {
+    throw new Error(
+      `Refusing to run the test suite against the "${database}" database: ` +
+        `its name must end with "_test". Check DB_DATABASE in .env.test.`
+    )
+  }
+}
+
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [],
+  setup: [assertDedicatedTestDatabase, () => testUtils.db().migrate()],
   teardown: [],
 }
 
@@ -50,6 +66,12 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
  * Learn more - https://japa.dev/docs/test-suites#lifecycle-hooks
  */
 export const configureSuite: Config['configureSuite'] = (suite) => {
+  /**
+   * Empty the tables between tests while keeping the schema, so every test
+   * starts from a known-empty database without repeating the hook everywhere.
+   */
+  suite.onGroup((group) => group.each.setup(() => testUtils.db().truncate()))
+
   if (['browser', 'functional', 'e2e'].includes(suite.name)) {
     return suite.setup(() => testUtils.httpServer().start())
   }

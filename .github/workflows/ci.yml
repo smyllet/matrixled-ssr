@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, format, typecheck and tests
+    runs-on: ubuntu-latest
+
+    # Mirrors compose.yml. The suite targets matrixled_test, and .env.test is
+    # self-contained, so no secret or extra configuration is needed here.
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: matrixled
+          POSTGRES_PASSWORD: matrixled
+          POSTGRES_DB: matrixled_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U matrixled -d matrixled_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    defaults:
+      run:
+        working-directory: webapp
+
+    steps:
+      - uses: actions/checkout@v5
+
+      # Action inputs are resolved from the repository root, not from
+      # `defaults.run.working-directory`: hence the explicit paths below.
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: webapp/package.json
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: webapp/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+
+      - run: pnpm format:check
+
+      - run: pnpm typecheck
+
+      - run: pnpm test

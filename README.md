@@ -81,9 +81,11 @@ qu'on puisse rouvrir un choix en lisant un fichier plutôt qu'en refaisant l'ana
 
 ## Démarrage
 
-Prérequis : Node 24+, pnpm 10+, PostgreSQL.
+Prérequis : Node 24+, pnpm 10+, Docker.
 
 ```bash
+docker compose up -d          # PostgreSQL
+
 cd webapp
 pnpm install
 
@@ -95,6 +97,9 @@ pnpm dev
 
 - API : http://localhost:3333
 - Dashboard : http://localhost:3000
+
+La suite de tests vise une base dédiée, `matrixled_test`, créée par `compose.yml` au premier démarrage. Si elle
+manque — volume créé avant l'ajout du script d'initialisation — la recréer avec `docker compose down -v && docker compose up -d`.
 
 ## Licence
 
