@@ -81,9 +81,11 @@ qu'on puisse rouvrir un choix en lisant un fichier plutôt qu'en refaisant l'ana
 
 ## Démarrage
 
-Prérequis : Node 24+, pnpm 10+, PostgreSQL.
+Prérequis : Node 24+, pnpm 10+, Docker.
 
 ```bash
+docker compose up -d          # PostgreSQL
+
 cd webapp
 pnpm install
 
