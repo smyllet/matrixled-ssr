@@ -129,7 +129,8 @@ Registre complet des devices assignés à ce renderer, avec leurs scènes. Répo
     "devices": [
       {
         "device_id": "…",
-        "token_hash": "argon2id$…",
+        "token_prefix": "71ce04ba82df",
+        "token_hash": "scrypt$…",
         "panel_type": "hub75",
         "width": 64, "height": 32, "chain_length": 1,
         "brightness": 128,
@@ -143,6 +144,11 @@ Registre complet des devices assignés à ce renderer, avec leurs scènes. Répo
 
 Le renderer reçoit **l'empreinte** du token, jamais le token. C'est ce qui rend acceptable sa réplication chez un
 tiers ([DATA-MODEL.md](DATA-MODEL.md#credentials)).
+
+Il reçoit aussi le **préfixe**, et il en a besoin : un `DEVICE_HELLO` ne porte que le token, sans identifiant de
+device ([PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md#authentification)). Le préfixe est ce qui rattache le token
+présenté à une entrée du cache ; l'empreinte ne sert qu'ensuite, à vérifier le secret
+([ADR-0012](adr/0012-format-des-tokens.md)).
 
 Il ne reçoit **que ses propres devices assignés**, jamais le registre global. Sur le renderer par défaut, qui est
 multi-tenant, cette restriction est la frontière d'isolation entre utilisateurs.

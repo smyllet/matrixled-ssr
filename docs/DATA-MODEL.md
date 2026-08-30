@@ -23,11 +23,11 @@ Un moteur de rendu déclaré auprès de la plateforme.
 | `id` | uuid | Clé primaire |
 | `ownerId` | uuid \| null | Propriétaire. `null` = renderer de la plateforme |
 | `name` | string | Nom lisible |
-| `tokenHash` | string | Empreinte du credential de connexion |
-| `tokenPrefix` | string | Préfixe en clair, pour identifier un token sans le révéler |
+| `tokenHash` | string | Empreinte du secret du credential |
+| `tokenPrefix` | string | Préfixe en clair, unique et indexé : identifie le token et sert à le retrouver |
 | `isDefault` | boolean | Renderer assigné par défaut aux nouveaux devices |
-| `version` | string | Version annoncée à la connexion |
-| `capabilities` | jsonb | Primitives que ce renderer sait rendre |
+| `version` | string \| null | Version annoncée à la connexion. `null` tant qu'il ne s'est pas connecté |
+| `capabilities` | jsonb \| null | Primitives que ce renderer sait rendre. `null` tant qu'il ne s'est pas connecté |
 | `endpoint` | string \| null | Adresse annoncée, transmise aux devices au bootstrap |
 | `status` | enum | `online` \| `offline` |
 | `lastSeenAt` | timestamptz \| null | Dernière activité sur le canal de contrôle |
@@ -51,8 +51,8 @@ Un appareil qui affiche : matériel ou simulateur.
 | `rendererId` | uuid | Renderer qui sert ce device |
 | `sceneId` | uuid \| null | Scène assignée. `null` = écran noir |
 | `name` | string | Nom lisible, 3 à 100 caractères |
-| `tokenHash` | string | Empreinte du credential |
-| `tokenPrefix` | string | Préfixe en clair |
+| `tokenHash` | string | Empreinte du secret du credential |
+| `tokenPrefix` | string | Préfixe en clair, unique et indexé |
 | `panelType` | enum | `hub75` — seule valeur supportée ([ADR-0005](adr/0005-hub75-dabord.md)) |
 | `isSimulator` | boolean | Distingue un simulateur dans l'interface |
 | `width` / `height` | integer | Géométrie totale en pixels |
@@ -113,12 +113,27 @@ lieu de refuser la scène.
 
 ## Credentials
 
-Les tokens de renderer et de device suivent la même règle :
+Les tokens de renderer et de device suivent la même règle, et le même format
+([ADR-0012](adr/0012-format-des-tokens.md)) :
+
+```
+mxr_2f9c1ab34d7e_9a8b…   renderer
+mxd_71ce04ba82df_4d2f…   device
+   └─ préfixe            └─ secret
+```
 
 - générés à l'appairage, **affichés une seule fois** ;
-- stockés **hachés** — `tokenHash` — jamais en clair ;
-- `tokenPrefix` conserve les premiers caractères en clair pour permettre d'identifier un token dans une
-  interface ou un journal sans le divulguer.
+- seul le secret est stocké, **haché** — `tokenHash` — jamais en clair ;
+- `tokenPrefix` reste en clair, unique et indexé. Il a deux rôles : identifier un token dans une interface ou un
+  journal sans le divulguer, et **le retrouver**. Un client présente son token sans identifiant — le préfixe est
+  ce qui le rattache à une ligne, puisqu'une empreinte salée ne se recherche pas.
+- l'étiquette de tête porte la portée : un token de device présenté sur le canal renderer est rejeté sans même
+  vérifier le secret.
+
+**Une exception : le renderer de la plateforme.** Il n'a pas de propriétaire, donc personne ne peut l'appairer
+depuis l'interface. Son credential est déclaré par le déploiement dans `PLATFORM_RENDERER_TOKEN` et appliqué au
+démarrage ; le changer et redémarrer vaut rotation
+([ADR-0013](adr/0013-provisionnement-du-renderer-plateforme.md)).
 
 Le renderer reçoit l'**empreinte** des tokens de ses devices et hache le token qu'on lui présente pour comparer.
 C'est ce qui rend acceptable la réplication chez un tiers imposée par
