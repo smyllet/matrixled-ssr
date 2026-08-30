@@ -82,6 +82,10 @@ migrates once in `runnerHooks.setup` and truncates before every test.
 
 Node 24 (`.nvmrc`), pnpm 10.
 
+`minimumReleaseAge` in `pnpm-workspace.yaml` holds installs back to versions published at least three days ago.
+A brand-new release therefore resolves to the previous one rather than failing — if a version you expect does
+not appear, check its publication date before assuming the lockfile is stale.
+
 ## Architecture
 
 ### Generated files you must not hand-edit

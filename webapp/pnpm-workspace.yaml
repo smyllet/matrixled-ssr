@@ -1,5 +1,10 @@
 packages:
   - 'apps/*'
 
+# Quarantine freshly published versions for three days. A compromised release
+# is usually spotted and unpublished within hours; installing nothing younger
+# than that is what keeps a poisoned version out of the lockfile.
+minimumReleaseAge: 4320
+
 overrides:
   'nuxt@4.4.4': '4.4.2'
