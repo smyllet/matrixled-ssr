@@ -91,7 +91,7 @@ Un renderer conforme doit :
 
 - fermer immédiatement la connexion d'un device sur `device.revoked` ;
 - purger l'entrée de son cache ;
-- horodater son dernier contact de contrôle réussi, et fermer avec `ERROR 0x09` toute session dont
+- horodater son dernier contact de contrôle réussi, et fermer avec `ERROR 0x0A` toute session dont
   l'`offlineGrace` est dépassé depuis cet horodatage — **connexions établies comprises**
   ([ADR-0015](adr/0015-bail-de-session-device.md)).
 
@@ -102,7 +102,7 @@ Quand la plateforme est injoignable, un renderer conforme :
 - **continue de servir** les devices déjà authentifiés dont le bail court encore, sur son dernier état connu ;
 - **continue d'accepter** les connexions de devices dont l'empreinte est en cache et le bail valide ;
 - **refuse** les devices inconnus de son cache ;
-- **coupe** les devices dont le bail a expiré, avec `ERROR 0x09` ;
+- **coupe** les devices dont le bail a expiré, avec `ERROR 0x0A` ;
 - accumule l'état à remonter et le rejoue à la reconnexion ;
 - reconnecte avec un retrait exponentiel plafonné.
 

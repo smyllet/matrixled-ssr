@@ -28,8 +28,8 @@ plateforme** — pas par réception d'une révocation.
 - `devices.offlineGrace` : durée pendant laquelle le renderer peut servir ce device sans confirmation de la
   plateforme. Défaut **7 jours**, `null` = illimité.
 - Le renderer horodate son **dernier contact de contrôle réussi**. Tout device dont l'`offlineGrace` est dépassé
-  depuis cet horodatage voit sa connexion fermée avec `ERROR 0x09`. Une seule horloge, un seuil par device.
-- L'entrée n'est pas purgée mais **marquée expirée** : les reconnexions sont refusées avec `0x09` et non `0x04`,
+  depuis cet horodatage voit sa connexion fermée avec `ERROR 0x0A`. Une seule horloge, un seuil par device.
+- L'entrée n'est pas purgée mais **marquée expirée** : les reconnexions sont refusées avec `0x0A` et non `0x04`,
   ce qui distingue « ton token est invalide » de « le renderer a perdu la plateforme ». La différence compte le
   jour où il faut diagnostiquer une dalle noire.
 - Un contact réussi avec Adonis réarme tous les baux.
@@ -66,7 +66,7 @@ pour la raison inchangée qu'une panne de la plateforme éteindrait toutes les d
   renderer auto-hébergé, qui est derrière NAT et ne sert que son réseau local
   ([ADR-0007](0007-plan-de-controle-wss.md)) ; et le renderer de la plateforme étant colocalisé avec Adonis,
   `device.revoked` y parvient sans délai notable.
-- Le firmware doit traiter `0x09` autrement qu'un refus d'authentification : il s'agit d'un état transitoire,
+- Le firmware doit traiter `0x0A` autrement qu'un refus d'authentification : il s'agit d'un état transitoire,
   qui se résout quand le renderer retrouve la plateforme. Retrait exponentiel, pas d'abandon définitif.
 - Un `offlineGrace` à `null` restaure exactement le comportement antérieur, pour les dalles où l'autonomie prime
   sur la révocation.

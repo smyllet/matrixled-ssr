@@ -14,7 +14,7 @@
 Formules, directement issues des en-têtes du protocole :
 
 ```
-FULL   = 10 + largeur × hauteur × 3   octets
+FULL   = 9 + largeur × hauteur × 3   octets
 DELTA  = 7  + 5 × pixels_modifiés     octets
 ```
 
@@ -28,12 +28,12 @@ la ligne correspondante, un device à 60 FPS le double.
 
 | Géométrie | Pixels | FULL | Débit @30 FPS | |
 |-----------|--------|------|---------------|---|
-| 32×32 | 1 024 | 3 082 o | 90,3 Kio/s | 0,74 Mbit/s |
-| **64×32** | **2 048** | **6 154 o** | **180,3 Kio/s** | **1,48 Mbit/s** |
-| 64×64 | 4 096 | 12 298 o | 360,3 Kio/s | 2,95 Mbit/s |
-| 128×64 | 8 192 | 24 586 o | 720,3 Kio/s | 5,90 Mbit/s |
-| 128×128 | 16 384 | 49 162 o | 1,41 Mio/s | 11,8 Mbit/s |
-| 256×256 | 65 536 | 196 618 o | 5,63 Mio/s | 47,2 Mbit/s |
+| 32×32 | 1 024 | 3 081 o | 90,3 Kio/s | 0,74 Mbit/s |
+| **64×32** | **2 048** | **6 153 o** | **180,3 Kio/s** | **1,48 Mbit/s** |
+| 64×64 | 4 096 | 12 297 o | 360,3 Kio/s | 2,95 Mbit/s |
+| 128×64 | 8 192 | 24 585 o | 720,3 Kio/s | 5,90 Mbit/s |
+| 128×128 | 16 384 | 49 161 o | 1,41 Mio/s | 11,8 Mbit/s |
+| 256×256 | 65 536 | 196 617 o | 5,63 Mio/s | 47,2 Mbit/s |
 
 256×256 est le maximum absolu du protocole, imposé par l'index de pixel sur 16 bits.
 
@@ -48,7 +48,7 @@ Pour une dalle 64×32, à 30 FPS :
 | 25 % (512 px) | 2 567 o | 75,2 Kio/s | ÷ 2,4 |
 | 60 % (1 229 px) | 6 152 o | 180,2 Kio/s | ≈ égal |
 
-**Point de bascule** : le mode différentiel cesse d'être rentable à `(3P + 3) / 5` pixels modifiés, soit environ
+**Point de bascule** : le mode différentiel cesse d'être rentable à `(3P + 2) / 5` pixels modifiés, soit environ
 **60 % des pixels**. Le renderer n'a pas besoin de ce chiffre — il compare directement les deux tailles avant
 chaque envoi ([PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md#arbitrage-full--delta)) — mais il éclaire les ordres de
 grandeur.
@@ -124,7 +124,7 @@ Rien de ce qui précède ne remplace une mesure. Ce qu'il faut relever, et comme
 `fps`, `frames_applied`, `last_applied_sequence`, `free_heap`, `free_psram`, `wifi_rssi`.
 
 **Latence de bout en bout** : différence entre la séquence émise par le renderer et le `last_applied_sequence`
-remonté, multipliée par la période de frame. C'est la mesure la plus utile du système, et elle ne coûte rien —
+remonté — modulo 2³², le compteur bouclant — multipliée par la période de frame de ce device. C'est la mesure la plus utile du système, et elle ne coûte rien —
 elle tombe du protocole existant.
 
 ### Côté renderer

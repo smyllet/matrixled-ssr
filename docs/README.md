@@ -39,7 +39,7 @@
 |---|---|
 | Matériel de référence | Adafruit MatrixPortal S3 + dalle HUB75 64×32 |
 | Cadence | 30 FPS par défaut, réglable par device de 1 à 60 |
-| Frame complète 64×32 | 6 154 octets, soit 1,48 Mbit/s en flux permanent |
+| Frame complète 64×32 | 6 153 octets, soit 1,48 Mbit/s en flux permanent |
 | Géométrie maximale | 65 536 pixels (256×256), limite du protocole |
 | Ports | Nuxt 3000, Adonis 3333, renderer 8889, PostgreSQL 5432 |
 

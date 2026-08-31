@@ -48,9 +48,11 @@ Le partage s'arrête au **tampon de pixels natif**. Tout ce qui suit reste par d
 - **Le plafonnement d'émission** : un device à `maxFps` ne reçoit qu'une frame sur `n`
   ([ADR-0019](0019-cadence-portee-par-la-scene.md)).
 
-- **L'en-tête de frame** — `brightness` est un champ de `FULL_FRAME`
-  ([PROTOCOL-DEVICE.md](../PROTOCOL-DEVICE.md#0x01--full_frame)), donc deux devices d'un même groupe réglés à des
-  luminosités différentes émettent des octets différents à partir du même tampon.
+- **L'en-tête de frame**, qui porte le compteur `sequence`
+  ([PROTOCOL-DEVICE.md](../PROTOCOL-DEVICE.md#le-compteur-sequence)) : il appartient à la connexion d'un device,
+  donc deux devices d'un même groupe émettent des octets différents à partir du même tampon. La luminosité, elle,
+  ne voyage que dans `CONFIG` : elle n'entre dans aucune frame et n'a donc d'effet ni sur le calcul ni sur
+  l'encodage.
 - **Le numéro de séquence et le tampon de frame précédente**, donc le DELTA. Il dépend de la dernière frame
   appliquée *par ce device-là*, et diverge dès qu'un device se reconnecte — le suivant reçoit un `FULL_FRAME`
   pendant que les autres continuent en différentiel.

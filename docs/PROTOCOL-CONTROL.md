@@ -259,7 +259,7 @@ instantanée. Trois mécanismes bornent la fenêtre :
 
 1. **Événement immédiat** — `device.revoked` est traité dès réception, connexion fermée.
 2. **Bail de session** — chaque device porte un `offlineGrace`. Passé ce délai sans contact de contrôle
-   réussi, le renderer ferme la connexion avec `ERROR 0x09` et refuse les reconnexions jusqu'au rétablissement.
+   réussi, le renderer ferme la connexion avec `ERROR 0x0A` et refuse les reconnexions jusqu'au rétablissement.
    La coupure vise **aussi les connexions établies** : le lien renderer → device étant permanent
    ([ADR-0001](adr/0001-streaming-de-frames.md)), une expiration qui ne filtrerait que les reconnexions ne
    s'appliquerait jamais à une dalle allumée ([ADR-0015](adr/0015-bail-de-session-device.md)).

@@ -21,7 +21,7 @@ l'écrire sur la dalle.
 La cadence **visée est 30 FPS**, et c'est la valeur par défaut — mais elle est un **réglage par device**, pas une
 constante du protocole : entre **1 et 60**. Le renderer la reçoit dans `sync.full`
 ([PROTOCOL-CONTROL.md](../PROTOCOL-CONTROL.md)) et l'impose au device dans `CONFIG`, qui peut être renvoyé à tout
-moment pour la modifier sans rouvrir la connexion ([PROTOCOL-DEVICE.md](../PROTOCOL-DEVICE.md#0x04--config)).
+moment pour la modifier sans rouvrir la connexion ([PROTOCOL-DEVICE.md](../PROTOCOL-DEVICE.md#0x02--config)).
 
 Le choix du streaming ne dépend pas du chiffre : ce qui l'oppose au clip pré-rendu, c'est que le contenu d'une
 frame soit décidé à l'instant où elle part, pas la fréquence à laquelle elle part.

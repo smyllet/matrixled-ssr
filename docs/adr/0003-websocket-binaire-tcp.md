@@ -5,7 +5,7 @@
 ## Contexte
 
 Il faut acheminer ~30 frames/seconde du renderer vers chaque device. Une frame complète en 64×32 pèse
-6 154 octets, soit largement plus que la MTU Ethernet de 1 500 octets.
+6 153 octets, soit largement plus que la MTU Ethernet de 1 500 octets.
 
 ## Décision
 
