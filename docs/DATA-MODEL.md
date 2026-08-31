@@ -79,7 +79,7 @@ Un appareil qui affiche : matériel ou simulateur.
 - `offlineGrace` est le curseur entre révocation rapide et autonomie longue. Le mettre à `null` rend la fenêtre
   d'exposition de ce device infinie : c'est un choix légitime pour une dalle sans donnée sensible, jamais un
   défaut.
-- `width` et `height` sont strictement positifs et multiples de la géométrie d'une dalle.
+- `width` et `height` sont strictement positifs.
 - `kind` se choisit à la création et ne change plus. Un device simulateur n'est pas une dalle qu'un onglet
   remplace : c'est un device à part entière, avec son token et sa géométrie, et le simulateur ne propose que les
   devices `kind = simulator` ([ADR-0020](adr/0020-simulateur-device-declare.md)).

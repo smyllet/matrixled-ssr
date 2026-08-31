@@ -99,4 +99,3 @@ les fonctionnalités :
 | L'agrandissement `k×k` est fait par le renderer, donc payé sur le lien le plus contraint | [ADR-0018](adr/0018-geometrie-native-de-la-scene.md) |
 | Ce que fait un renderer d'un device qui remonte des FPS très inférieures à sa cadence effective | [ADR-0019](adr/0019-cadence-portee-par-la-scene.md) |
 | Le plan de contrôle n'a aucun accusé de réception, d'où une fenêtre de course après une rotation | [ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md) |
-| `width` et `height` d'un device doivent être « multiples de la géométrie d'une dalle », qu'aucun champ ne porte | [#17](https://github.com/smyllet/matrixled-ssr/issues/17) |
