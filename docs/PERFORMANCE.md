@@ -18,6 +18,11 @@ FULL   = 10 + largeur × hauteur × 3   octets
 DELTA  = 7  + 5 × pixels_modifiés     octets
 ```
 
+**Les débits ci-dessous sont donnés à 30 FPS parce que c'est la cadence par défaut, pas parce qu'elle est
+figée.** `targetFps` se règle par device, de 1 à 60 ([ADR-0001](adr/0001-streaming-de-frames.md)) ; la taille
+d'une frame n'en dépend pas, le débit lui est directement proportionnel. Un device à 10 FPS consomme le tiers de
+la ligne correspondante, un device à 60 FPS le double.
+
 ### Frame complète, à 30 FPS
 
 | Géométrie | Pixels | FULL | Débit @30 FPS | |

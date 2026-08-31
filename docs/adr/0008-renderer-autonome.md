@@ -31,6 +31,10 @@ le délai de révocation devient un problème.
 
 - La dalle du salon continue de fonctionner si un service distant tombe. C'est l'argument central de
   l'auto-hébergement, et il compense la fragilité introduite par [ADR-0001](0001-streaming-de-frames.md).
+- **« Dernier état connu » ne dit rien des valeurs affichées.** Ce que devient une donnée externe pendant une
+  panne dépend de qui va la chercher — question ouverte, instruite par
+  [ADR-0014](0014-sources-de-donnees-cote-adonis.md), encore `Proposé`. Quelle qu'en soit l'issue, cet ADR-ci
+  garantit qu'une dalle reste **allumée** pendant une panne, pas que ce qu'elle affiche reste **vrai**.
 - **Les empreintes de tokens device sont répliquées chez un tiers.** D'où le stockage haché, jamais en clair :
   le renderer reçoit l'empreinte et hache le token qu'on lui présente.
 - **La révocation n'est pas instantanée.** Il faut spécifier un événement de révocation sur le canal de

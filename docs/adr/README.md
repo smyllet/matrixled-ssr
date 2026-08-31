@@ -32,3 +32,6 @@ rouvre en refaisant toute l'analyse.
 | [0011](0011-auth-premier-message.md) | Authentification device par premier message binaire | Accepté |
 | [0012](0012-format-des-tokens.md) | Token à préfixe public et secret haché | Accepté |
 | [0013](0013-provisionnement-du-renderer-plateforme.md) | Credential du renderer plateforme provisionné par l'environnement | Accepté |
+| [0014](0014-sources-de-donnees-cote-adonis.md) | Les sources de données appartiennent à Adonis | Proposé |
+| [0015](0015-bail-de-session-device.md) | Bail de session device, borné par l'absence de contact | Accepté |
+| [0016](0016-transports-declares-par-le-renderer.md) | Le renderer déclare ses transports | Accepté |

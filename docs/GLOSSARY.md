@@ -23,8 +23,8 @@ une géométrie et un état. Un device se connecte à **un** renderer.
 **Scene** — Un contenu à afficher, décrit par une configuration versionnée et validée. Une scène est une donnée,
 pas un processus. Plusieurs devices peuvent afficher la même scène.
 
-**Simulateur** — Une page web de debug qui remplace le matériel : elle parle le protocole device et peint les
-frames sur un canvas. C'est un **device**, pas une prévisualisation.
+**Simulateur** — Une page du dashboard Nuxt qui remplace le matériel : elle parle le protocole device et peint
+les frames sur un canvas. C'est un **device**, pas une prévisualisation.
 
 ---
 

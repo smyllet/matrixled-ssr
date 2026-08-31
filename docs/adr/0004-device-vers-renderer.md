@@ -15,8 +15,8 @@ contrôle et **le seul composant qui accède à la base**.
 ## Alternatives écartées
 
 **Adonis termine la connexion device et relaie les frames.** Authentification centralisée et un seul port
-exposé. Écarté parce que Node se retrouverait dans le chemin critique à 30 FPS pour chaque device, ce qui annule
-l'intérêt d'un renderer séparé ([ADR-0002](0002-renderer-en-go.md)) et ajoute un saut réseau.
+exposé. Écarté parce que Node se retrouverait dans le chemin de rendu de chaque device, ce qui annule l'intérêt
+d'un renderer séparé ([ADR-0002](0002-renderer-en-go.md)) et ajoute un saut réseau.
 
 **Le renderer lit directement la base.** Aucune synchronisation à spécifier. Écarté parce que deux services
 écriraient le même schéma dans deux langages sans migrations partagées — couplage fort et dérive garantie. Cette
@@ -26,7 +26,7 @@ utilisateurs.
 
 ## Conséquences
 
-- Adonis n'est jamais dans le chemin 30 FPS.
+- Adonis n'est jamais dans le chemin de rendu.
 - Un seul propriétaire du schéma, donc un seul jeu de migrations.
 - Le renderer a besoin d'un moyen de valider les tokens device sans accès à la base : c'est le rôle du plan de
   contrôle ([ADR-0007](0007-plan-de-controle-wss.md)).

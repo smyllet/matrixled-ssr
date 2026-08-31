@@ -67,14 +67,19 @@ Premier message après l'ouverture. Il porte l'identité, les capacités et **la
       "max_devices": 32,
       "max_pixels_per_device": 65536
     },
-    "endpoint": "wss://renderer.lan:8889",
+    "endpoints": ["wss://renderer.lan:8889", "ws://192.168.1.50:8889"],
     "state_version": 41
   }
 }
 ```
 
-`version`, `capabilities` et `endpoint` sont **déclarés par le renderer**. Ce sont des données non fiables :
+`version`, `capabilities` et `endpoints` sont **déclarés par le renderer**. Ce sont des données non fiables :
 Adonis les valide et les borne avant de les persister ([ARCHITECTURE.md](ARCHITECTURE.md#frontière-de-confiance)).
+
+`endpoints` est une **liste** : un renderer peut être joignable en `wss://`, en `ws://`, ou les deux. Adonis la
+transmet telle quelle au bootstrap et **ne choisit pas** à la place du client
+([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)). Il ne peut d'ailleurs rien vérifier : un renderer
+auto-hébergé lui est injoignable.
 
 `state_version` est le pivot de la resynchronisation.
 
@@ -213,11 +218,19 @@ Le renderer met en cache les empreintes de tokens device pour rester autonome. U
 instantanée. Trois mécanismes bornent la fenêtre :
 
 1. **Événement immédiat** — `device.revoked` est traité dès réception, connexion fermée.
-2. **Durée de validité du cache** — une entrée non revalidée expire. Passé ce délai, le renderer refuse les
-   nouvelles connexions du device concerné, mais ne coupe pas celles déjà établies.
-3. **Comportement hors ligne** — un renderer déconnecté de la plateforme continue de servir les devices déjà
-   authentifiés sur son cache. C'est le compromis explicite de [ADR-0008](adr/0008-renderer-autonome.md) : la
-   dalle du salon survit à une panne, au prix d'un délai de révocation.
+2. **Bail de session** — chaque device porte un `offlineGrace`. Passé ce délai sans contact de contrôle
+   réussi, le renderer ferme la connexion avec `ERROR 0x09` et refuse les reconnexions jusqu'au rétablissement.
+   La coupure vise **aussi les connexions établies** : le lien renderer → device étant permanent
+   ([ADR-0001](adr/0001-streaming-de-frames.md)), une expiration qui ne filtrerait que les reconnexions ne
+   s'appliquerait jamais à une dalle allumée ([ADR-0015](adr/0015-bail-de-session-device.md)).
+3. **Comportement hors ligne** — un renderer déconnecté continue de servir les devices déjà authentifiés dont le
+   bail court encore. C'est le compromis explicite de [ADR-0008](adr/0008-renderer-autonome.md) : la dalle du
+   salon survit à une panne, au prix d'un délai de révocation — mais ce délai est désormais fini et réglable par
+   dalle, au lieu d'être illimité.
+
+Le déclencheur du point 2 est **l'absence de contact**, non la réception d'un message : un `device.revoked` ne
+peut pas traverser un canal coupé, et c'est précisément quand le canal est coupé qu'on ne peut plus rien
+révoquer.
 
 Une révocation vraiment immédiate imposerait de déléguer la validation à Adonis, alternative écartée parce
 qu'elle éteindrait toutes les dalles en cas de panne de la plateforme.

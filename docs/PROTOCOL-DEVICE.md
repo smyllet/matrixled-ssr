@@ -37,11 +37,16 @@ Authorization: Bearer <token device>
 
 ```jsonc
 {
-  "renderer_url": "wss://renderer.example.net:8889",
+  "renderer_urls": ["wss://renderer.example.net:8889", "ws://192.168.1.50:8889"],
   "panel": { "width": 64, "height": 32, "chain": 1 },
   "scene_version": 42
 }
 ```
+
+`renderer_urls` est la liste déclarée par le renderer, transmise telle quelle. **Le client choisit** : un
+firmware retient `wss://` s'il est présent et `ws://` sinon ; le simulateur ne retient que ce que le navigateur
+autorise depuis l'origine de la page qui le sert
+([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)).
 
 Le device **met cette réponse en cache localement** et repart dessus si la plateforme ne répond pas au
 redémarrage suivant. Sans ce cache, une panne de la plateforme empêcherait tout redémarrage, ce qui contredirait
@@ -109,6 +114,17 @@ Si un device déjà connecté ouvre une seconde connexion, **la nouvelle remplac
 Cette règle est nécessaire indépendamment du simulateur : après une coupure WiFi, l'ancienne socket reste
 souvent ouverte côté renderer, et sans cette règle le device se retrouverait incapable de se reconnecter jusqu'à
 expiration du keep-alive TCP.
+
+### Expiration du bail
+
+Le droit de recevoir des frames est un **bail**, borné par l'`offlineGrace` du device
+([ADR-0015](adr/0015-bail-de-session-device.md)). Quand le renderer est resté sans contact avec la plateforme
+plus longtemps que cette durée, il ferme la connexion avec `ERROR 0x09`, **y compris une connexion établie de
+longue date**. Les reconnexions sont ensuite refusées avec le même code tant que le contact n'est pas rétabli.
+
+`0x09` n'est pas `0x04` : le token reste valide, c'est le renderer qui n'est plus en mesure de l'affirmer.
+L'état est transitoire et se résout dès que la plateforme redevient joignable. Le device réessaie donc avec un
+retrait exponentiel plafonné, sans considérer son credential comme perdu.
 
 ---
 
@@ -192,7 +208,7 @@ luminosité seul se transmet par `CONFIG`.
 | 2 | 2 | u16 | `width` faisant autorité |
 | 4 | 2 | u16 | `height` faisant autorité |
 | 6 | 1 | u8 | `brightness` (0–255) |
-| 7 | 1 | u8 | `target_fps` |
+| 7 | 1 | u8 | `target_fps` — 1 à 60 ([ADR-0001](adr/0001-streaming-de-frames.md)) |
 | 8 | 2 | u16 | `status_interval_s` — période des `STATUS_UPDATE` |
 | 10 | 4 | u32 | `session_id` |
 
@@ -248,6 +264,7 @@ est une source classique de dépassement de lecture.
 | `0x06` | Version de protocole non supportée |
 | `0x07` | Allocation mémoire impossible |
 | `0x08` | Connexion remplacée par une plus récente |
+| `0x09` | Bail expiré : le renderer a perdu le contact avec la plateforme |
 | `0x09` | Device inconnu ou révoqué |
 
 ---

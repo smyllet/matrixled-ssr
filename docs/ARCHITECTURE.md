@@ -42,7 +42,7 @@
          │  même protocole, même registre
     ┌────┴─────────┐
     │ Simulateur   │
-    │ (navigateur) │
+    │ (page Nuxt)  │
     └──────────────┘
 ```
 
@@ -50,8 +50,9 @@
 
 | Composant | Rôle | Ne fait pas |
 |-----------|------|-------------|
-| **Nuxt** | Dashboard : appairage, édition de scènes, supervision | Ne parle jamais à un renderer |
-| **AdonisJS** | Plan de contrôle : authentification, registre, persistance, assignation | N'est jamais dans le chemin 30 FPS |
+| **Nuxt** | Dashboard : appairage, édition de scènes, supervision. Sert aussi la page du simulateur | En tant que dashboard, ne parle jamais à un renderer |
+| **Simulateur** | Page du dashboard qui se substitue au matériel et parle le protocole device ([SIMULATOR.md](SIMULATOR.md)) | Ne partage aucun code avec le renderer : ce n'est pas une prévisualisation |
+| **AdonisJS** | Plan de contrôle : authentification, registre, persistance, assignation | N'est jamais dans le chemin de rendu |
 | **PostgreSQL** | Source de vérité unique | N'est lu que par Adonis |
 | **Renderer** | Plan de données : calcule les frames, tient les connexions device | N'accède jamais à la base |
 | **Device** | Reçoit, décode, écrit sur la dalle | Aucune logique d'affichage |
@@ -64,7 +65,7 @@ et sensible à la milliseconde. Ils n'ont ni le même transport, ni le même for
 
 | # | Chemin | Transport | Format | Cadence | Spécification |
 |---|--------|-----------|--------|---------|---------------|
-| 1 | Renderer → Device | WebSocket | **Binaire** | ~30 FPS | [PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md) |
+| 1 | Renderer → Device | WebSocket | **Binaire** | 1 à 60 FPS, 30 par défaut | [PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md) |
 | 2 | Renderer ↔ Adonis | WSS sortant | JSON versionné | Événementiel | [PROTOCOL-CONTROL.md](PROTOCOL-CONTROL.md) |
 | 3 | Device → Adonis | HTTP | JSON | Une fois au boot | [PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md#bootstrap) |
 
@@ -87,9 +88,9 @@ Un renderer **n'expose aucun port à la plateforme**. Le seul port qu'il ouvre s
 ```
 1. Le device s'allume. Il connaît l'adresse de la plateforme et son token (gravés au flash).
 2. GET /api/v1/device/bootstrap        (authentifié par le token device)
-       ──▶ { renderer_url, panel: { width, height, chain }, scene_version }
+       ──▶ { renderer_urls, panel: { width, height, chain }, scene_version }
 3. Il met la réponse en cache local.
-4. Il ouvre un WebSocket vers renderer_url.
+4. Il choisit une URL selon son transport (wss d'abord) et ouvre un WebSocket.
 5. Il envoie son token en premier message binaire.
 6. Le renderer valide, répond CONFIG, puis pousse une FULL_FRAME et commence à streamer.
 ```
@@ -133,9 +134,10 @@ ajoutées. Voir [SELF-HOSTING.md](SELF-HOSTING.md).
 
 Le renderer met en cache les empreintes de tokens device pour rester autonome
 ([ADR-0008](adr/0008-renderer-autonome.md)). Une révocation n'est donc **pas instantanée**. Trois mécanismes la
-bornent : un événement de révocation poussé sur le canal de contrôle, une durée de validité des entrées en
-cache, et un comportement défini quand le renderer est hors ligne. Voir
-[PROTOCOL-CONTROL.md](PROTOCOL-CONTROL.md).
+bornent : un événement de révocation poussé sur le canal de contrôle, un **bail de session** par device qui
+expire faute de contact avec la plateforme ([ADR-0015](adr/0015-bail-de-session-device.md)), et un comportement
+défini quand le renderer est hors ligne. La fenêtre d'exposition est donc finie, et sa durée se règle par dalle.
+Voir [PROTOCOL-CONTROL.md](PROTOCOL-CONTROL.md).
 
 ## Resynchronisation
 

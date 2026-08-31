@@ -28,7 +28,7 @@ Un moteur de rendu déclaré auprès de la plateforme.
 | `isDefault` | boolean | Renderer assigné par défaut aux nouveaux devices |
 | `version` | string \| null | Version annoncée à la connexion. `null` tant qu'il ne s'est pas connecté |
 | `capabilities` | jsonb \| null | Primitives que ce renderer sait rendre. `null` tant qu'il ne s'est pas connecté |
-| `endpoint` | string \| null | Adresse annoncée, transmise aux devices au bootstrap |
+| `endpoints` | jsonb \| null | Adresses annoncées, transmises telles quelles aux devices au bootstrap. Liste : `wss://`, `ws://`, ou les deux ([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)) |
 | `status` | enum | `online` \| `offline` |
 | `lastSeenAt` | timestamptz \| null | Dernière activité sur le canal de contrôle |
 | `createdAt` / `updatedAt` | timestamptz | |
@@ -36,7 +36,7 @@ Un moteur de rendu déclaré auprès de la plateforme.
 **Règles**
 
 - Exactement un renderer porte `isDefault = true` et `ownerId = null`.
-- `version`, `capabilities` et `endpoint` sont **déclarés par le renderer** à sa connexion. Ce sont des données
+- `version`, `capabilities` et `endpoints` sont **déclarés par le renderer** à sa connexion. Ce sont des données
   non fiables : Adonis les valide et les borne avant de les persister.
 - `status` et `lastSeenAt` sont dérivés de l'état de la connexion de contrôle, jamais renseignés par une requête.
 
@@ -57,6 +57,9 @@ Un appareil qui affiche : matériel ou simulateur.
 | `isSimulator` | boolean | Distingue un simulateur dans l'interface |
 | `width` / `height` | integer | Géométrie totale en pixels |
 | `chainLength` | integer | Nombre de dalles chaînées |
+| `brightness` | integer | Luminosité de la dalle, 0 à 255. Défaut 128 |
+| `targetFps` | integer | Cadence visée, 1 à 60. Défaut 30 ([ADR-0001](adr/0001-streaming-de-frames.md)) |
+| `offlineGrace` | integer \| null | Secondes pendant lesquelles le renderer peut servir ce device sans contact avec la plateforme. `null` = illimité. Défaut 604 800, soit 7 jours ([ADR-0015](adr/0015-bail-de-session-device.md)) |
 | `firmwareVersion` | string \| null | Déclarée par le device |
 | `protocolVersion` | integer \| null | Déclarée par le device |
 | `status` | enum | `online` \| `offline` \| `error` |
@@ -68,6 +71,11 @@ Un appareil qui affiche : matériel ou simulateur.
 
 - `width × height ≤ 65 536`. La limite dérive de l'index de pixel sur 16 bits du protocole
   ([PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md)), soit 256×256 au maximum.
+- `1 ≤ targetFps ≤ 60`. Bornée à l'écriture : la valeur part telle quelle vers le renderer puis vers le device,
+  et rien en aval ne la revalide.
+- `offlineGrace` est le curseur entre révocation rapide et autonomie longue. Le mettre à `null` rend la fenêtre
+  d'exposition de ce device infinie : c'est un choix légitime pour une dalle sans donnée sensible, jamais un
+  défaut.
 - `width` et `height` sont strictement positifs et multiples de la géométrie d'une dalle.
 - `firmwareVersion`, `protocolVersion`, `status`, `lastSeenAt` et `ipAddress` sont **observés**, jamais saisis.
 - Un device appartient à un utilisateur ; son renderer peut appartenir à un autre utilisateur uniquement s'il

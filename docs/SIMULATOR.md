@@ -88,3 +88,23 @@ dire précisément la partie que le matériel rend pénible à observer.
 Une page du dashboard Nuxt, derrière l'authentification utilisateur. Elle récupère l'adresse du renderer par le
 même mécanisme de bootstrap que le matériel, ce qui exerce aussi ce chemin
 ([ADR-0009](adr/0009-bootstrap-par-redirection.md)).
+
+## Ce qu'il peut atteindre
+
+Le simulateur est soumis aux règles du navigateur, que le firmware ne connaît pas : une page servie en HTTPS ne
+peut ouvrir ni un `ws://`, ni un `wss://` dont le certificat n'est pas reconnu.
+
+Il ne propose donc que les `renderer_urls` compatibles avec **l'origine de la page qui le sert**
+([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)) :
+
+| Le simulateur est servi depuis | Il peut atteindre |
+|--------------------------------|-------------------|
+| `http://localhost:3000` — développement | tout : `ws://` comme `wss://`, y compris un renderer auto-hébergé sur le réseau local |
+| Le dashboard hébergé, en HTTPS | uniquement les renderers déclarant `wss://` avec un certificat reconnu — en pratique celui de la plateforme |
+
+Le cas qui justifie le simulateur — développer le renderer et le dashboard sans matériel — tombe dans la
+première ligne. La contrainte ne mord que sur le dashboard hébergé.
+
+Quand aucune URL n'est utilisable, le simulateur doit le **dire** plutôt que d'échouer à la connexion : Adonis ne
+peut pas vérifier ce qu'un renderer déclare, donc un `wss://` annoncé peut très bien présenter un certificat que
+le navigateur refuse. Nommer la cause probable vaut mieux qu'une socket qui se ferme sans explication.
