@@ -3,7 +3,8 @@
 > **Version de l'enveloppe** : 1
 > Décisions : [ADR-0007](adr/0007-plan-de-controle-wss.md) (WSS sortant, JSON versionné),
 > [ADR-0004](adr/0004-device-vers-renderer.md) (Adonis seul propriétaire de la base),
-> [ADR-0008](adr/0008-renderer-autonome.md) (autonomie hors ligne).
+> [ADR-0008](adr/0008-renderer-autonome.md) (autonomie hors ligne),
+> [ADR-0017](adr/0017-rendu-mutualise.md) (scènes normalisées dans le registre).
 
 Ce document spécifie le canal entre un **renderer** et **AdonisJS** : configuration et registre dans un sens,
 état dans l'autre.
@@ -124,13 +125,18 @@ Télémétrie agrégée du renderer : nombre de devices servis, frames émises, 
 
 ### `sync.full`
 
-Registre complet des devices assignés à ce renderer, avec leurs scènes. Réponse par défaut à `renderer.hello`.
+Registre complet des devices assignés à ce renderer, et des scènes qu'ils référencent. Réponse par défaut à
+`renderer.hello`.
 
 ```jsonc
 {
   "v": 1, "type": "sync.full", "id": "…",
   "payload": {
     "state_version": 47,
+    "scenes": [
+      { "scene_id": "…", "version": 12, "width": 64, "height": 32, "target_fps": 30,
+        "config": { "version": 1, "nodes": [] } }
+    ],
     "devices": [
       {
         "device_id": "…",
@@ -139,13 +145,32 @@ Registre complet des devices assignés à ce renderer, avec leurs scènes. Répo
         "panel_type": "hub75",
         "width": 64, "height": 32, "chain_length": 1,
         "brightness": 128,
-        "target_fps": 30,
-        "scene": { "scene_id": "…", "version": 12, "config": { "version": 1, "nodes": [] } }
+        "max_fps": null,
+        "scene_id": "…"
       }
     ]
   }
 }
 ```
+
+**Les scènes sont une section à part, et un device n'en porte que la référence.** Le modèle lie déjà N devices à
+une scène ([DATA-MODEL.md](DATA-MODEL.md#scene)) ; recopier la configuration dans chaque entrée de device aurait
+autorisé deux copies divergentes d'une même scène en une même version, et aurait présenté comme N contenus
+indépendants ce que le renderer doit calculer une seule fois ([ADR-0017](adr/0017-rendu-mutualise.md)).
+
+Une scène porte **sa** géométrie, distincte de celle du device : le renderer l'évalue en natif puis réplique
+chaque pixel en un bloc `k×k`, où `k` est le rapport entier entre les deux
+([ADR-0018](adr/0018-geometrie-native-de-la-scene.md)). Adonis n'assigne jamais une paire dont le rapport n'est
+pas un entier identique sur les deux axes ; le renderer qui en reçoit une malgré tout refuse la scène et
+journalise, il ne redimensionne pas au mieux.
+
+**La cadence est portée par la scène**, `max_fps` n'étant qu'un plafond d'émission par device — `null` la
+plupart du temps ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)). Le renderer évalue à `target_fps` et
+n'émet qu'une frame sur `n = ⌈target_fps / max_fps⌉` vers un device plafonné.
+
+`scene_id` vaut `null` pour un device sans scène assignée — écran noir. Tout `scene_id` référencé par un device
+**doit** figurer dans `scenes` ; un message qui référence une scène absente est rejeté en entier plutôt
+qu'appliqué partiellement. Une scène qu'aucun device ne référence n'est pas envoyée.
 
 Le renderer reçoit **l'empreinte** du token, jamais le token. C'est ce qui rend acceptable sa réplication chez un
 tiers ([DATA-MODEL.md](DATA-MODEL.md#credentials)).
@@ -160,13 +185,15 @@ multi-tenant, cette restriction est la frontière d'isolation entre utilisateurs
 
 ### `sync.delta`
 
-Changements depuis un `state_version` donné, quand Adonis peut les calculer. Même forme, restreinte aux entrées
-modifiées, avec les suppressions listées.
+Changements depuis un `state_version` donné, quand Adonis peut les calculer. Même forme — les deux sections
+`scenes` et `devices` — restreinte aux entrées modifiées, avec les suppressions listées. Une scène modifiée y
+figure **une fois**, quel que soit le nombre de devices qui la référencent.
 
 ### `device.assigned` / `device.unassigned`
 
 Un device entre ou sort du périmètre de ce renderer. À la désassignation, le renderer ferme la connexion du
-device et **purge son entrée de cache**.
+device et **purge son entrée de cache**. Il purge aussi la scène référencée s'il était le dernier device à la
+référencer.
 
 ### `device.revoked`
 
@@ -180,13 +207,26 @@ Le renderer ferme immédiatement la connexion concernée avec `ERROR 0x09` et re
 
 ### `scene.updated`
 
-La scène assignée à un ou plusieurs devices a changé. Porte la configuration complète et sa version — pas un
-diff : une scène est petite, et un diff introduirait un état intermédiaire à gérer.
+Une scène a changé. Le message porte la scène, pas les devices : il est émis **une fois**, et le renderer
+l'applique à tous les devices qui la référencent — il les connaît par son registre.
+
+```jsonc
+{
+  "v": 1, "type": "scene.updated", "id": "…",
+  "payload": { "scene_id": "…", "version": 13, "width": 64, "height": 32, "target_fps": 30,
+               "config": { "version": 1, "nodes": [] } }
+}
+```
+
+La configuration est complète, jamais un diff : une scène est petite, et un diff introduirait un état
+intermédiaire à gérer.
 
 ### `config.updated`
 
-Changement de luminosité ou de cadence sans changement de scène. Se traduit par un `CONFIG` sur le chemin device,
-sans reconnexion.
+Changement de luminosité ou de plafond d'émission sans changement de scène. Se traduit par un `CONFIG` sur le
+chemin device, sans reconnexion. Un changement de **cadence** relève de `scene.updated`, puisque la cadence
+appartient à la scène — mais il produit lui aussi un `CONFIG`, la cadence effective de chaque device en
+dépendant.
 
 ---
 

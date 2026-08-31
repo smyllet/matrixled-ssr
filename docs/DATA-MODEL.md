@@ -49,7 +49,7 @@ Un appareil qui affiche : matériel ou simulateur.
 | `id` | uuid | Clé primaire |
 | `userId` | uuid | Propriétaire |
 | `rendererId` | uuid | Renderer qui sert ce device |
-| `sceneId` | uuid \| null | Scène assignée. `null` = écran noir |
+| `sceneId` | uuid \| null | Scène assignée. `null` = écran noir. La géométrie du device doit être un multiple entier de celle de la scène ([ADR-0018](adr/0018-geometrie-native-de-la-scene.md)) |
 | `name` | string | Nom lisible, 3 à 100 caractères |
 | `tokenHash` | string | Empreinte du secret du credential |
 | `tokenPrefix` | string | Préfixe en clair, unique et indexé |
@@ -58,7 +58,7 @@ Un appareil qui affiche : matériel ou simulateur.
 | `width` / `height` | integer | Géométrie totale en pixels |
 | `chainLength` | integer | Nombre de dalles chaînées |
 | `brightness` | integer | Luminosité de la dalle, 0 à 255. Défaut 128 |
-| `targetFps` | integer | Cadence visée, 1 à 60. Défaut 30 ([ADR-0001](adr/0001-streaming-de-frames.md)) |
+| `maxFps` | integer \| null | Plafond d'émission, 1 à 60. `null` = aucun plafond, valeur par défaut ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)) |
 | `offlineGrace` | integer \| null | Secondes pendant lesquelles le renderer peut servir ce device sans contact avec la plateforme. `null` = illimité. Défaut 604 800, soit 7 jours ([ADR-0015](adr/0015-bail-de-session-device.md)) |
 | `firmwareVersion` | string \| null | Déclarée par le device |
 | `protocolVersion` | integer \| null | Déclarée par le device |
@@ -71,8 +71,11 @@ Un appareil qui affiche : matériel ou simulateur.
 
 - `width × height ≤ 65 536`. La limite dérive de l'index de pixel sur 16 bits du protocole
   ([PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md)), soit 256×256 au maximum.
-- `1 ≤ targetFps ≤ 60`. Bornée à l'écriture : la valeur part telle quelle vers le renderer puis vers le device,
-  et rien en aval ne la revalide.
+- `1 ≤ maxFps ≤ 60` quand il n'est pas `null`. Borné à l'écriture, comme la cadence de la scène : la valeur part
+  telle quelle vers le renderer puis vers le device, et rien en aval ne la revalide.
+- La cadence n'appartient pas au device : il n'en pose qu'un plafond. Un device plafonné reçoit une frame sur
+  `n = ⌈scene.targetFps / maxFps⌉`, donc une cadence effective qui est un **sous-multiple exact** de celle de la
+  scène ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)).
 - `offlineGrace` est le curseur entre révocation rapide et autonomie longue. Le mettre à `null` rend la fenêtre
   d'exposition de ce device infinie : c'est un choix légitime pour une dalle sans donnée sensible, jamais un
   défaut.
@@ -90,9 +93,24 @@ Un contenu à afficher.
 | `id` | uuid | Clé primaire |
 | `userId` | uuid | Propriétaire |
 | `name` | string | Nom lisible, 3 à 100 caractères |
+| `width` / `height` | integer | Géométrie native, celle pour laquelle la scène est écrite ([ADR-0018](adr/0018-geometrie-native-de-la-scene.md)) |
+| `targetFps` | integer | Cadence à laquelle la scène est évaluée, 1 à 60. Défaut 30 ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)) |
 | `config` | jsonb | Configuration versionnée et validée |
 | `version` | integer | Incrémenté à chaque modification, sert au diff du plan de contrôle |
 | `createdAt` / `updatedAt` | timestamptz | |
+
+**Règles**
+
+- `width × height ≤ 65 536`, comme pour un device : une scène plus grande que le maximum du protocole ne
+  pourrait être affichée nulle part.
+- `1 ≤ targetFps ≤ 60`. C'est la scène qui décide de sa cadence : une horloge n'a rien à recalculer trente fois
+  par seconde, un texte défilant si.
+- Une scène ne peut être assignée qu'à un device dont la géométrie est un **multiple entier de la sienne, de
+  même facteur sur les deux axes** — `device.width = k × scene.width` et `device.height = k × scene.height`,
+  `k` entier ≥ 1. Le renderer réplique alors chaque pixel en un bloc `k×k`
+  ([ADR-0018](adr/0018-geometrie-native-de-la-scene.md)).
+- Changer la géométrie d'un device ou d'une scène doit être refusé, ou désassigner explicitement : une paire
+  incompatible ne reste jamais en base.
 
 ### Configuration de scène
 
@@ -161,6 +179,8 @@ Le découpage :
 |------------------|-------------|
 | `id`, `name`, `width`, `height`, `userId` | `devices` |
 | `config`, `userId` | `scenes`, avec un nom dérivé de celui de la matrice |
+| `width`, `height` | recopiés aussi dans `scenes` : la scène migrée a la géométrie de la matrice, donc `k = 1` |
+| — | aucune cadence à migrer : `scenes.targetFps` prend son défaut de 30, `devices.maxFps` reste `null` |
 | — | `devices.sceneId` pointe vers la scène créée |
 | — | `devices.rendererId` pointe vers le renderer par défaut |
 | — | `devices.tokenHash` doit être régénéré : aucun token n'existe dans le schéma actuel |

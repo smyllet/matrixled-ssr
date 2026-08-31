@@ -60,4 +60,7 @@ garanti par le compilateur.
 - **La capacité d'un renderer se raisonne en cœurs.** Ajouter des devices consomme du CPU parallèle ; la montée
   en charge se fait d'abord en cœurs sur un renderer, puis en ajoutant des renderers. Ni l'un ni l'autre
   n'impose de changement de code.
+- Le « par device » de cet ADR est le **pire cas** : N devices affichant N scènes distinctes. Des devices
+  équivalents partagent leur calcul et ne comptent que pour un ([ADR-0017](0017-rendu-mutualise.md)). C'est ce
+  pire cas qui dimensionne, et c'est lui qui justifie le choix de Go.
 - Un binaire Go statique se distribue sans runtime, ce qui simplifie l'auto-hébergement.

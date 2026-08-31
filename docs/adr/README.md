@@ -35,3 +35,6 @@ rouvre en refaisant toute l'analyse.
 | [0014](0014-sources-de-donnees-cote-adonis.md) | Les sources de données appartiennent à Adonis | Proposé |
 | [0015](0015-bail-de-session-device.md) | Bail de session device, borné par l'absence de contact | Accepté |
 | [0016](0016-transports-declares-par-le-renderer.md) | Le renderer déclare ses transports | Accepté |
+| [0017](0017-rendu-mutualise.md) | Rendu mutualisé par groupe de devices équivalents | Accepté |
+| [0018](0018-geometrie-native-de-la-scene.md) | La scène porte sa géométrie native, agrandissement entier | Accepté |
+| [0019](0019-cadence-portee-par-la-scene.md) | La cadence appartient à la scène, le device en pose le plafond | Accepté |

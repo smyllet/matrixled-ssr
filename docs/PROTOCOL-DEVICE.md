@@ -208,11 +208,14 @@ luminosité seul se transmet par `CONFIG`.
 | 2 | 2 | u16 | `width` faisant autorité |
 | 4 | 2 | u16 | `height` faisant autorité |
 | 6 | 1 | u8 | `brightness` (0–255) |
-| 7 | 1 | u8 | `target_fps` — 1 à 60 ([ADR-0001](adr/0001-streaming-de-frames.md)) |
+| 7 | 1 | u8 | `target_fps` — cadence **effective** de ce device, 1 à 60 ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)) |
 | 8 | 2 | u16 | `status_interval_s` — période des `STATUS_UPDATE` |
 | 10 | 4 | u32 | `session_id` |
 
 **Total = 14 octets**
+
+La cadence transmise ici est celle de la scène, éventuellement divisée par le plafond du device. Le calcul est
+fait par Adonis : le device reçoit un seul chiffre et n'arbitre rien.
 
 `CONFIG` peut être renvoyé à tout moment pour modifier luminosité ou cadence sans rouvrir la connexion. Un
 changement de géométrie, lui, impose une reconnexion.

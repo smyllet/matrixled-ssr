@@ -19,7 +19,7 @@ Deux modèles de diffusion s'opposaient donc :
 l'écrire sur la dalle.
 
 La cadence **visée est 30 FPS**, et c'est la valeur par défaut — mais elle est un **réglage par device**, pas une
-constante du protocole : `devices.targetFps`, entre **1 et 60**. Le renderer la reçoit dans `sync.full`
+constante du protocole : entre **1 et 60**. Le renderer la reçoit dans `sync.full`
 ([PROTOCOL-CONTROL.md](../PROTOCOL-CONTROL.md)) et l'impose au device dans `CONFIG`, qui peut être renvoyé à tout
 moment pour la modifier sans rouvrir la connexion ([PROTOCOL-DEVICE.md](../PROTOCOL-DEVICE.md#0x04--config)).
 
@@ -45,7 +45,7 @@ un seul parseur. Elle a été écartée au profit du streaming simple, plus dire
   proportionnel. Un contenu qui change lentement — une horloge, une donnée relevée à la minute — n'a aucune
   raison d'être servi à 30 FPS. La borne haute à 60 laisse une marge, sans promettre une cadence que le matériel
   de référence n'a jamais démontrée ([HARDWARE.md](../HARDWARE.md)).
-- La cadence est un réglage, donc une valeur à valider et à borner côté plateforme. Un `targetFps` non borné
+- La cadence est un réglage, donc une valeur à valider et à borner côté plateforme. Une cadence non bornée
   transmis à un device est un moyen de le saturer.
 - Un mode différentiel est nécessaire pour rendre ce coût acceptable — voir
   [PROTOCOL-DEVICE.md](../PROTOCOL-DEVICE.md).

@@ -19,7 +19,8 @@ DELTA  = 7  + 5 × pixels_modifiés     octets
 ```
 
 **Les débits ci-dessous sont donnés à 30 FPS parce que c'est la cadence par défaut, pas parce qu'elle est
-figée.** `targetFps` se règle par device, de 1 à 60 ([ADR-0001](adr/0001-streaming-de-frames.md)) ; la taille
+figée.** La cadence se règle par scène, de 1 à 60, et se plafonne par device
+([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)) ; la taille
 d'une frame n'en dépend pas, le débit lui est directement proportionnel. Un device à 10 FPS consomme le tiers de
 la ligne correspondante, un device à 60 FPS le double.
 
@@ -76,6 +77,11 @@ C'est le coût assumé de [ADR-0001](adr/0001-streaming-de-frames.md), et la rai
 | **Total** | **28 ms** — marge 5 ms |
 
 Ces valeurs servent à décider où regarder quand la cadence décroche, pas à affirmer que la cadence tient.
+
+**Cette répartition est donnée à la cadence par défaut, pas à toutes.** À 60 FPS la frame ne dispose plus
+que de 16,7 ms et le total ci-dessus est dépassé : un device réglé au-delà de 30 FPS n'est pas couvert par
+ce budget. Le reprendre par cadence n'aurait pas de sens avant d'avoir mesuré, puisqu'aucune de ces lignes
+n'a été relevée — voir [À remplir](#à-remplir).
 
 ## Architecture temps réel du firmware — budget
 

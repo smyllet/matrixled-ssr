@@ -20,8 +20,13 @@ existe deux sortes, qui parlent le même protocole :
 **Device** — Un appareil qui affiche : un Matrix Portal S3, ou un simulateur. Porte une identité, un credential,
 une géométrie et un état. Un device se connecte à **un** renderer.
 
-**Scene** — Un contenu à afficher, décrit par une configuration versionnée et validée. Une scène est une donnée,
-pas un processus. Plusieurs devices peuvent afficher la même scène.
+**Scene** — Un contenu à afficher, décrit par une configuration versionnée et validée, **pour une géométrie
+donnée**. Une scène est une donnée, pas un processus. Plusieurs devices peuvent afficher la même scène, à
+condition que leur géométrie en soit un multiple entier ([ADR-0018](adr/0018-geometrie-native-de-la-scene.md)).
+
+**Groupe de rendu** — L'ensemble des devices qui affichent une même scène, et pour lesquels le renderer ne
+calcule donc qu'une seule frame — quitte à l'agrandir ou à l'espacer ensuite pour chacun. C'est une notion interne au renderer : elle n'existe ni
+en base ni dans l'interface ([ADR-0017](adr/0017-rendu-mutualise.md)).
 
 **Simulateur** — Une page du dashboard Nuxt qui remplace le matériel : elle parle le protocole device et peint
 les frames sur un canvas. C'est un **device**, pas une prévisualisation.
