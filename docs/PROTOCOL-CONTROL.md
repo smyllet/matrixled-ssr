@@ -205,6 +205,25 @@ Le credential d'un device n'est plus valide.
 
 Le renderer ferme immédiatement la connexion concernée avec `ERROR 0x09` et retire l'empreinte de son cache.
 
+### `device.credential_rotated`
+
+Le credential d'un device a été remplacé. Le renderer met à jour son entrée de cache et **ferme la connexion en
+cours** avec `ERROR 0x09` : le token qu'elle avait présenté n'est plus valide.
+
+```jsonc
+{
+  "v": 1, "type": "device.credential_rotated", "id": "…",
+  "payload": { "device_id": "…", "token_prefix": "71ce04ba82df", "token_hash": "scrypt$…" }
+}
+```
+
+C'est la réponse à une fuite pour n'importe quel device ([ADR-0012](adr/0012-format-des-tokens.md)), et le moyen
+par lequel le simulateur obtient à l'ouverture un token utilisable, puisque aucun secret n'est relisible
+([ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md)).
+
+Adonis émet cet événement **avant** de rendre le secret à son demandeur, et refuse la rotation quand le renderer
+est hors ligne : un secret que le renderer ne peut pas apprendre ne servirait qu'à détruire le précédent.
+
 ### `scene.updated`
 
 Une scène a changé. Le message porte la scène, pas les devices : il est émis **une fois**, et le renderer

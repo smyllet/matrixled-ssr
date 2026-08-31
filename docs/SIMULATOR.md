@@ -83,9 +83,37 @@ simulateur ne partage son identité avec aucun matériel. Et elle garde sa raiso
 coupure WiFi, l'ancienne socket reste souvent ouverte côté renderer, et sans cette règle le device serait
 incapable de se reconnecter.
 
+## Comment il obtient son token
+
+Un token n'est affiché qu'une fois, à l'appairage, et seule son empreinte est conservée
+([ADR-0012](adr/0012-format-des-tokens.md)) : le dashboard ne peut pas le redonner, il ne l'a plus. Le faire
+ressaisir reviendrait à demander à l'utilisateur d'avoir archivé à la main le credential d'une page de debug
+qu'il ouvre depuis une session déjà authentifiée.
+
+Le dashboard **fait donc tourner le credential** du device simulateur à l'ouverture, et remet le secret frais à
+la page ([ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md)) :
+
+1. `POST /api/v1/devices/:id/credential` — refusé si le device n'appartient pas à l'utilisateur, et refusé aussi
+   si son renderer est hors ligne : le secret frais ne pourrait pas l'atteindre, et l'ancien serait détruit pour
+   rien.
+2. Adonis pousse `device.credential_rotated` au renderer, **puis** rend le token à la page.
+3. La page enchaîne le bootstrap et le `DEVICE_HELLO` habituels, sans rien de spécifique au navigateur.
+
+Le secret reste **en mémoire** dans l'onglet, jamais en `localStorage` : un nouveau est à un clic, le persister
+n'apporterait qu'une exposition.
+
+Deux effets à connaître. Ouvrir le simulateur **invalide l'onglet précédent** sur ce device, dont le token vient
+de mourir. Et le `token_prefix` change à chaque ouverture : il n'identifie donc pas ce device dans les journaux,
+c'est l'`id` qui le fait.
+
+Si le renderer n'a pas encore appliqué la rotation quand la page se présente, le handshake échoue en
+`ERROR 0x04` et le simulateur réessaie quelques fois. Dans cette fenêtre, et dans elle seule, un refus
+d'authentification est transitoire par construction.
+
 ## Attendus fonctionnels
 
-- Sélection d'un device `kind = simulator` parmi ceux de l'utilisateur, et saisie de son token.
+- Sélection d'un device `kind = simulator` parmi ceux de l'utilisateur. **Aucun token à saisir** : il est
+  obtenu par rotation à l'ouverture.
 - Connexion, affichage de la phase de handshake et des erreurs reçues.
 - Rendu des frames sur un canvas, avec zoom — un pixel de dalle occupe plusieurs pixels d'écran.
 - Affichage des compteurs : FPS reçues, dernière séquence, part de `FULL` et de `DELTA`, octets reçus.

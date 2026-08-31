@@ -161,6 +161,10 @@ mxd_71ce04ba82df_4d2f…   device
   ce qui le rattache à une ligne, puisqu'une empreinte salée ne se recherche pas.
 - l'étiquette de tête porte la portée : un token de device présenté sur le canal renderer est rejeté sans même
   vérifier le secret.
+- un credential se **remplace**, il ne se relit pas. La rotation crée un nouveau secret — affiché une fois lui
+  aussi — et invalide immédiatement le précédent. C'est la réponse à une fuite, et le moyen par lequel le
+  simulateur obtient un token utilisable à l'ouverture
+  ([ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md)).
 
 **Une exception : le renderer de la plateforme.** Il n'a pas de propriétaire, donc personne ne peut l'appairer
 depuis l'interface. Son credential est déclaré par le déploiement dans `PLATFORM_RENDERER_TOKEN` et appliqué au

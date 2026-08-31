@@ -91,6 +91,9 @@ Un renderer conforme doit :
 
 - fermer immédiatement la connexion d'un device sur `device.revoked` ;
 - purger l'entrée de son cache ;
+- remplacer l'entrée de cache et fermer la connexion en cours sur `device.credential_rotated`, avec le même
+  code `ERROR 0x09` : le token présenté par cette connexion n'est plus valide
+  ([ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md)) ;
 - horodater son dernier contact de contrôle réussi, et fermer avec `ERROR 0x0A` toute session dont
   l'`offlineGrace` est dépassé depuis cet horodatage — **connexions établies comprises**
   ([ADR-0015](adr/0015-bail-de-session-device.md)).
