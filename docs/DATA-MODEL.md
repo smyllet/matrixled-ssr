@@ -28,7 +28,7 @@ Un moteur de rendu déclaré auprès de la plateforme.
 | `isDefault` | boolean | Renderer assigné par défaut aux nouveaux devices |
 | `version` | string \| null | Version annoncée à la connexion. `null` tant qu'il ne s'est pas connecté |
 | `capabilities` | jsonb \| null | Primitives que ce renderer sait rendre. `null` tant qu'il ne s'est pas connecté |
-| `endpoint` | string \| null | Adresse annoncée, transmise aux devices au bootstrap |
+| `endpoints` | jsonb \| null | Adresses annoncées, transmises telles quelles aux devices au bootstrap. Liste : `wss://`, `ws://`, ou les deux ([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)) |
 | `status` | enum | `online` \| `offline` |
 | `lastSeenAt` | timestamptz \| null | Dernière activité sur le canal de contrôle |
 | `createdAt` / `updatedAt` | timestamptz | |
@@ -36,7 +36,7 @@ Un moteur de rendu déclaré auprès de la plateforme.
 **Règles**
 
 - Exactement un renderer porte `isDefault = true` et `ownerId = null`.
-- `version`, `capabilities` et `endpoint` sont **déclarés par le renderer** à sa connexion. Ce sont des données
+- `version`, `capabilities` et `endpoints` sont **déclarés par le renderer** à sa connexion. Ce sont des données
   non fiables : Adonis les valide et les borne avant de les persister.
 - `status` et `lastSeenAt` sont dérivés de l'état de la connexion de contrôle, jamais renseignés par une requête.
 
@@ -49,14 +49,17 @@ Un appareil qui affiche : matériel ou simulateur.
 | `id` | uuid | Clé primaire |
 | `userId` | uuid | Propriétaire |
 | `rendererId` | uuid | Renderer qui sert ce device |
-| `sceneId` | uuid \| null | Scène assignée. `null` = écran noir |
+| `sceneId` | uuid \| null | Scène assignée. `null` = écran noir. La géométrie du device doit être un multiple entier de celle de la scène ([ADR-0018](adr/0018-geometrie-native-de-la-scene.md)) |
 | `name` | string | Nom lisible, 3 à 100 caractères |
 | `tokenHash` | string | Empreinte du secret du credential |
 | `tokenPrefix` | string | Préfixe en clair, unique et indexé |
 | `panelType` | enum | `hub75` — seule valeur supportée ([ADR-0005](adr/0005-hub75-dabord.md)) |
-| `isSimulator` | boolean | Distingue un simulateur dans l'interface |
+| `kind` | enum | `hardware` \| `simulator`. Nature du device, choisie à la création et non modifiable ensuite ([ADR-0020](adr/0020-simulateur-device-declare.md)) |
 | `width` / `height` | integer | Géométrie totale en pixels |
 | `chainLength` | integer | Nombre de dalles chaînées |
+| `brightness` | integer | Luminosité de la dalle, 0 à 255. Défaut 128 |
+| `maxFps` | integer \| null | Plafond d'émission, 1 à 60. `null` = aucun plafond, valeur par défaut ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)) |
+| `offlineGrace` | integer \| null | Secondes pendant lesquelles le renderer peut servir ce device sans contact avec la plateforme. `null` = illimité. Défaut 604 800, soit 7 jours ([ADR-0015](adr/0015-bail-de-session-device.md)) |
 | `firmwareVersion` | string \| null | Déclarée par le device |
 | `protocolVersion` | integer \| null | Déclarée par le device |
 | `status` | enum | `online` \| `offline` \| `error` |
@@ -68,7 +71,21 @@ Un appareil qui affiche : matériel ou simulateur.
 
 - `width × height ≤ 65 536`. La limite dérive de l'index de pixel sur 16 bits du protocole
   ([PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md)), soit 256×256 au maximum.
-- `width` et `height` sont strictement positifs et multiples de la géométrie d'une dalle.
+- `1 ≤ maxFps ≤ 60` quand il n'est pas `null`. Borné à l'écriture, comme la cadence de la scène : la valeur part
+  telle quelle vers le renderer puis vers le device, et rien en aval ne la revalide.
+- La cadence n'appartient pas au device : il n'en pose qu'un plafond. Un device plafonné reçoit une frame sur
+  `n = ⌈scene.targetFps / maxFps⌉`, donc une cadence effective qui est un **sous-multiple exact** de celle de la
+  scène ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)).
+- `offlineGrace` est le curseur entre révocation rapide et autonomie longue. Le mettre à `null` rend la fenêtre
+  d'exposition de ce device infinie : c'est un choix légitime pour une dalle sans donnée sensible, jamais un
+  défaut.
+- `width` et `height` sont strictement positifs.
+- `kind` se choisit à la création et ne change plus. Un device simulateur n'est pas une dalle qu'un onglet
+  remplace : c'est un device à part entière, avec son token et sa géométrie, et le simulateur ne propose que les
+  devices `kind = simulator` ([ADR-0020](adr/0020-simulateur-device-declare.md)).
+- `kind` **ne voyage pas sur le plan de contrôle** : le renderer l'ignore, et le doit. La règle est tenue par
+  l'API et le dashboard ; ce n'est pas une frontière d'authentification, rien dans le protocole device ne
+  distinguant un navigateur d'un firmware.
 - `firmwareVersion`, `protocolVersion`, `status`, `lastSeenAt` et `ipAddress` sont **observés**, jamais saisis.
 - Un device appartient à un utilisateur ; son renderer peut appartenir à un autre utilisateur uniquement s'il
   s'agit du renderer de la plateforme.
@@ -82,9 +99,24 @@ Un contenu à afficher.
 | `id` | uuid | Clé primaire |
 | `userId` | uuid | Propriétaire |
 | `name` | string | Nom lisible, 3 à 100 caractères |
+| `width` / `height` | integer | Géométrie native, celle pour laquelle la scène est écrite ([ADR-0018](adr/0018-geometrie-native-de-la-scene.md)) |
+| `targetFps` | integer | Cadence à laquelle la scène est évaluée, 1 à 60. Défaut 30 ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)) |
 | `config` | jsonb | Configuration versionnée et validée |
 | `version` | integer | Incrémenté à chaque modification, sert au diff du plan de contrôle |
 | `createdAt` / `updatedAt` | timestamptz | |
+
+**Règles**
+
+- `width × height ≤ 65 536`, comme pour un device : une scène plus grande que le maximum du protocole ne
+  pourrait être affichée nulle part.
+- `1 ≤ targetFps ≤ 60`. C'est la scène qui décide de sa cadence : une horloge n'a rien à recalculer trente fois
+  par seconde, un texte défilant si.
+- Une scène ne peut être assignée qu'à un device dont la géométrie est un **multiple entier de la sienne, de
+  même facteur sur les deux axes** — `device.width = k × scene.width` et `device.height = k × scene.height`,
+  `k` entier ≥ 1. Le renderer réplique alors chaque pixel en un bloc `k×k`
+  ([ADR-0018](adr/0018-geometrie-native-de-la-scene.md)).
+- Changer la géométrie d'un device ou d'une scène doit être refusé, ou désassigner explicitement : une paire
+  incompatible ne reste jamais en base.
 
 ### Configuration de scène
 
@@ -129,6 +161,10 @@ mxd_71ce04ba82df_4d2f…   device
   ce qui le rattache à une ligne, puisqu'une empreinte salée ne se recherche pas.
 - l'étiquette de tête porte la portée : un token de device présenté sur le canal renderer est rejeté sans même
   vérifier le secret.
+- un credential se **remplace**, il ne se relit pas. La rotation crée un nouveau secret — affiché une fois lui
+  aussi — et invalide immédiatement le précédent. C'est la réponse à une fuite, et le moyen par lequel le
+  simulateur obtient un token utilisable à l'ouverture
+  ([ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md)).
 
 **Une exception : le renderer de la plateforme.** Il n'a pas de propriétaire, donc personne ne peut l'appairer
 depuis l'interface. Son credential est déclaré par le déploiement dans `PLATFORM_RENDERER_TOKEN` et appliqué au
@@ -153,6 +189,9 @@ Le découpage :
 |------------------|-------------|
 | `id`, `name`, `width`, `height`, `userId` | `devices` |
 | `config`, `userId` | `scenes`, avec un nom dérivé de celui de la matrice |
+| `width`, `height` | recopiés aussi dans `scenes` : la scène migrée a la géométrie de la matrice, donc `k = 1` |
+| — | aucune cadence à migrer : `scenes.targetFps` prend son défaut de 30, `devices.maxFps` reste `null` |
+| — | `devices.kind` vaut `hardware` : une matrice existante décrit du matériel |
 | — | `devices.sceneId` pointe vers la scène créée |
 | — | `devices.rendererId` pointe vers le renderer par défaut |
 | — | `devices.tokenHash` doit être régénéré : aucun token n'existe dans le schéma actuel |

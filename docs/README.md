@@ -1,5 +1,10 @@
 # Documentation technique
 
+> **Ces documents décrivent l'architecture cible, que le code n'implémente aujourd'hui qu'en partie.** `Renderer`
+> existe ; `Matrix` est encore là où les specs parlent de `Device` et de `Scene` ; le renderer Go, le protocole
+> binaire et le firmware n'existent pas. L'écart se lit dans les [issues](#travaux-en-cours), et il est censé se
+> réduire : une spec et un code qui divergent sont un défaut, pas un état de fait.
+
 ## Par où commencer
 
 1. **[GLOSSARY.md](GLOSSARY.md)** — le vocabulaire. Court, et il évite les contresens sur tout le reste.
@@ -14,7 +19,7 @@
 |----------|---------|
 | [GLOSSARY.md](GLOSSARY.md) | Vocabulaire du projet — un terme, un sens |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Topologie, plans contrôle/données, frontière de confiance, bootstrap |
-| [adr/](adr/) | Les 11 décisions d'architecture, avec leurs alternatives écartées |
+| [adr/](adr/) | Les décisions d'architecture, une par fichier, avec leurs alternatives écartées |
 
 ### Spécifications
 
@@ -38,9 +43,10 @@
 | | |
 |---|---|
 | Matériel de référence | Adafruit MatrixPortal S3 + dalle HUB75 64×32 |
-| Cadence cible | 30 FPS |
-| Frame complète 64×32 | 6 154 octets, soit 1,48 Mbit/s en flux permanent |
+| Cadence | 30 FPS par défaut, réglée **par scène** de 1 à 60, plafonnée par device ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)) |
+| Frame complète 64×32 | 6 153 octets, soit 1,48 Mbit/s en flux permanent |
 | Géométrie maximale | 65 536 pixels (256×256), limite du protocole |
+| Scène → device | même géométrie, ou un multiple entier `k` identique sur les deux axes ([ADR-0018](adr/0018-geometrie-native-de-la-scene.md)) |
 | Ports | Nuxt 3000, Adonis 3333, renderer 8889, PostgreSQL 5432 |
 
 ## Conventions
@@ -76,11 +82,20 @@ en anglais, comme le reste du dépôt.
 
 ## Ce qui reste ouvert
 
-Deux sujets sont volontairement non spécifiés. Le mécanisme et le point d'extension sont en place, les valeurs
-viendront avec les fonctionnalités :
+**Volontairement non spécifié.** Le mécanisme et le point d'extension sont en place, les valeurs viendront avec
+les fonctionnalités :
 
 - **Le catalogue de primitives de scène.** L'enveloppe est versionnée et validée
   ([DATA-MODEL.md](DATA-MODEL.md#configuration-de-scène)), son contenu reste ouvert.
 - **Le vocabulaire de capacités.** Le mécanisme de négociation est spécifié
   ([PROTOCOL-CONTROL.md](PROTOCOL-CONTROL.md#négociation-de-capacités)), les valeurs se rempliront au fil des
   primitives ajoutées.
+
+**Non tranché.** Ces points sont consignés là où ils se poseront, pour être rouverts en lisant un fichier :
+
+| Sujet | Où |
+|-------|-----|
+| Les sources de données appartiennent à Adonis — décision encore `Proposé`, rien ne s'y conforme | [ADR-0014](adr/0014-sources-de-donnees-cote-adonis.md) |
+| L'agrandissement `k×k` est fait par le renderer, donc payé sur le lien le plus contraint | [ADR-0018](adr/0018-geometrie-native-de-la-scene.md) |
+| Ce que fait un renderer d'un device qui remonte des FPS très inférieures à sa cadence effective | [ADR-0019](adr/0019-cadence-portee-par-la-scene.md) |
+| Le plan de contrôle n'a aucun accusé de réception, d'où une fenêtre de course après une rotation | [ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md) |

@@ -38,5 +38,7 @@ implémentation de référence fidèle.
   laisser des sockets non authentifiées ouvertes.
 - Le simulateur reste une implémentation de référence fidèle du protocole
   ([SIMULATOR.md](../SIMULATOR.md)).
-- Corollaire à spécifier : **une seule connexion active par device**. Simulateur et matériel peuvent revendiquer
-  le même device, et après une coupure WiFi l'ancienne socket est souvent encore ouverte côté renderer.
+- Corollaire à spécifier : **une seule connexion active par device**. Après une coupure WiFi, l'ancienne socket
+  reste souvent ouverte côté renderer, et sans cette règle le device ne pourrait pas se reconnecter. Cette
+  conséquence invoquait aussi la concurrence entre simulateur et matériel sur un même device ;
+  [ADR-0020](0020-simulateur-device-declare.md) l'a fait disparaître en donnant au simulateur son propre device.

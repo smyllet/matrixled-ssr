@@ -73,6 +73,12 @@ capacités affichera un résultat faux au lieu de refuser une scène.
 | `max_devices` | Nombre de devices servis simultanément |
 | `max_pixels_per_device` | Plafond de géométrie. Ne peut excéder 65 536 ([PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md)) |
 
+Le renderer déclare en outre ses **`endpoints`** : les adresses auxquelles ses devices peuvent le joindre,
+`wss://`, `ws://`, ou les deux ([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)). Sur un réseau
+local, `ws://` en clair est un choix assumé : sans certificat reconnu, un `wss://` auto-signé non épinglé
+n'apporte que du chiffrement, pas d'authentification. Déclarer aussi un `wss://` avec un certificat reconnu est
+ce qui rend le renderer atteignable depuis le simulateur du dashboard hébergé ([SIMULATOR.md](SIMULATOR.md)).
+
 Adonis refuse d'assigner ce que ces capacités ne couvrent pas, et remonte la cause à l'utilisateur.
 **Un refus explicite vaut mieux qu'un affichage faux.**
 
@@ -85,22 +91,34 @@ Un renderer conforme doit :
 
 - fermer immédiatement la connexion d'un device sur `device.revoked` ;
 - purger l'entrée de son cache ;
-- faire expirer les entrées non revalidées au-delà de leur durée de validité.
+- remplacer l'entrée de cache et fermer la connexion en cours sur `device.credential_rotated`, avec le même
+  code `ERROR 0x09` : le token présenté par cette connexion n'est plus valide
+  ([ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md)) ;
+- horodater son dernier contact de contrôle réussi, et fermer avec `ERROR 0x0A` toute session dont
+  l'`offlineGrace` est dépassé depuis cet horodatage — **connexions établies comprises**
+  ([ADR-0015](adr/0015-bail-de-session-device.md)). Cet horodatage doit survivre à un redémarrage : sinon
+  relancer le renderer remet le bail à zéro, et la borne ne borne plus rien
+  ([ADR-0008](adr/0008-renderer-autonome.md)).
 
 ## Fonctionnement hors ligne
 
 Quand la plateforme est injoignable, un renderer conforme :
 
-- **continue de servir** les devices déjà authentifiés, sur son dernier état connu ;
-- **continue d'accepter** les connexions de devices dont l'empreinte est en cache et non expirée ;
+- **continue de servir** les devices déjà authentifiés dont le bail court encore, sur son dernier état connu ;
+- **continue d'accepter** les connexions de devices dont l'empreinte est en cache et le bail valide ;
 - **refuse** les devices inconnus de son cache ;
+- **coupe** les devices dont le bail a expiré, avec `ERROR 0x0A` ;
 - accumule l'état à remonter et le rejoue à la reconnexion ;
 - reconnecte avec un retrait exponentiel plafonné.
 
-Il ne doit **jamais** éteindre ses dalles parce que la plateforme ne répond plus. C'est la raison d'être de
-l'auto-hébergement, et cela compense la fragilité introduite par
+Il ne doit **jamais** éteindre une dalle du seul fait que la plateforme ne répond plus. C'est la raison d'être
+de l'auto-hébergement, et cela compense la fragilité introduite par
 [ADR-0001](adr/0001-streaming-de-frames.md) — sans quoi une panne distante noircirait un écran posé à trois
 mètres de son serveur.
+
+La seule extinction admise est l'**expiration du bail** ([ADR-0015](adr/0015-bail-de-session-device.md)), et
+elle ne s'y substitue pas : son défaut de sept jours dépasse toute panne réaliste. Une dalle qui s'éteint au
+bout de quelques minutes de coupure est un renderer mal configuré, pas un renderer conforme.
 
 ## Le renderer par défaut est multi-tenant
 

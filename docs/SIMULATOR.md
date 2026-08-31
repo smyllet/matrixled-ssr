@@ -1,10 +1,11 @@
 # Simulateur
 
-> Décision liée : [ADR-0011](adr/0011-auth-premier-message.md).
+> Décisions liées : [ADR-0011](adr/0011-auth-premier-message.md) (authentification),
+> [ADR-0020](adr/0020-simulateur-device-declare.md) (un device déclaré).
 > Protocole implémenté : [PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md).
 
-Une page web de debug qui **remplace le matériel** : elle parle le protocole device au renderer et peint les
-frames reçues sur un canvas.
+Une page web de debug qui **tient le rôle du matériel** : elle parle le protocole device au renderer et peint
+les frames reçues sur un canvas.
 
 ## Ce que c'est, et ce que ce n'est pas
 
@@ -54,26 +55,65 @@ pas. Cette règle fait partie de la relecture de conformité de
 
 ## Place dans le modèle
 
-Un simulateur est un `Device` du registre comme un autre : token, géométrie, renderer assigné. Le drapeau
-`isSimulator` sert uniquement à le distinguer dans l'interface.
+Un simulateur est un `Device` du registre comme un autre : token, géométrie, renderer assigné. Il se **déclare**
+comme tel — `kind = simulator`, choisi à la création — et n'emprunte l'identité d'aucune dalle
+([ADR-0020](adr/0020-simulateur-device-declare.md)).
 
-**Aucun cas particulier côté renderer.** Il n'a pas à savoir s'il parle à du silicium ou à un onglet — c'est
-d'ailleurs la condition pour que le simulateur teste quelque chose d'utile.
+C'est ce qui sépare observer de déranger. Pour voir ce qu'affiche une dalle, on crée un device simulateur et on
+lui assigne la même scène : le renderer les place dans le **même groupe de rendu**
+([ADR-0017](adr/0017-rendu-mutualise.md)) et ne calcule qu'une frame pour les deux. À géométrie et `maxFps`
+identiques, le simulateur reçoit donc ce que reçoit la dalle — au `sequence` près, qui appartient à chaque
+connexion, et à l'arbitrage `FULL`/`DELTA` près, qui dépend de l'historique de chacune.
+
+Ce n'est pas pour autant un miroir de la connexion de la dalle : un défaut qui ne se produit que sur *sa* socket
+ne se voit pas ici.
+
+**Aucun cas particulier côté renderer.** `kind` ne lui est même pas transmis : il n'a pas à savoir s'il parle à
+du silicium ou à un onglet — c'est d'ailleurs la condition pour que le simulateur teste quelque chose d'utile.
 
 ## Interaction avec la règle de connexion unique
 
-Simulateur et matériel peuvent revendiquer le même device. La règle **une seule connexion active par device**
-([PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md#une-seule-connexion-active-par-device)) devient donc immédiatement
-observable : ouvrir le simulateur sur un device allumé coupe la dalle, et inversement.
+La règle **une seule connexion active par device**
+([PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md#une-seule-connexion-active-par-device)) vaut pour le simulateur comme
+pour le reste : deux onglets ouverts sur le même device simulateur se coupent l'un l'autre, le dernier arrivé
+gagnant.
 
-Ce n'est pas un effet de bord regrettable, c'est le comportement voulu, et le simulateur le rend visible au lieu
-de le laisser dormir jusqu'au jour où un ESP32 se reconnecte après une coupure WiFi.
+Elle reste donc immédiatement observable, mais sans qu'ouvrir le simulateur n'éteigne une dalle — un device
+simulateur ne partage son identité avec aucun matériel. Et elle garde sa raison d'être propre : après une
+coupure WiFi, l'ancienne socket reste souvent ouverte côté renderer, et sans cette règle le device serait
+incapable de se reconnecter.
 
-Pour observer un device sans le déranger, il faut créer un second device dédié.
+## Comment il obtient son token
+
+Un token n'est affiché qu'une fois, à l'appairage, et seule son empreinte est conservée
+([ADR-0012](adr/0012-format-des-tokens.md)) : le dashboard ne peut pas le redonner, il ne l'a plus. Le faire
+ressaisir reviendrait à demander à l'utilisateur d'avoir archivé à la main le credential d'une page de debug
+qu'il ouvre depuis une session déjà authentifiée.
+
+Le dashboard **fait donc tourner le credential** du device simulateur à l'ouverture, et remet le secret frais à
+la page ([ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md)) :
+
+1. `POST /api/v1/devices/:id/credential` — refusé si le device n'appartient pas à l'utilisateur, et refusé aussi
+   si son renderer est hors ligne : le secret frais ne pourrait pas l'atteindre, et l'ancien serait détruit pour
+   rien.
+2. Adonis pousse `device.credential_rotated` au renderer, **puis** rend le token à la page.
+3. La page enchaîne le bootstrap et le `DEVICE_HELLO` habituels, sans rien de spécifique au navigateur.
+
+Le secret reste **en mémoire** dans l'onglet, jamais en `localStorage` : un nouveau est à un clic, le persister
+n'apporterait qu'une exposition.
+
+Deux effets à connaître. Ouvrir le simulateur **invalide l'onglet précédent** sur ce device, dont le token vient
+de mourir. Et le `token_prefix` change à chaque ouverture : il n'identifie donc pas ce device dans les journaux,
+c'est l'`id` qui le fait.
+
+Si le renderer n'a pas encore appliqué la rotation quand la page se présente, le handshake échoue en
+`ERROR 0x04` et le simulateur réessaie quelques fois. Dans cette fenêtre, et dans elle seule, un refus
+d'authentification est transitoire par construction.
 
 ## Attendus fonctionnels
 
-- Saisie ou sélection d'un device et de son token.
+- Sélection d'un device `kind = simulator` parmi ceux de l'utilisateur. **Aucun token à saisir** : il est
+  obtenu par rotation à l'ouverture.
 - Connexion, affichage de la phase de handshake et des erreurs reçues.
 - Rendu des frames sur un canvas, avec zoom — un pixel de dalle occupe plusieurs pixels d'écran.
 - Affichage des compteurs : FPS reçues, dernière séquence, part de `FULL` et de `DELTA`, octets reçus.
@@ -88,3 +128,23 @@ dire précisément la partie que le matériel rend pénible à observer.
 Une page du dashboard Nuxt, derrière l'authentification utilisateur. Elle récupère l'adresse du renderer par le
 même mécanisme de bootstrap que le matériel, ce qui exerce aussi ce chemin
 ([ADR-0009](adr/0009-bootstrap-par-redirection.md)).
+
+## Ce qu'il peut atteindre
+
+Le simulateur est soumis aux règles du navigateur, que le firmware ne connaît pas : une page servie en HTTPS ne
+peut ouvrir ni un `ws://`, ni un `wss://` dont le certificat n'est pas reconnu.
+
+Il ne propose donc que les `renderer_urls` compatibles avec **l'origine de la page qui le sert**
+([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)) :
+
+| Le simulateur est servi depuis | Il peut atteindre |
+|--------------------------------|-------------------|
+| `http://localhost:3000` — développement | tout : `ws://` comme `wss://`, y compris un renderer auto-hébergé sur le réseau local |
+| Le dashboard hébergé, en HTTPS | uniquement les renderers déclarant `wss://` avec un certificat reconnu — en pratique celui de la plateforme |
+
+Le cas qui justifie le simulateur — développer le renderer et le dashboard sans matériel — tombe dans la
+première ligne. La contrainte ne mord que sur le dashboard hébergé.
+
+Quand aucune URL n'est utilisable, le simulateur doit le **dire** plutôt que d'échouer à la connexion : Adonis ne
+peut pas vérifier ce qu'un renderer déclare, donc un `wss://` annoncé peut très bien présenter un certificat que
+le navigateur refuse. Nommer la cause probable vaut mieux qu'une socket qui se ferme sans explication.

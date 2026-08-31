@@ -15,8 +15,16 @@ Deux modèles de diffusion s'opposaient donc :
 
 ## Décision
 
-**Streaming de frames binaires à 30 FPS.** Le renderer calcule chaque frame et l'envoie au device, qui se
-contente de l'écrire sur la dalle.
+**Streaming de frames binaires.** Le renderer calcule chaque frame et l'envoie au device, qui se contente de
+l'écrire sur la dalle.
+
+La cadence **visée est 30 FPS**, et c'est la valeur par défaut — mais elle est un **réglage par device**, pas une
+constante du protocole : entre **1 et 60**. Le renderer la reçoit dans `sync.full`
+([PROTOCOL-CONTROL.md](../PROTOCOL-CONTROL.md)) et l'impose au device dans `CONFIG`, qui peut être renvoyé à tout
+moment pour la modifier sans rouvrir la connexion ([PROTOCOL-DEVICE.md](../PROTOCOL-DEVICE.md#0x02--config)).
+
+Le choix du streaming ne dépend pas du chiffre : ce qui l'oppose au clip pré-rendu, c'est que le contenu d'une
+frame soit décidé à l'instant où elle part, pas la fréquence à laquelle elle part.
 
 ## Alternative écartée
 
@@ -31,8 +39,14 @@ un seul parseur. Elle a été écartée au profit du streaming simple, plus dire
 
 ## Conséquences
 
-- La bande passante devient une contrainte de conception permanente : ~185 KB/s par matrice 64×32 à 30 FPS.
+- La bande passante devient une contrainte de conception permanente : ~185 kB/s par device 64×32 à 30 FPS.
   Voir [PERFORMANCE.md](../PERFORMANCE.md).
+- **Baisser la cadence est le premier levier disponible** quand ce coût ne passe pas : le débit lui est
+  proportionnel. Un contenu qui change lentement — une horloge, une donnée relevée à la minute — n'a aucune
+  raison d'être servi à 30 FPS. La borne haute à 60 laisse une marge, sans promettre une cadence que le matériel
+  de référence n'a jamais démontrée ([HARDWARE.md](../HARDWARE.md)).
+- La cadence est un réglage, donc une valeur à valider et à borner côté plateforme. Une cadence non bornée
+  transmis à un device est un moyen de le saturer.
 - Un mode différentiel est nécessaire pour rendre ce coût acceptable — voir
   [PROTOCOL-DEVICE.md](../PROTOCOL-DEVICE.md).
 - **Le device n'affiche plus rien si son renderer est injoignable.** C'est le prix assumé de cette décision, et

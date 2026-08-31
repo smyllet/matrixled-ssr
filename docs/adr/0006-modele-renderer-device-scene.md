@@ -15,7 +15,10 @@ Le mot « matrix » désignait donc, selon la phrase, la dalle physique, l'appar
 
 - `Renderer` — un moteur de rendu, celui de la plateforme ou celui d'un utilisateur.
 - `Device` — un appareil physique : identité, credential, géométrie, état.
-- `Scene` — un contenu : configuration versionnée et validée.
+- `Scene` — un contenu : configuration versionnée et validée, écrite pour une géométrie donnée
+  ([ADR-0018](0018-geometrie-native-de-la-scene.md)). Elle en porte une parce que son contenu est en pixels,
+  pas parce qu'elle appartiendrait à une dalle : elle reste réutilisable sur toutes celles dont la géométrie
+  en est un multiple entier.
 
 ## Alternatives écartées
 

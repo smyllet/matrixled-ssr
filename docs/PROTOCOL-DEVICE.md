@@ -37,11 +37,16 @@ Authorization: Bearer <token device>
 
 ```jsonc
 {
-  "renderer_url": "wss://renderer.example.net:8889",
+  "renderer_urls": ["wss://renderer.example.net:8889", "ws://192.168.1.50:8889"],
   "panel": { "width": 64, "height": 32, "chain": 1 },
   "scene_version": 42
 }
 ```
+
+`renderer_urls` est la liste déclarée par le renderer, transmise telle quelle. **Le client choisit** : un
+firmware retient `wss://` s'il est présent et `ws://` sinon ; le simulateur ne retient que ce que le navigateur
+autorise depuis l'origine de la page qui le sert
+([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)).
 
 Le device **met cette réponse en cache localement** et repart dessus si la plateforme ne répond pas au
 redémarrage suivant. Sans ce cache, une panne de la plateforme empêcherait tout redémarrage, ce qui contredirait
@@ -59,19 +64,19 @@ Device                                              Renderer
   │  ── ouverture WebSocket (aucun credential) ────────▶│
   │                                                     │  démarre le délai
   │                                                     │  d'authentification
-  │  ── 0x03 DEVICE_HELLO (token, version, géométrie) ─▶│
+  │  ── 0x01 DEVICE_HELLO (token, version, géométrie) ─▶│
   │                                                     │  valide l'empreinte
   │                                                     │  vérifie la géométrie
-  │◀─ 0x04 CONFIG (géométrie autoritaire, fps) ─────────│
+  │◀─ 0x02 CONFIG (géométrie autoritaire, fps) ─────────│
   │                                                     │
-  │◀─ 0x01 FULL_FRAME (obligatoire en premier) ─────────│
-  │◀─ 0x02 DELTA_FRAME ─────────────────────────────────│
-  │◀─ 0x02 DELTA_FRAME ─────────────────────────────────│
+  │◀─ 0x03 FULL_FRAME (obligatoire en premier) ─────────│
+  │◀─ 0x04 DELTA_FRAME ─────────────────────────────────│
+  │◀─ 0x04 DELTA_FRAME ─────────────────────────────────│
   │  ── 0x05 STATUS_UPDATE (périodique) ───────────────▶│
   │                                                     │
 ```
 
-**En cas d'échec**, le renderer envoie un `0x08 ERROR` puis ferme la connexion. Il ne laisse jamais une
+**En cas d'échec**, le renderer envoie un `0x06 ERROR` puis ferme la connexion. Il ne laisse jamais une
 connexion non authentifiée ouverte.
 
 ### Authentification
@@ -110,42 +115,99 @@ Cette règle est nécessaire indépendamment du simulateur : après une coupure 
 souvent ouverte côté renderer, et sans cette règle le device se retrouverait incapable de se reconnecter jusqu'à
 expiration du keep-alive TCP.
 
+### Expiration du bail
+
+Le droit de recevoir des frames est un **bail**, borné par l'`offlineGrace` du device
+([ADR-0015](adr/0015-bail-de-session-device.md)). Quand le renderer est resté sans contact avec la plateforme
+plus longtemps que cette durée, il ferme la connexion avec `ERROR 0x0A`, **y compris une connexion établie de
+longue date**. Les reconnexions sont ensuite refusées avec le même code tant que le contact n'est pas rétabli.
+
+`0x0A` n'est ni `0x04` ni `0x09` : le token reste valide, c'est le renderer qui n'est plus en mesure de
+l'affirmer.
+L'état est transitoire et se résout dès que la plateforme redevient joignable. Le device réessaie donc avec un
+retrait exponentiel plafonné, sans considérer son credential comme perdu.
+
 ---
 
 ## Messages
 
+**Les codes suivent l'ordre de la session** : poignée de main, configuration, données, télémétrie, erreur.
+C'est l'ordre dans lequel ce document les décrit, et celui dans lequel une trace les fait apparaître.
+
 | Code | Nom | Sens | Taille |
 |------|-----|------|--------|
-| `0x01` | `FULL_FRAME` | Renderer → Device | 10 + w×h×3 |
-| `0x02` | `DELTA_FRAME` | Renderer → Device | 7 + 5×N |
-| `0x03` | `DEVICE_HELLO` | Device → Renderer | 11 + N |
-| `0x04` | `CONFIG` | Renderer → Device | 14 |
+| `0x01` | `DEVICE_HELLO` | Device → Renderer | 11 + N |
+| `0x02` | `CONFIG` | Renderer → Device | 10 |
+| `0x03` | `FULL_FRAME` | Renderer → Device | 9 + w×h×3 |
+| `0x04` | `DELTA_FRAME` | Renderer → Device | 7 + 5×N |
 | `0x05` | `STATUS_UPDATE` | Device → Renderer | 27 |
-| `0x08` | `ERROR` | Bidirectionnel | 4 + M |
+| `0x06` | `ERROR` | Bidirectionnel | 4 + M |
 
-### 0x01 — FULL_FRAME
+`0x00` n'est le code d'aucun message et ne doit jamais en devenir un : un octet nul est ce qu'on lit d'un tampon
+mal initialisé ou d'une frame tronquée, et c'est la seule valeur dont l'invalidité distingue un bug d'un message.
+
+**Les codes d'erreur forment un espace de nommage distinct.** Le `0x06` de cette table est le message `ERROR` ;
+le `0x06` de la table des codes d'erreur est « version de protocole non supportée ». Rien ne les relie, et une
+implémentation qui les confondrait n'échouerait pas bruyamment.
+
+### 0x01 — DEVICE_HELLO
 
 | Offset | Taille | Type | Champ |
 |--------|--------|------|-------|
 | 0 | 1 | u8 | Type = `0x01` |
+| 1 | 1 | u8 | `protocol_version` (= 1) |
+| 2 | 2 | u16 | `firmware_version` (majeure × 256 + mineure) |
+| 4 | 2 | u16 | `declared_width` |
+| 6 | 2 | u16 | `declared_height` |
+| 8 | 1 | u8 | `panel_type` — `0x00` = HUB75 |
+| 9 | 1 | u8 | `flags` — bit 0 : device simulé |
+| 10 | 1 | u8 | `token_len` (N) |
+| 11 | N | u8[] | `token`, ASCII, **sans terminateur** |
+
+**Total = 11 + N**
+
+### 0x02 — CONFIG
+
+| Offset | Taille | Type | Champ |
+|--------|--------|------|-------|
+| 0 | 1 | u8 | Type = `0x02` |
+| 1 | 1 | u8 | `protocol_version` retenue |
+| 2 | 2 | u16 | `width` faisant autorité |
+| 4 | 2 | u16 | `height` faisant autorité |
+| 6 | 1 | u8 | `brightness` (0–255) |
+| 7 | 1 | u8 | `target_fps` — cadence **effective** de ce device, 1 à 60 ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)) |
+| 8 | 2 | u16 | `status_interval_s` — période des `STATUS_UPDATE` |
+
+**Total = 10 octets**
+
+La cadence transmise ici est celle de la scène, éventuellement divisée par le plafond du device. Le calcul est
+fait par Adonis : le device reçoit un seul chiffre et n'arbitre rien.
+
+`CONFIG` peut être renvoyé à tout moment pour modifier luminosité ou cadence sans rouvrir la connexion. Un
+changement de géométrie, lui, impose une reconnexion.
+
+### 0x03 — FULL_FRAME
+
+| Offset | Taille | Type | Champ |
+|--------|--------|------|-------|
+| 0 | 1 | u8 | Type = `0x03` |
 | 1 | 4 | u32 | `sequence` |
 | 5 | 2 | u16 | `width` |
 | 7 | 2 | u16 | `height` |
-| 9 | 1 | u8 | `brightness` (0–255) |
-| 10 | w×h×3 | u8[] | RGB888, **row-major** |
+| 9 | w×h×3 | u8[] | RGB888, **row-major** |
 
-**Total = 10 + (width × height × 3)** — soit 6 154 octets en 64×32.
+**Total = 9 + (width × height × 3)** — soit 6 153 octets en 64×32.
 
 Ordre des pixels : ligne par ligne, de gauche à droite et de haut en bas. `index = y × width + x`.
 
 Le device **doit** rejeter la frame si `width` ou `height` diffèrent de sa configuration, ou si la taille du
 message ne correspond pas à la formule. C'est la dernière barrière contre un débordement de tampon.
 
-### 0x02 — DELTA_FRAME
+### 0x04 — DELTA_FRAME
 
 | Offset | Taille | Type | Champ |
 |--------|--------|------|-------|
-| 0 | 1 | u8 | Type = `0x02` |
+| 0 | 1 | u8 | Type = `0x04` |
 | 1 | 4 | u32 | `sequence` |
 | 5 | 2 | u16 | `count` (N) |
 | 7 | 5 × N | — | N entrées consécutives |
@@ -164,42 +226,31 @@ Chaque entrée fait 5 octets :
 L'index sur 16 bits **plafonne une dalle à 65 536 pixels**, soit 256×256. Cette limite est structurelle : la
 dépasser impose une version 2 du protocole.
 
-Une `DELTA_FRAME` hérite de la `brightness` de la dernière `FULL_FRAME` ou du dernier `CONFIG`. Un changement de
-luminosité seul se transmet par `CONFIG`.
+**Aucune frame ne porte la luminosité** : elle n'est transportée que par `CONFIG`, qui en est la seule source.
+La faire voyager aussi dans l'en-tête d'une frame imposerait une règle de précédence, et donc un défaut — une
+frame calculée avant un changement de luminosité écraserait le réglage frais en arrivant après lui. La
+luminosité est un réglage du device, pas un attribut de l'image : une scène qui veut fondre au noir assombrit
+ses pixels.
 
-### 0x03 — DEVICE_HELLO
+### Le compteur `sequence`
 
-| Offset | Taille | Type | Champ |
-|--------|--------|------|-------|
-| 0 | 1 | u8 | Type = `0x03` |
-| 1 | 1 | u8 | `protocol_version` (= 1) |
-| 2 | 2 | u16 | `firmware_version` (majeure × 256 + mineure) |
-| 4 | 2 | u16 | `declared_width` |
-| 6 | 2 | u16 | `declared_height` |
-| 8 | 1 | u8 | `panel_type` — `0x00` = HUB75 |
-| 9 | 1 | u8 | `flags` — bit 0 : device simulé |
-| 10 | 1 | u8 | `token_len` (N) |
-| 11 | N | u8[] | `token`, ASCII, **sans terminateur** |
+Les deux types de frame portent le même compteur, et il obéit à trois règles :
 
-**Total = 11 + N**
+- **Il appartient à la connexion d'un device**, pas à la scène ni au groupe de rendu. Le renderer l'incrémente de
+  1 à chaque frame **réellement envoyée à ce device**, quel que soit son type. Un device plafonné
+  ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)) ne voit donc aucun trou : les frames qu'il ne reçoit pas
+  ne lui ont jamais été numérotées. Deux devices d'un même groupe ont des compteurs indépendants, et c'est
+  nécessaire — un compteur partagé rendrait faux le calcul de latence, qui multiplie un écart de séquence par une
+  période de frame.
+- **Il repart de 0 à chaque connexion**, sur la `FULL_FRAME` obligatoire qui ouvre la session. Le device n'a donc
+  aucun état à conserver d'une session à l'autre, et une reconnexion ne se distingue pas d'un premier démarrage.
+- **Il boucle modulo 2³²**, ce qui laisse environ deux ans et demi de session continue à 60 FPS. La comparaison
+  avec `last_applied_sequence` doit se faire modulo, sans quoi ce bouclage produirait une latence aberrante une
+  fois par éternité.
 
-### 0x04 — CONFIG
-
-| Offset | Taille | Type | Champ |
-|--------|--------|------|-------|
-| 0 | 1 | u8 | Type = `0x04` |
-| 1 | 1 | u8 | `protocol_version` retenue |
-| 2 | 2 | u16 | `width` faisant autorité |
-| 4 | 2 | u16 | `height` faisant autorité |
-| 6 | 1 | u8 | `brightness` (0–255) |
-| 7 | 1 | u8 | `target_fps` |
-| 8 | 2 | u16 | `status_interval_s` — période des `STATUS_UPDATE` |
-| 10 | 4 | u32 | `session_id` |
-
-**Total = 14 octets**
-
-`CONFIG` peut être renvoyé à tout moment pour modifier luminosité ou cadence sans rouvrir la connexion. Un
-changement de géométrie, lui, impose une reconnexion.
+Le device ne fait rien d'autre que le mémoriser et le renvoyer : ni détection de trou, ni demande de
+retransmission. L'ordre et l'intégrité sont garantis par TCP ([ADR-0003](adr/0003-websocket-binaire-tcp.md)), et
+une frame perdue serait de toute façon remplacée par la suivante avant d'être utile.
 
 ### 0x05 — STATUS_UPDATE
 
@@ -224,11 +275,11 @@ Trois métriques des versions antérieures ont été retirées : la **tension d'
 CPU**, faute de capteur fiable sur le matériel de référence, et le **compteur de paquets perdus**, sans objet
 sur TCP. Une métrique inventée est pire qu'une métrique absente.
 
-### 0x08 — ERROR
+### 0x06 — ERROR
 
 | Offset | Taille | Type | Champ |
 |--------|--------|------|-------|
-| 0 | 1 | u8 | Type = `0x08` |
+| 0 | 1 | u8 | Type = `0x06` |
 | 1 | 1 | u8 | `code` |
 | 2 | 2 | u16 | `msg_len` (M) |
 | 4 | M | u8[] | Message UTF-8, **sans terminateur** |
@@ -237,6 +288,8 @@ sur TCP. Une métrique inventée est pire qu'une métrique absente.
 
 La longueur est explicite plutôt que délimitée par un octet nul : chercher un terminateur dans un flux binaire
 est une source classique de dépassement de lecture.
+
+`0x00` n'est le code d'aucune erreur, comme il n'est le code d'aucun message.
 
 | Code | Signification |
 |------|---------------|
@@ -249,6 +302,7 @@ est une source classique de dépassement de lecture.
 | `0x07` | Allocation mémoire impossible |
 | `0x08` | Connexion remplacée par une plus récente |
 | `0x09` | Device inconnu ou révoqué |
+| `0x0A` | Bail expiré : le renderer a perdu le contact avec la plateforme |
 
 ---
 
@@ -257,7 +311,7 @@ est une source classique de dépassement de lecture.
 Avant chaque envoi, le renderer calcule les deux tailles et **envoie la plus petite** :
 
 ```
-fullSize  = 10 + width × height × 3
+fullSize  = 9 + width × height × 3
 deltaSize = 7  + 5 × nombre_de_pixels_modifiés
 
 si   aucun pixel modifié       → n'envoyer rien
@@ -267,7 +321,7 @@ sinon                          → FULL_FRAME
 
 La règle est **exacte** : elle compare les deux coûts réels au lieu d'approcher le point de bascule par un seuil
 en pourcentage. Le point d'équilibre s'en déduit — le mode différentiel cesse d'être rentable au-delà de
-`(3 × width × height + 3) / 5` pixels modifiés, soit environ 60 % des pixels.
+`(3 × width × height + 2) / 5` pixels modifiés, soit environ 60 % des pixels.
 
 Cas particuliers, à respecter impérativement :
 
