@@ -1,10 +1,11 @@
 # Simulateur
 
-> Décision liée : [ADR-0011](adr/0011-auth-premier-message.md).
+> Décisions liées : [ADR-0011](adr/0011-auth-premier-message.md) (authentification),
+> [ADR-0020](adr/0020-simulateur-device-declare.md) (un device déclaré).
 > Protocole implémenté : [PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md).
 
-Une page web de debug qui **remplace le matériel** : elle parle le protocole device au renderer et peint les
-frames reçues sur un canvas.
+Une page web de debug qui **tient le rôle du matériel** : elle parle le protocole device au renderer et peint
+les frames reçues sur un canvas.
 
 ## Ce que c'est, et ce que ce n'est pas
 
@@ -54,26 +55,37 @@ pas. Cette règle fait partie de la relecture de conformité de
 
 ## Place dans le modèle
 
-Un simulateur est un `Device` du registre comme un autre : token, géométrie, renderer assigné. Le drapeau
-`isSimulator` sert uniquement à le distinguer dans l'interface.
+Un simulateur est un `Device` du registre comme un autre : token, géométrie, renderer assigné. Il se **déclare**
+comme tel — `kind = simulator`, choisi à la création — et n'emprunte l'identité d'aucune dalle
+([ADR-0020](adr/0020-simulateur-device-declare.md)).
 
-**Aucun cas particulier côté renderer.** Il n'a pas à savoir s'il parle à du silicium ou à un onglet — c'est
-d'ailleurs la condition pour que le simulateur teste quelque chose d'utile.
+C'est ce qui sépare observer de déranger. Pour voir ce qu'affiche une dalle, on crée un device simulateur et on
+lui assigne la même scène : le renderer les place dans le **même groupe de rendu**
+([ADR-0017](adr/0017-rendu-mutualise.md)) et ne calcule qu'une frame pour les deux. À géométrie et `maxFps`
+identiques, le simulateur reçoit donc ce que reçoit la dalle — au `sequence` près, qui appartient à chaque
+connexion, et à l'arbitrage `FULL`/`DELTA` près, qui dépend de l'historique de chacune.
+
+Ce n'est pas pour autant un miroir de la connexion de la dalle : un défaut qui ne se produit que sur *sa* socket
+ne se voit pas ici.
+
+**Aucun cas particulier côté renderer.** `kind` ne lui est même pas transmis : il n'a pas à savoir s'il parle à
+du silicium ou à un onglet — c'est d'ailleurs la condition pour que le simulateur teste quelque chose d'utile.
 
 ## Interaction avec la règle de connexion unique
 
-Simulateur et matériel peuvent revendiquer le même device. La règle **une seule connexion active par device**
-([PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md#une-seule-connexion-active-par-device)) devient donc immédiatement
-observable : ouvrir le simulateur sur un device allumé coupe la dalle, et inversement.
+La règle **une seule connexion active par device**
+([PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md#une-seule-connexion-active-par-device)) vaut pour le simulateur comme
+pour le reste : deux onglets ouverts sur le même device simulateur se coupent l'un l'autre, le dernier arrivé
+gagnant.
 
-Ce n'est pas un effet de bord regrettable, c'est le comportement voulu, et le simulateur le rend visible au lieu
-de le laisser dormir jusqu'au jour où un ESP32 se reconnecte après une coupure WiFi.
-
-Pour observer un device sans le déranger, il faut créer un second device dédié.
+Elle reste donc immédiatement observable, mais sans qu'ouvrir le simulateur n'éteigne une dalle — un device
+simulateur ne partage son identité avec aucun matériel. Et elle garde sa raison d'être propre : après une
+coupure WiFi, l'ancienne socket reste souvent ouverte côté renderer, et sans cette règle le device serait
+incapable de se reconnecter.
 
 ## Attendus fonctionnels
 
-- Saisie ou sélection d'un device et de son token.
+- Sélection d'un device `kind = simulator` parmi ceux de l'utilisateur, et saisie de son token.
 - Connexion, affichage de la phase de handshake et des erreurs reçues.
 - Rendu des frames sur un canvas, avec zoom — un pixel de dalle occupe plusieurs pixels d'écran.
 - Affichage des compteurs : FPS reçues, dernière séquence, part de `FULL` et de `DELTA`, octets reçus.

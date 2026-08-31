@@ -38,8 +38,8 @@
 │ S3 + HUB75     │          │ S3 + HUB75         │
 └────────────────┘          └────────────────────┘
          ▲
-         │  Le simulateur se substitue au matériel,
-         │  même protocole, même registre
+         │  Le simulateur est un device du registre,
+         │  même protocole, sans matériel
     ┌────┴─────────┐
     │ Simulateur   │
     │ (page Nuxt)  │
@@ -51,7 +51,7 @@
 | Composant | Rôle | Ne fait pas |
 |-----------|------|-------------|
 | **Nuxt** | Dashboard : appairage, édition de scènes, supervision. Sert aussi la page du simulateur | En tant que dashboard, ne parle jamais à un renderer |
-| **Simulateur** | Page du dashboard qui se substitue au matériel et parle le protocole device ([SIMULATOR.md](SIMULATOR.md)) | Ne partage aucun code avec le renderer : ce n'est pas une prévisualisation |
+| **Simulateur** | Page du dashboard qui tient le rôle du matériel, sur un device déclaré `kind = simulator`, et parle le protocole device ([SIMULATOR.md](SIMULATOR.md)) | Ne partage aucun code avec le renderer, et n'emprunte l'identité d'aucune dalle |
 | **AdonisJS** | Plan de contrôle : authentification, registre, persistance, assignation | N'est jamais dans le chemin de rendu |
 | **PostgreSQL** | Source de vérité unique | N'est lu que par Adonis |
 | **Renderer** | Plan de données : calcule les frames, tient les connexions device | N'accède jamais à la base |

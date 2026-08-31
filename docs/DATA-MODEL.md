@@ -54,7 +54,7 @@ Un appareil qui affiche : matériel ou simulateur.
 | `tokenHash` | string | Empreinte du secret du credential |
 | `tokenPrefix` | string | Préfixe en clair, unique et indexé |
 | `panelType` | enum | `hub75` — seule valeur supportée ([ADR-0005](adr/0005-hub75-dabord.md)) |
-| `isSimulator` | boolean | Distingue un simulateur dans l'interface |
+| `kind` | enum | `hardware` \| `simulator`. Nature du device, choisie à la création et non modifiable ensuite ([ADR-0020](adr/0020-simulateur-device-declare.md)) |
 | `width` / `height` | integer | Géométrie totale en pixels |
 | `chainLength` | integer | Nombre de dalles chaînées |
 | `brightness` | integer | Luminosité de la dalle, 0 à 255. Défaut 128 |
@@ -80,6 +80,12 @@ Un appareil qui affiche : matériel ou simulateur.
   d'exposition de ce device infinie : c'est un choix légitime pour une dalle sans donnée sensible, jamais un
   défaut.
 - `width` et `height` sont strictement positifs et multiples de la géométrie d'une dalle.
+- `kind` se choisit à la création et ne change plus. Un device simulateur n'est pas une dalle qu'un onglet
+  remplace : c'est un device à part entière, avec son token et sa géométrie, et le simulateur ne propose que les
+  devices `kind = simulator` ([ADR-0020](adr/0020-simulateur-device-declare.md)).
+- `kind` **ne voyage pas sur le plan de contrôle** : le renderer l'ignore, et le doit. La règle est tenue par
+  l'API et le dashboard ; ce n'est pas une frontière d'authentification, rien dans le protocole device ne
+  distinguant un navigateur d'un firmware.
 - `firmwareVersion`, `protocolVersion`, `status`, `lastSeenAt` et `ipAddress` sont **observés**, jamais saisis.
 - Un device appartient à un utilisateur ; son renderer peut appartenir à un autre utilisateur uniquement s'il
   s'agit du renderer de la plateforme.
@@ -181,6 +187,7 @@ Le découpage :
 | `config`, `userId` | `scenes`, avec un nom dérivé de celui de la matrice |
 | `width`, `height` | recopiés aussi dans `scenes` : la scène migrée a la géométrie de la matrice, donc `k = 1` |
 | — | aucune cadence à migrer : `scenes.targetFps` prend son défaut de 30, `devices.maxFps` reste `null` |
+| — | `devices.kind` vaut `hardware` : une matrice existante décrit du matériel |
 | — | `devices.sceneId` pointe vers la scène créée |
 | — | `devices.rendererId` pointe vers le renderer par défaut |
 | — | `devices.tokenHash` doit être régénéré : aucun token n'existe dans le schéma actuel |

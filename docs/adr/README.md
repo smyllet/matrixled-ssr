@@ -38,3 +38,4 @@ rouvre en refaisant toute l'analyse.
 | [0017](0017-rendu-mutualise.md) | Rendu mutualisé par groupe de devices équivalents | Accepté |
 | [0018](0018-geometrie-native-de-la-scene.md) | La scène porte sa géométrie native, agrandissement entier | Accepté |
 | [0019](0019-cadence-portee-par-la-scene.md) | La cadence appartient à la scène, le device en pose le plafond | Accepté |
+| [0020](0020-simulateur-device-declare.md) | Le simulateur est un device déclaré, pas un device emprunté | Accepté |

@@ -28,8 +28,10 @@ condition que leur géométrie en soit un multiple entier ([ADR-0018](adr/0018-g
 calcule donc qu'une seule frame — quitte à l'agrandir ou à l'espacer ensuite pour chacun. C'est une notion interne au renderer : elle n'existe ni
 en base ni dans l'interface ([ADR-0017](adr/0017-rendu-mutualise.md)).
 
-**Simulateur** — Une page du dashboard Nuxt qui remplace le matériel : elle parle le protocole device et peint
-les frames sur un canvas. C'est un **device**, pas une prévisualisation.
+**Simulateur** — Une page du dashboard Nuxt qui tient le rôle du matériel : elle parle le protocole device et
+peint les frames sur un canvas. C'est un **device** déclaré comme tel dans le registre — `kind = simulator` — et
+non l'emprunt d'identité d'une dalle, ni une prévisualisation
+([ADR-0020](adr/0020-simulateur-device-declare.md)).
 
 ---
 
