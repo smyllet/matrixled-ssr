@@ -96,7 +96,9 @@ Un renderer conforme doit :
   ([ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md)) ;
 - horodater son dernier contact de contrôle réussi, et fermer avec `ERROR 0x0A` toute session dont
   l'`offlineGrace` est dépassé depuis cet horodatage — **connexions établies comprises**
-  ([ADR-0015](adr/0015-bail-de-session-device.md)).
+  ([ADR-0015](adr/0015-bail-de-session-device.md)). Cet horodatage doit survivre à un redémarrage : sinon
+  relancer le renderer remet le bail à zéro, et la borne ne borne plus rien
+  ([ADR-0008](adr/0008-renderer-autonome.md)).
 
 ## Fonctionnement hors ligne
 

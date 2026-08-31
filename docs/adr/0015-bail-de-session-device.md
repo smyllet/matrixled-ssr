@@ -70,6 +70,8 @@ pour la raison inchangée qu'une panne de la plateforme éteindrait toutes les d
   qui se résout quand le renderer retrouve la plateforme. Retrait exponentiel, pas d'abandon définitif.
 - Un `offlineGrace` à `null` restaure exactement le comportement antérieur, pour les dalles où l'autonomie prime
   sur la révocation.
-- **Piste non traitée.** La règle `ERROR 0x08` rend un vol de token bruyant : l'imposteur et la dalle légitime
-  s'évincent mutuellement en boucle, et Adonis voit le `device.status` battre. C'est un signal de détection
-  gratuit, en amont de la révocation — il dit *quand* révoquer. Rien ne l'exploite aujourd'hui.
+- **Un signal de détection gratuit.** La règle `ERROR 0x08` rend un vol de token bruyant : l'imposteur et la
+  dalle légitime s'évincent mutuellement en boucle, et Adonis voit le `device.status` battre. C'est une
+  détection en amont de la révocation — elle dit *quand* révoquer. Rien ne l'exploite encore ; l'exploitation
+  est suivie par l'issue [#57](https://github.com/smyllet/matrixled-ssr/issues/57), et la réponse est la
+  rotation du credential ([ADR-0021](0021-credential-du-simulateur-par-rotation.md)).
