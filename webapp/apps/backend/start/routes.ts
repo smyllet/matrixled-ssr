@@ -45,5 +45,18 @@ router
       .prefix('matrices')
       .as('matrices')
       .use(middleware.auth())
+
+    router
+      .group(() => {
+        router.get('/', [controllers.Renderers, 'index']).as('index')
+        router.get('/:id', [controllers.Renderers, 'show']).as('show')
+        router.post('/', [controllers.Renderers, 'store']).as('store')
+        router.patch('/:id', [controllers.Renderers, 'patch']).as('patch')
+        router.delete('/:id', [controllers.Renderers, 'delete']).as('delete')
+        router.post('/:id/token', [controllers.Renderers, 'rotateToken']).as('token')
+      })
+      .prefix('renderers')
+      .as('renderers')
+      .use(middleware.auth())
   })
   .prefix('/api/v1')

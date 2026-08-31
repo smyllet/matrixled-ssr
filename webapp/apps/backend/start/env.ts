@@ -25,6 +25,13 @@ export default await Env.create(new URL('../', import.meta.url), {
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
 
+  /**
+   * Credential of the platform renderer, provisioned by the deployment rather
+   * than issued through the dashboard — it has no owner, so no one can pair it.
+   * See docs/adr/0013-provisionnement-du-renderer-plateforme.md
+   */
+  PLATFORM_RENDERER_TOKEN: Env.schema.string.optional(),
+
   // Database
   DB_HOST: Env.schema.string({ format: 'host' }),
   DB_PORT: Env.schema.number(),

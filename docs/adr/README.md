@@ -30,3 +30,5 @@ rouvre en refaisant toute l'analyse.
 | [0009](0009-bootstrap-par-redirection.md) | Bootstrap device par redirection depuis la plateforme | Accepté |
 | [0010](0010-postgresql-partout.md) | PostgreSQL partout, dev et test compris | Accepté |
 | [0011](0011-auth-premier-message.md) | Authentification device par premier message binaire | Accepté |
+| [0012](0012-format-des-tokens.md) | Token à préfixe public et secret haché | Accepté |
+| [0013](0013-provisionnement-du-renderer-plateforme.md) | Credential du renderer plateforme provisionné par l'environnement | Accepté |

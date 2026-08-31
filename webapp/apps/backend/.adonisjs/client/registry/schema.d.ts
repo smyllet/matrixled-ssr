@@ -115,4 +115,76 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['delete']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'renderers.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/renderers'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['index']>>>
+    }
+  }
+  'renderers.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/renderers/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/renderer').showRendererValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['show']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'renderers.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/renderers'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/renderer').createRendererValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/renderer').createRendererValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'renderers.patch': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/renderers/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/renderer').patchRendererValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/renderer').patchRendererValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['patch']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['patch']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'renderers.delete': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/renderers/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/renderer').deleteRendererValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/renderer').deleteRendererValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['delete']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['delete']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'renderers.token': {
+    methods: ["POST"]
+    pattern: '/api/v1/renderers/:id/token'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/renderer').rotateRendererTokenValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/renderer').rotateRendererTokenValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['rotateToken']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['rotateToken']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
 }

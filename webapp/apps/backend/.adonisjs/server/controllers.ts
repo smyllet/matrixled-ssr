@@ -7,5 +7,6 @@ export const controllers = {
   Matrices: () => import('#controllers/matrices_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Profile: () => import('#controllers/profile_controller'),
+  Renderers: () => import('#controllers/renderers_controller'),
   Session: () => import('#controllers/session_controller'),
 }

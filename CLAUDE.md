@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Read the specs first
 
-`docs/` is the source of truth for where this project is going, and **it describes an architecture the code does
-not implement yet**. Reading the code alone will mislead you: the code has a single `Matrix` entity, while the
-specs define `Renderer` / `Device` / `Scene`, a Go renderer, a binary device protocol and a firmware — none of
-which exist.
+`docs/` is the source of truth for where this project is going, and **it describes an architecture the code only
+partly implements**. Reading the code alone will mislead you: `Renderer` exists, but the code still has a
+`Matrix` entity where the specs define `Device` and `Scene`, and the Go renderer, the binary device protocol and
+the firmware do not exist at all.
 
 Start with `docs/GLOSSARY.md` (short, and it prevents the main vocabulary confusion), then
 `docs/ARCHITECTURE.md`. Decisions and their rejected alternatives live in `docs/adr/`.

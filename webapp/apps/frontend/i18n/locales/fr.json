@@ -51,6 +51,30 @@
           }
         }
       }
+    },
+    "renderers": {
+      "title": "Mes renderers",
+      "never": "Jamais",
+      "table": {
+        "name": "Nom",
+        "kind": "Type",
+        "status": "État",
+        "tokenPrefix": "Préfixe du token",
+        "lastSeenAt": "Dernière activité"
+      },
+      "kind": {
+        "platform": "Plateforme",
+        "own": "Auto-hébergé"
+      },
+      "status": {
+        "online": "En ligne",
+        "offline": "Hors ligne"
+      },
+      "actions": {
+        "create": "Nouveau renderer",
+        "delete": "Supprimer",
+        "rotateToken": "Régénérer le token"
+      }
     }
   },
   "validation": {
@@ -60,7 +84,10 @@
     "email": "Le champ doit être un email valide"
   },
   "nav": {
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "platform": "Plateforme",
+    "matrices": "Matrices",
+    "renderers": "Renderers"
   },
   "app": {
     "name": "Matrix Led SSR",
@@ -79,6 +106,19 @@
       },
       "submit": "Créer",
       "cancel": "Annuler"
+    },
+    "createRenderer": {
+      "title": "Créer un renderer",
+      "failure": {
+        "title": "Échec de la création",
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de création d'un renderer."
+      },
+      "fields": {
+        "name": "Nom"
+      },
+      "submit": "Créer",
+      "cancel": "Annuler",
+      "done": "Terminé"
     }
   },
   "dialogs": {
@@ -91,6 +131,35 @@
       "description": "Êtes-vous sûr de vouloir supprimer la matrice {0} ? Cette action est irréversible.",
       "cancel": "Annuler",
       "confirm": "Supprimer"
+    },
+    "deleteRenderer": {
+      "title": "Supprimer le renderer",
+      "description": "Êtes-vous sûr de vouloir supprimer le renderer {0} ? Cette action est irréversible.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer",
+      "failure": {
+        "title": "Échec de la suppression",
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de suppression du renderer."
+      }
+    },
+    "rotateRendererToken": {
+      "title": "Régénérer le token",
+      "description": "Régénérer le token du renderer {0} invalidera immédiatement le token actuel. Le renderer devra être reconfiguré.",
+      "cancel": "Annuler",
+      "confirm": "Régénérer",
+      "done": "Terminé",
+      "failure": {
+        "title": "Échec de la régénération",
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de régénération du token."
+      }
+    }
+  },
+  "components": {
+    "tokenReveal": {
+      "title": "Token du renderer",
+      "description": "Ce token n'est affiché qu'une seule fois. Copiez-le maintenant : il ne pourra plus être récupéré.",
+      "copy": "Copier",
+      "copied": "Copié"
     }
   }
 }
