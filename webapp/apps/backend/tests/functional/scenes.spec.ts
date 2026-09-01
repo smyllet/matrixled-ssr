@@ -61,7 +61,7 @@ test.group('Scenes', () => {
     response.assertStatus(422)
   })
 
-  test('rejects a geometry above the protocol maximum', async ({ client }) => {
+  test('rejects a geometry above the protocol maximum', async ({ client, assert }) => {
     const user = await createUser()
 
     const response = await client
@@ -70,6 +70,9 @@ test.group('Scenes', () => {
       .loginAs(user)
 
     response.assertStatus(422)
+
+    const [failure] = (response.body() as unknown as { errors: { message: string }[] }).errors
+    assert.include(failure!.message, '300x300')
   })
 
   test('defaults targetFps and config when omitted', async ({ client, assert }) => {
@@ -146,10 +149,7 @@ test.group('Scenes', () => {
     destroy.assertStatus(403)
   })
 
-  test('bumps version when config changes, not when only the name does', async ({
-    client,
-    assert,
-  }) => {
+  test('bumps version on every change, a rename included', async ({ client, assert }) => {
     const user = await createUser()
 
     const creation = await client
@@ -164,14 +164,43 @@ test.group('Scenes', () => {
       .json({ name: 'Renamed' })
       .loginAs(user)
 
-    assert.equal(sceneFrom(renamed.body()).version, 1)
+    assert.equal(sceneFrom(renamed.body()).version, 2)
 
     const reconfigured = await client
       .patch(`/api/v1/scenes/${scene.id}`)
       .json({ config: { version: 1, nodes: [{ type: 'text' }] } })
       .loginAs(user)
 
-    assert.equal(sceneFrom(reconfigured.body()).version, 2)
+    assert.equal(sceneFrom(reconfigured.body()).version, 3)
+  })
+
+  test('leaves version alone when a patch changes nothing', async ({ client, assert }) => {
+    const user = await createUser()
+
+    const creation = await client
+      .post('/api/v1/scenes')
+      .json({ name: 'Clock', width: 64, height: 32, targetFps: 30 })
+      .loginAs(user)
+
+    const scene = sceneFrom(creation.body())
+
+    /**
+     * The edit sheet submits every field it renders, not only the dirty ones,
+     * so resubmitting an untouched form must not inflate the version. The
+     * `config` envelope is compared by value too, not by identity.
+     */
+    const resubmitted = await client
+      .patch(`/api/v1/scenes/${scene.id}`)
+      .json({
+        name: 'Clock',
+        width: 64,
+        height: 32,
+        targetFps: 30,
+        config: { version: 1, nodes: [] },
+      })
+      .loginAs(user)
+
+    assert.equal(sceneFrom(resubmitted.body()).version, 1)
   })
 
   test('rejects a patch that would push a merged geometry past the maximum', async ({

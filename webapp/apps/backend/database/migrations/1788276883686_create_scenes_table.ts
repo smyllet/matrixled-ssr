@@ -10,6 +10,12 @@ export default class extends BaseSchema {
       table.string('user_id').notNullable()
       table.foreign('user_id').references('users.id').onDelete('CASCADE')
 
+      /**
+       * Every listing is scoped to one owner, and a foreign key creates no
+       * index of its own in PostgreSQL.
+       */
+      table.index(['user_id'], 'scenes_user_id_index')
+
       table.string('name').notNullable()
 
       /**
@@ -29,7 +35,7 @@ export default class extends BaseSchema {
       table.jsonb('config').notNullable()
 
       /**
-       * Row revision, bumped by SceneService on every render-relevant change.
+       * Row revision, bumped by SceneService on every change.
        * The control plane diffs on `scene_id` + this column
        * (docs/adr/0019-cadence-portee-par-la-scene.md).
        */
@@ -39,6 +45,11 @@ export default class extends BaseSchema {
       table.timestamp('updated_at', { useTz: true }).nullable()
     })
 
+    /**
+     * The literals mirror `PROTOCOL_MAXIMUM_PIXELS` and the validator's fps
+     * bounds on purpose: a migration is a snapshot of the schema at its date
+     * and must not move when an application constant does.
+     */
     this.schema.raw(
       `ALTER TABLE ${this.tableName} ADD CONSTRAINT scenes_geometry_bounded_check CHECK (width * height <= 65536)`
     )

@@ -1,6 +1,5 @@
 import Scene from '#models/scene'
-import { sceneGeometrySchema, type SceneConfig } from '#validators/scene'
-import vine from '@vinejs/vine'
+import { sceneGeometryValidator, type SceneConfig } from '#validators/scene'
 
 const DEFAULT_SCENE_CONFIG: SceneConfig = { version: 1, nodes: [] }
 const DEFAULT_TARGET_FPS = 30
@@ -65,34 +64,41 @@ export class SceneService {
      * request validator, which never sees the sibling value still in the row.
      */
     if (patch.width !== undefined || patch.height !== undefined) {
-      await vine.validate({
-        schema: sceneGeometrySchema,
-        data: { width: mergedWidth, height: mergedHeight },
-      })
+      await sceneGeometryValidator.validate({ width: mergedWidth, height: mergedHeight })
     }
-
-    /**
-     * Bumped when a render-relevant field is present in the patch, regardless
-     * of whether the new value differs from the stored one — an occasional
-     * spurious diff downstream is cheap, a missed one is a stale render.
-     * `name` alone never bumps it: the render group key is `scene_id` +
-     * `version` (docs/adr/0019-cadence-portee-par-la-scene.md), and a rename
-     * carries nothing a renderer needs to re-diff.
-     */
-    const rendersDifferently =
-      patch.width !== undefined ||
-      patch.height !== undefined ||
-      patch.targetFps !== undefined ||
-      patch.config !== undefined
 
     scene.name = patch.name ?? scene.name
     scene.width = mergedWidth
     scene.height = mergedHeight
     scene.targetFps = patch.targetFps ?? scene.targetFps
     scene.config = patch.config ?? scene.config
-    if (rendersDifferently) scene.version += 1
+
+    /**
+     * Any change bumps the version, a rename included — the control plane
+     * diffs on `scene_id` + `version` (docs/adr/0019-cadence-portee-par-la-scene.md)
+     * and an occasional diff over a field it ignores is cheaper than the
+     * bookkeeping needed to avoid it.
+     *
+     * Lucid answers "did anything change" by deep-comparing the attributes
+     * against the loaded row, so a client repeating the whole form on every
+     * save — the edit sheet does — bumps nothing until a value really moves.
+     * Read before `save()`, which resets the tracking.
+     */
+    const modified = scene.$isDirty
 
     await scene.save()
+
+    /**
+     * Incremented in SQL rather than read-modify-written in JS: two patches
+     * racing on the same scene would both read the same version and write the
+     * same successor, and the lost bump leaves every renderer serving a stale
+     * scene until the next change. Reload so the response carries the version
+     * the database settled on.
+     */
+    if (modified) {
+      await Scene.query().where('id', scene.id).increment('version', 1)
+      await scene.refresh()
+    }
 
     return scene
   }
