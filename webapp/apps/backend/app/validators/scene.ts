@@ -56,10 +56,11 @@ const sceneGeometrySchema = vine
   .use(boundedByProtocolMaximum())
 
 /**
- * Compiled once: `vine.validate({ schema })` rebuilds the validation function
- * on every call, and SceneService re-runs this on every geometry patch.
+ * Pre-compiled once: `vine.validate({ schema })` rebuilds the validation
+ * function on every call, and SceneService re-runs this on every geometry
+ * patch.
  */
-export const sceneGeometryValidator = vine.compile(sceneGeometrySchema)
+export const sceneGeometryValidator = vine.create(sceneGeometrySchema)
 
 /**
  * `version` on the row and `status`-like observed fields don't exist on
