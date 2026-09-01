@@ -6,6 +6,7 @@
 
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
+import type { SceneConfig } from '#validators/scene'
 
 export class MatrixSchema extends BaseModel {
   static $columns = [
@@ -80,6 +81,42 @@ export class RendererSchema extends BaseModel {
   declare updatedAt: DateTime | null
   @column()
   declare version: string | null
+}
+
+export class SceneSchema extends BaseModel {
+  static $columns = [
+    'config',
+    'createdAt',
+    'height',
+    'id',
+    'name',
+    'targetFps',
+    'updatedAt',
+    'userId',
+    'version',
+    'width',
+  ] as const
+  $columns = SceneSchema.$columns
+  @column()
+  declare config: SceneConfig
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare height: number
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare name: string
+  @column()
+  declare targetFps: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+  @column()
+  declare version: number
+  @column()
+  declare width: number
 }
 
 export class UserSchema extends BaseModel {

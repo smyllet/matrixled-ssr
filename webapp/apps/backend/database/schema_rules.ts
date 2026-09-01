@@ -23,5 +23,18 @@ export default {
         },
       },
     },
+    scenes: {
+      columns: {
+        /**
+         * The generator can't infer the versioned envelope from a jsonb
+         * column; this keeps `Scene.config` typed instead of `any`.
+         */
+        config: {
+          tsType: 'SceneConfig',
+          decorators: [{ name: '@column' }],
+          imports: [{ source: '#validators/scene', typeImports: ['SceneConfig'] }],
+        },
+      },
+    },
   },
 } satisfies SchemaRules

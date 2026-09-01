@@ -187,4 +187,64 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/renderers_controller').default['rotateToken']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'scenes.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/scenes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/scenes_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/scenes_controller').default['index']>>>
+    }
+  }
+  'scenes.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/scenes/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/scene').showSceneValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/scenes_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/scenes_controller').default['show']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'scenes.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/scenes'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/scene').createSceneValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/scene').createSceneValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/scenes_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/scenes_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'scenes.patch': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/scenes/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/scene').patchSceneValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/scene').patchSceneValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/scenes_controller').default['patch']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/scenes_controller').default['patch']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'scenes.delete': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/scenes/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/scene').deleteSceneValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/scene').deleteSceneValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/scenes_controller').default['delete']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/scenes_controller').default['delete']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
 }

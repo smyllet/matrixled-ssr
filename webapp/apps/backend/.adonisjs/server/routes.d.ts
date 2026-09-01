@@ -19,6 +19,11 @@ export type ScannedRoutes = {
     'renderers.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.token': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'scenes.index': { paramsTuple?: []; params?: {} }
+    'scenes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'scenes.store': { paramsTuple?: []; params?: {} }
+    'scenes.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'scenes.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
@@ -26,6 +31,8 @@ export type ScannedRoutes = {
     'matrices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.index': { paramsTuple?: []; params?: {} }
     'renderers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'scenes.index': { paramsTuple?: []; params?: {} }
+    'scenes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
@@ -33,6 +40,8 @@ export type ScannedRoutes = {
     'matrices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.index': { paramsTuple?: []; params?: {} }
     'renderers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'scenes.index': { paramsTuple?: []; params?: {} }
+    'scenes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
@@ -41,14 +50,17 @@ export type ScannedRoutes = {
     'matrices.store': { paramsTuple?: []; params?: {} }
     'renderers.store': { paramsTuple?: []; params?: {} }
     'renderers.token': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'scenes.store': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
     'matrices.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'scenes.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'matrices.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'scenes.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

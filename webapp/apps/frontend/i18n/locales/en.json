@@ -75,6 +75,20 @@
         "delete": "Delete",
         "rotateToken": "Rotate token"
       }
+    },
+    "scenes": {
+      "title": "My scenes",
+      "table": {
+        "name": "Name",
+        "size": "Size (w x h)",
+        "targetFps": "Target FPS",
+        "version": "Version"
+      },
+      "actions": {
+        "create": "New scene",
+        "edit": "Edit",
+        "delete": "Delete"
+      }
     }
   },
   "validation": {
@@ -87,7 +101,8 @@
     "logout": "Log out",
     "platform": "Platform",
     "matrices": "Matrices",
-    "renderers": "Renderers"
+    "renderers": "Renderers",
+    "scenes": "Scenes"
   },
   "app": {
     "name": "Matrix Led SSR",
@@ -119,6 +134,42 @@
       "submit": "Create",
       "cancel": "Cancel",
       "done": "Done"
+    },
+    "createScene": {
+      "title": "Create a scene",
+      "failure": {
+        "title": "Creation failed",
+        "unknownDescription": "An unknown error occurred while trying to create a scene."
+      },
+      "fields": {
+        "name": "Name",
+        "width": "Width (px)",
+        "height": "Height (px)",
+        "targetFps": "Target FPS"
+      },
+      "validation": {
+        "geometry": "The scene geometry exceeds the protocol maximum of {max} pixels"
+      },
+      "submit": "Create",
+      "cancel": "Cancel"
+    },
+    "editScene": {
+      "title": "Edit the scene",
+      "failure": {
+        "title": "Update failed",
+        "unknownDescription": "An unknown error occurred while trying to update the scene."
+      },
+      "fields": {
+        "name": "Name",
+        "width": "Width (px)",
+        "height": "Height (px)",
+        "targetFps": "Target FPS"
+      },
+      "validation": {
+        "geometry": "The scene geometry exceeds the protocol maximum of {max} pixels"
+      },
+      "submit": "Save",
+      "cancel": "Cancel"
     }
   },
   "dialogs": {
@@ -151,6 +202,16 @@
       "failure": {
         "title": "Rotation failed",
         "unknownDescription": "An unknown error occurred while trying to rotate the token."
+      }
+    },
+    "deleteScene": {
+      "title": "Delete the scene",
+      "description": "Are you sure you want to delete the scene {0}? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "failure": {
+        "title": "Deletion failed",
+        "unknownDescription": "An unknown error occurred while trying to delete the scene."
       }
     }
   },
