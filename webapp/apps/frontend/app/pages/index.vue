@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { Trash } from 'lucide-vue-next'
+
+definePageMeta({
+  breadcrumb: [{ label: 'nav.platform' }, { label: 'nav.matrices', to: '/' }],
+})
+
 const { $api, hook } = useNuxtApp()
 
 const {

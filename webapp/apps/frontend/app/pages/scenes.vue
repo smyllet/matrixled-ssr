@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { Pencil, Trash } from 'lucide-vue-next'
 
+definePageMeta({
+  breadcrumb: [{ label: 'nav.platform' }, { label: 'nav.scenes', to: '/scenes' }],
+})
+
 const { t } = useI18n()
 const { $api, hook } = useNuxtApp()
 
