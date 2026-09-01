@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Trash } from 'lucide-vue-next'
+import { Pencil, Trash } from 'lucide-vue-next'
 
 const { t } = useI18n()
 const { $api, hook } = useNuxtApp()
@@ -64,6 +64,17 @@ hook('app:scene:deleted', async () => {
           <UiTableCell>{{ scene.version }}</UiTableCell>
           <UiTableCell class="text-right">
             <div class="flex justify-end gap-2">
+              <SheetSceneEdit :scene="scene">
+                <UiButton
+                  variant="outline"
+                  size="icon"
+                  :aria-label="t('pages.scenes.actions.edit')"
+                  class="cursor-pointer"
+                >
+                  <Pencil />
+                </UiButton>
+              </SheetSceneEdit>
+
               <DialogSceneDelete :scene="scene">
                 <UiButton
                   variant="destructive"

@@ -86,6 +86,7 @@
       },
       "actions": {
         "create": "Nouvelle scène",
+        "edit": "Modifier",
         "delete": "Supprimer"
       }
     }
@@ -150,6 +151,24 @@
         "geometry": "La géométrie de la scène dépasse le maximum du protocole de 65536 pixels"
       },
       "submit": "Créer",
+      "cancel": "Annuler"
+    },
+    "editScene": {
+      "title": "Modifier la scène",
+      "failure": {
+        "title": "Échec de la modification",
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de modification de la scène."
+      },
+      "fields": {
+        "name": "Nom",
+        "width": "Largeur (px)",
+        "height": "Hauteur (px)",
+        "targetFps": "Cadence cible"
+      },
+      "validation": {
+        "geometry": "La géométrie de la scène dépasse le maximum du protocole de 65536 pixels"
+      },
+      "submit": "Enregistrer",
       "cancel": "Annuler"
     }
   },

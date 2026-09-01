@@ -86,6 +86,7 @@
       },
       "actions": {
         "create": "New scene",
+        "edit": "Edit",
         "delete": "Delete"
       }
     }
@@ -150,6 +151,24 @@
         "geometry": "The scene geometry exceeds the protocol maximum of 65536 pixels"
       },
       "submit": "Create",
+      "cancel": "Cancel"
+    },
+    "editScene": {
+      "title": "Edit the scene",
+      "failure": {
+        "title": "Update failed",
+        "unknownDescription": "An unknown error occurred while trying to update the scene."
+      },
+      "fields": {
+        "name": "Name",
+        "width": "Width (px)",
+        "height": "Height (px)",
+        "targetFps": "Target FPS"
+      },
+      "validation": {
+        "geometry": "The scene geometry exceeds the protocol maximum of 65536 pixels"
+      },
+      "submit": "Save",
       "cancel": "Cancel"
     }
   },
