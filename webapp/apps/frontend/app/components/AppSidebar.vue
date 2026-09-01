@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SidebarProps } from '@/components/ui/sidebar'
 
-import { Grid2x2, Server, Tv2 } from 'lucide-vue-next'
+import { Grid2x2, Layers, Server, Tv2 } from 'lucide-vue-next'
 
 const props = withDefaults(defineProps<SidebarProps>(), {
   collapsible: 'icon',
@@ -27,6 +27,11 @@ const data = computed(() => ({
       title: t('nav.matrices'),
       url: '/',
       icon: Grid2x2,
+    },
+    {
+      title: t('nav.scenes'),
+      url: '/scenes',
+      icon: Layers,
     },
     {
       title: t('nav.renderers'),

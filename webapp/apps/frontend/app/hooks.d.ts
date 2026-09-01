@@ -3,6 +3,7 @@ import type { Route } from '@tuyau/core/types'
 
 type MatrixDto = Route.Response<'matrices.store'>['data']
 type RendererDto = Route.Response<'renderers.store'>['data']
+type SceneDto = Route.Response<'scenes.store'>['data']
 
 declare module '#app' {
   interface RuntimeNuxtHooks {
@@ -12,5 +13,8 @@ declare module '#app' {
     'app:renderer:created': (renderer: RendererDto) => HookResult
     'app:renderer:updated': (renderer: RendererDto) => HookResult
     'app:renderer:deleted': (rendererId: RendererDto['id']) => HookResult
+    'app:scene:created': (scene: SceneDto) => HookResult
+    'app:scene:updated': (scene: SceneDto) => HookResult
+    'app:scene:deleted': (sceneId: SceneDto['id']) => HookResult
   }
 }

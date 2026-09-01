@@ -75,6 +75,19 @@
         "delete": "Supprimer",
         "rotateToken": "Régénérer le token"
       }
+    },
+    "scenes": {
+      "title": "Mes scènes",
+      "table": {
+        "name": "Nom",
+        "size": "Taille (l x h)",
+        "targetFps": "Cadence cible",
+        "version": "Version"
+      },
+      "actions": {
+        "create": "Nouvelle scène",
+        "delete": "Supprimer"
+      }
     }
   },
   "validation": {
@@ -87,7 +100,8 @@
     "logout": "Se déconnecter",
     "platform": "Plateforme",
     "matrices": "Matrices",
-    "renderers": "Renderers"
+    "renderers": "Renderers",
+    "scenes": "Scènes"
   },
   "app": {
     "name": "Matrix Led SSR",
@@ -119,6 +133,24 @@
       "submit": "Créer",
       "cancel": "Annuler",
       "done": "Terminé"
+    },
+    "createScene": {
+      "title": "Créer une scène",
+      "failure": {
+        "title": "Échec de la création",
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de création d'une scène."
+      },
+      "fields": {
+        "name": "Nom",
+        "width": "Largeur (px)",
+        "height": "Hauteur (px)",
+        "targetFps": "Cadence cible"
+      },
+      "validation": {
+        "geometry": "La géométrie de la scène dépasse le maximum du protocole de 65536 pixels"
+      },
+      "submit": "Créer",
+      "cancel": "Annuler"
     }
   },
   "dialogs": {
@@ -151,6 +183,16 @@
       "failure": {
         "title": "Échec de la régénération",
         "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de régénération du token."
+      }
+    },
+    "deleteScene": {
+      "title": "Supprimer la scène",
+      "description": "Êtes-vous sûr de vouloir supprimer la scène {0} ? Cette action est irréversible.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer",
+      "failure": {
+        "title": "Échec de la suppression",
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de suppression de la scène."
       }
     }
   },

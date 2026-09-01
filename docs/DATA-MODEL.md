@@ -102,7 +102,7 @@ Un contenu à afficher.
 | `width` / `height` | integer | Géométrie native, celle pour laquelle la scène est écrite ([ADR-0018](adr/0018-geometrie-native-de-la-scene.md)) |
 | `targetFps` | integer | Cadence à laquelle la scène est évaluée, 1 à 60. Défaut 30 ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)) |
 | `config` | jsonb | Configuration versionnée et validée |
-| `version` | integer | Incrémenté à chaque modification, sert au diff du plan de contrôle |
+| `version` | integer | Incrémenté à chaque modification affectant le rendu (`width`, `height`, `targetFps`, `config` — pas `name`), sert au diff du plan de contrôle |
 | `createdAt` / `updatedAt` | timestamptz | |
 
 **Règles**

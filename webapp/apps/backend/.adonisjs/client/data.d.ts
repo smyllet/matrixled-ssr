@@ -8,6 +8,7 @@ import type { InferData, InferVariants } from '@adonisjs/core/types/transformers
 import type MatrixTransformer from '#transformers/matrix_transformer'
 import type RendererTransformer from '#transformers/renderer_transformer'
 import type RendererWithTokenTransformer from '#transformers/renderer_with_token_transformer'
+import type SceneTransformer from '#transformers/scene_transformer'
 import type UserTransformer from '#transformers/user_transformer'
 
 export namespace Data {
@@ -22,6 +23,10 @@ export namespace Data {
   export type RendererWithToken = InferData<RendererWithTokenTransformer>
   export namespace RendererWithToken {
     export type Variants = InferVariants<RendererWithTokenTransformer>
+  }
+  export type Scene = InferData<SceneTransformer>
+  export namespace Scene {
+    export type Variants = InferVariants<SceneTransformer>
   }
   export type User = InferData<UserTransformer>
   export namespace User {

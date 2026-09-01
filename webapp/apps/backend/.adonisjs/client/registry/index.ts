@@ -96,6 +96,36 @@ const routes = {
     tokens: [{"old":"/api/v1/renderers/:id/token","type":0,"val":"api","end":""},{"old":"/api/v1/renderers/:id/token","type":0,"val":"v1","end":""},{"old":"/api/v1/renderers/:id/token","type":0,"val":"renderers","end":""},{"old":"/api/v1/renderers/:id/token","type":1,"val":"id","end":""},{"old":"/api/v1/renderers/:id/token","type":0,"val":"token","end":""}],
     types: placeholder as Registry['renderers.token']['types'],
   },
+  'scenes.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/scenes',
+    tokens: [{"old":"/api/v1/scenes","type":0,"val":"api","end":""},{"old":"/api/v1/scenes","type":0,"val":"v1","end":""},{"old":"/api/v1/scenes","type":0,"val":"scenes","end":""}],
+    types: placeholder as Registry['scenes.index']['types'],
+  },
+  'scenes.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/scenes/:id',
+    tokens: [{"old":"/api/v1/scenes/:id","type":0,"val":"api","end":""},{"old":"/api/v1/scenes/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/scenes/:id","type":0,"val":"scenes","end":""},{"old":"/api/v1/scenes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['scenes.show']['types'],
+  },
+  'scenes.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/scenes',
+    tokens: [{"old":"/api/v1/scenes","type":0,"val":"api","end":""},{"old":"/api/v1/scenes","type":0,"val":"v1","end":""},{"old":"/api/v1/scenes","type":0,"val":"scenes","end":""}],
+    types: placeholder as Registry['scenes.store']['types'],
+  },
+  'scenes.patch': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/scenes/:id',
+    tokens: [{"old":"/api/v1/scenes/:id","type":0,"val":"api","end":""},{"old":"/api/v1/scenes/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/scenes/:id","type":0,"val":"scenes","end":""},{"old":"/api/v1/scenes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['scenes.patch']['types'],
+  },
+  'scenes.delete': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/scenes/:id',
+    tokens: [{"old":"/api/v1/scenes/:id","type":0,"val":"api","end":""},{"old":"/api/v1/scenes/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/scenes/:id","type":0,"val":"scenes","end":""},{"old":"/api/v1/scenes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['scenes.delete']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

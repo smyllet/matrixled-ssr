@@ -33,4 +33,11 @@ export interface ApiDefinition {
     delete: typeof routes['renderers.delete']
     token: typeof routes['renderers.token']
   }
+  scenes: {
+    index: typeof routes['scenes.index']
+    show: typeof routes['scenes.show']
+    store: typeof routes['scenes.store']
+    patch: typeof routes['scenes.patch']
+    delete: typeof routes['scenes.delete']
+  }
 }

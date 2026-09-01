@@ -58,5 +58,17 @@ router
       .prefix('renderers')
       .as('renderers')
       .use(middleware.auth())
+
+    router
+      .group(() => {
+        router.get('/', [controllers.Scenes, 'index']).as('index')
+        router.get('/:id', [controllers.Scenes, 'show']).as('show')
+        router.post('/', [controllers.Scenes, 'store']).as('store')
+        router.patch('/:id', [controllers.Scenes, 'patch']).as('patch')
+        router.delete('/:id', [controllers.Scenes, 'delete']).as('delete')
+      })
+      .prefix('scenes')
+      .as('scenes')
+      .use(middleware.auth())
   })
   .prefix('/api/v1')
