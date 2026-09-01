@@ -87,57 +87,55 @@ const onSubmit = form.handleSubmit(async (values) => {
               </UiFormItem>
             </UiFormField>
 
-            <UiFormField v-slot="{ componentField }" name="width">
-              <UiFormItem>
-                <UiFormControl>
-                  <UiNumberField v-bind="componentField" :defaultValue="64" :min="1" :step="1">
-                    <UiFormLabel>{{ t('sheets.createScene.fields.width') }}</UiFormLabel>
-                    <UiNumberFieldContent>
-                      <UiNumberFieldDecrement />
-                      <UiNumberFieldInput />
-                      <UiNumberFieldIncrement />
-                    </UiNumberFieldContent>
-                    <UiFormMessage />
-                  </UiNumberField>
-                </UiFormControl>
-              </UiFormItem>
-            </UiFormField>
+            <div class="grid grid-cols-2 gap-4">
+              <UiFormField v-slot="{ componentField }" name="width">
+                <UiFormItem>
+                  <UiFormControl>
+                    <UiNumberField v-bind="componentField" :defaultValue="64" :min="1" :step="1">
+                      <UiFormLabel>{{ t('sheets.createScene.fields.width') }}</UiFormLabel>
+                      <UiNumberFieldContent>
+                        <UiNumberFieldDecrement />
+                        <UiNumberFieldInput />
+                        <UiNumberFieldIncrement />
+                      </UiNumberFieldContent>
+                      <UiFormMessage />
+                    </UiNumberField>
+                  </UiFormControl>
+                </UiFormItem>
+              </UiFormField>
 
-            <UiFormField v-slot="{ componentField }" name="height">
-              <UiFormItem>
-                <UiFormControl>
-                  <UiNumberField v-bind="componentField" :defaultValue="32" :min="1" :step="1">
-                    <UiFormLabel>{{ t('sheets.createScene.fields.height') }}</UiFormLabel>
-                    <UiNumberFieldContent>
-                      <UiNumberFieldDecrement />
-                      <UiNumberFieldInput />
-                      <UiNumberFieldIncrement />
-                    </UiNumberFieldContent>
-                    <UiFormMessage />
-                  </UiNumberField>
-                </UiFormControl>
-              </UiFormItem>
-            </UiFormField>
+              <UiFormField v-slot="{ componentField }" name="height">
+                <UiFormItem>
+                  <UiFormControl>
+                    <UiNumberField v-bind="componentField" :defaultValue="32" :min="1" :step="1">
+                      <UiFormLabel>{{ t('sheets.createScene.fields.height') }}</UiFormLabel>
+                      <UiNumberFieldContent>
+                        <UiNumberFieldDecrement />
+                        <UiNumberFieldInput />
+                        <UiNumberFieldIncrement />
+                      </UiNumberFieldContent>
+                      <UiFormMessage />
+                    </UiNumberField>
+                  </UiFormControl>
+                </UiFormItem>
+              </UiFormField>
+            </div>
 
-            <UiFormField v-slot="{ componentField }" name="targetFps">
+            <UiFormField v-slot="{ value, handleChange }" name="targetFps">
               <UiFormItem>
+                <UiFormLabel>
+                  {{ t('sheets.createScene.fields.targetFps') }} ({{ value }})
+                </UiFormLabel>
                 <UiFormControl>
-                  <UiNumberField
-                    v-bind="componentField"
-                    :defaultValue="30"
-                    :min="1"
+                  <UiSlider
+                    :model-value="[value]"
+                    :min="5"
                     :max="60"
-                    :step="1"
-                  >
-                    <UiFormLabel>{{ t('sheets.createScene.fields.targetFps') }}</UiFormLabel>
-                    <UiNumberFieldContent>
-                      <UiNumberFieldDecrement />
-                      <UiNumberFieldInput />
-                      <UiNumberFieldIncrement />
-                    </UiNumberFieldContent>
-                    <UiFormMessage />
-                  </UiNumberField>
+                    :step="5"
+                    @update:model-value="(v) => handleChange(v?.[0] ?? value)"
+                  />
                 </UiFormControl>
+                <UiFormMessage />
               </UiFormItem>
             </UiFormField>
           </div>
