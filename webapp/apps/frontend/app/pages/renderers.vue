@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { KeyRound, Trash } from 'lucide-vue-next'
 
+definePageMeta({
+  breadcrumb: [{ label: 'nav.platform' }, { label: 'nav.renderers', to: '/renderers' }],
+})
+
 const { t } = useI18n()
 const { $api, hook } = useNuxtApp()
 

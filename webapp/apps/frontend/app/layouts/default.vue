@@ -10,17 +10,7 @@
         <div class="flex items-center gap-2 px-4">
           <UiSidebarTrigger class="-ml-1" />
           <UiSeparator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
-          <UiBreadcrumb>
-            <UiBreadcrumbList>
-              <UiBreadcrumbItem class="hidden md:block">
-                <UiBreadcrumbLink href="#"> Building Your Application </UiBreadcrumbLink>
-              </UiBreadcrumbItem>
-              <UiBreadcrumbSeparator class="hidden md:block" />
-              <UiBreadcrumbItem>
-                <UiBreadcrumbPage>Data Fetching</UiBreadcrumbPage>
-              </UiBreadcrumbItem>
-            </UiBreadcrumbList>
-          </UiBreadcrumb>
+          <AppBreadcrumb />
         </div>
       </header>
       <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
