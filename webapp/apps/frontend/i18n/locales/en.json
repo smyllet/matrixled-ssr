@@ -148,7 +148,7 @@
         "targetFps": "Target FPS"
       },
       "validation": {
-        "geometry": "The scene geometry exceeds the protocol maximum of 65536 pixels"
+        "geometry": "The scene geometry exceeds the protocol maximum of {max} pixels"
       },
       "submit": "Create",
       "cancel": "Cancel"
@@ -166,7 +166,7 @@
         "targetFps": "Target FPS"
       },
       "validation": {
-        "geometry": "The scene geometry exceeds the protocol maximum of 65536 pixels"
+        "geometry": "The scene geometry exceeds the protocol maximum of {max} pixels"
       },
       "submit": "Save",
       "cancel": "Cancel"

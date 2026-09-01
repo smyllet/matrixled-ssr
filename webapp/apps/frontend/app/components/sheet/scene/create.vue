@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/scene'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import z from 'zod'
@@ -19,8 +20,8 @@ const formSchema = computed(() =>
         height: z.coerce.number().int().min(1),
         targetFps: z.coerce.number().int().min(1).max(60),
       })
-      .refine((values) => values.width * values.height <= 65536, {
-        message: t('sheets.createScene.validation.geometry'),
+      .refine((values) => values.width * values.height <= PROTOCOL_MAXIMUM_PIXELS, {
+        message: t('sheets.createScene.validation.geometry', { max: PROTOCOL_MAXIMUM_PIXELS }),
         path: ['height'],
       })
   )
@@ -129,9 +130,9 @@ const onSubmit = form.handleSubmit(async (values) => {
                 <UiFormControl>
                   <UiSlider
                     :model-value="[value]"
-                    :min="5"
+                    :min="1"
                     :max="60"
-                    :step="5"
+                    :step="1"
                     @update:model-value="(v) => handleChange(v?.[0] ?? value)"
                   />
                 </UiFormControl>

@@ -148,7 +148,7 @@
         "targetFps": "Cadence cible"
       },
       "validation": {
-        "geometry": "La géométrie de la scène dépasse le maximum du protocole de 65536 pixels"
+        "geometry": "La géométrie de la scène dépasse le maximum du protocole de {max} pixels"
       },
       "submit": "Créer",
       "cancel": "Annuler"
@@ -166,7 +166,7 @@
         "targetFps": "Cadence cible"
       },
       "validation": {
-        "geometry": "La géométrie de la scène dépasse le maximum du protocole de 65536 pixels"
+        "geometry": "La géométrie de la scène dépasse le maximum du protocole de {max} pixels"
       },
       "submit": "Enregistrer",
       "cancel": "Annuler"
