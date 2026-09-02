@@ -1,3 +1,6 @@
+import SceneCreated from '#events/scene_created'
+import SceneDeleted from '#events/scene_deleted'
+import SceneUpdated from '#events/scene_updated'
 import Scene from '#models/scene'
 import { sceneGeometryValidator, type SceneConfig } from '#validators/scene'
 
@@ -42,6 +45,8 @@ export class SceneService {
      * it. Reload so the response describes the stored row.
      */
     await scene.refresh()
+
+    SceneCreated.dispatch(scene)
 
     return scene
   }
@@ -98,6 +103,8 @@ export class SceneService {
     if (modified) {
       await Scene.query().where('id', scene.id).increment('version', 1)
       await scene.refresh()
+
+      SceneUpdated.dispatch(scene)
     }
 
     return scene
@@ -105,5 +112,7 @@ export class SceneService {
 
   async deleteScene(scene: Scene) {
     await scene.delete()
+
+    SceneDeleted.dispatch(scene)
   }
 }

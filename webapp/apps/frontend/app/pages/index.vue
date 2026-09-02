@@ -5,13 +5,9 @@ definePageMeta({
   breadcrumb: [{ label: 'nav.platform' }, { label: 'nav.matrices', to: '/' }],
 })
 
-const { $api, hook } = useNuxtApp()
+const { $api } = useNuxtApp()
 
-const {
-  data: matrices,
-  pending,
-  refresh,
-} = useAsyncData('matrices', async () => {
+const { data: matrices, pending } = useAsyncData('matrices', async () => {
   const [data, error] = await $api.request('matrices.index', {}).safe()
 
   if (error) {
@@ -19,16 +15,6 @@ const {
   }
 
   return data.data
-})
-
-hook('app:matrix:created', async () => {
-  await refresh()
-})
-hook('app:matrix:deleted', async () => {
-  await refresh()
-})
-hook('app:matrix:updated', async () => {
-  await refresh()
 })
 </script>
 

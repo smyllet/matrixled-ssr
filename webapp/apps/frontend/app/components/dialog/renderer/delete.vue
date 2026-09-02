@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { $api, callHook } = useNuxtApp()
+const { $api } = useNuxtApp()
 
 const deleteError = ref<string | null>(null)
 
@@ -28,8 +28,6 @@ async function deleteRenderer() {
     deleteError.value = t('dialogs.deleteRenderer.failure.unknownDescription')
     return
   }
-
-  await callHook('app:renderer:deleted', props.renderer.id)
 
   open.value = false
 }

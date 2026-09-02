@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { $api, callHook } = useNuxtApp()
+const { $api } = useNuxtApp()
 
 let deleteError = ref<string | null>(null)
 
@@ -28,8 +28,6 @@ async function deleteMatrix() {
     deleteError.value = t('dialogs.deleteMatrix.failure.unknownDescription')
     return
   }
-
-  await callHook('app:matrix:deleted', props.matrix.id)
 
   open.value = false
 }

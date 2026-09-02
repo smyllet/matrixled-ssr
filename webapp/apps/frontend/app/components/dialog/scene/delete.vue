@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { $api, callHook } = useNuxtApp()
+const { $api } = useNuxtApp()
 
 const deleteError = ref<string | null>(null)
 
@@ -28,8 +28,6 @@ async function deleteScene() {
     deleteError.value = t('dialogs.deleteScene.failure.unknownDescription')
     return
   }
-
-  await callHook('app:scene:deleted', props.scene.id)
 
   open.value = false
 }

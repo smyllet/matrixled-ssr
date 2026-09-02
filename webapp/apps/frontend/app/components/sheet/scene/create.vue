@@ -5,7 +5,7 @@ import { useForm } from 'vee-validate'
 import z from 'zod'
 
 const { t } = useI18n()
-const { $api, callHook } = useNuxtApp()
+const { $api } = useNuxtApp()
 
 const open = ref(false)
 
@@ -40,7 +40,7 @@ const form = useForm({
 const onSubmit = form.handleSubmit(async (values) => {
   creationError.value = null
 
-  const [data, error] = await $api
+  const [_, error] = await $api
     .request('scenes.store', {
       body: values,
     })
@@ -53,8 +53,6 @@ const onSubmit = form.handleSubmit(async (values) => {
   }
 
   form.resetForm()
-
-  await callHook('app:scene:created', data.data)
 
   open.value = false
 })

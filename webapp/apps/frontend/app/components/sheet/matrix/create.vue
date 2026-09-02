@@ -4,7 +4,7 @@ import { useForm } from 'vee-validate'
 import z from 'zod'
 
 const { t } = useI18n()
-const { $api, callHook } = useNuxtApp()
+const { $api } = useNuxtApp()
 
 const open = ref(false)
 
@@ -33,7 +33,7 @@ const onSubmit = form.handleSubmit(async (values) => {
   console.log('Submitting form with values:', values)
   creationError.value = null
 
-  const [data, error] = await $api
+  const [_, error] = await $api
     .request('matrices.store', {
       body: values,
     })
@@ -46,8 +46,6 @@ const onSubmit = form.handleSubmit(async (values) => {
   }
 
   form.resetForm()
-
-  await callHook('app:matrix:created', data.data)
 
   open.value = false
 })

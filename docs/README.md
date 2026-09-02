@@ -28,6 +28,7 @@
 | [DATA-MODEL.md](DATA-MODEL.md) | Renderer / Device / Scene, credentials, migration | Backend |
 | [PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md) | Protocole binaire renderer ↔ device | Firmware, renderer, simulateur |
 | [PROTOCOL-CONTROL.md](PROTOCOL-CONTROL.md) | Protocole de contrôle renderer ↔ Adonis | Backend, renderer |
+| [PROTOCOL-DASHBOARD.md](PROTOCOL-DASHBOARD.md) | Notifications SSE Adonis → navigateur | Backend, frontend |
 | [SELF-HOSTING.md](SELF-HOSTING.md) | Contrat d'un renderer tiers | Renderer |
 | [SIMULATOR.md](SIMULATOR.md) | Simulateur, implémentation de référence | Frontend |
 
@@ -99,3 +100,4 @@ les fonctionnalités :
 | L'agrandissement `k×k` est fait par le renderer, donc payé sur le lien le plus contraint | [ADR-0018](adr/0018-geometrie-native-de-la-scene.md) |
 | Ce que fait un renderer d'un device qui remonte des FPS très inférieures à sa cadence effective | [ADR-0019](adr/0019-cadence-portee-par-la-scene.md) |
 | Le plan de contrôle n'a aucun accusé de réception, d'où une fenêtre de course après une rotation | [ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md) |
+| Le canal de notification du dashboard est mono-instance : derrière un répartiteur de charge, une partie des clients ne recevrait rien, silencieusement | [ADR-0022](adr/0022-notifications-dashboard-par-sse.md) |

@@ -1,3 +1,6 @@
+import MatrixCreated from '#events/matrix_created'
+import MatrixDeleted from '#events/matrix_deleted'
+import MatrixUpdated from '#events/matrix_updated'
 import Matrix from '#models/matrix'
 
 const DEFAULT_MATRIX_CONFIG = {}
@@ -22,7 +25,17 @@ export class MatrixService {
     height: number
     userId: string
   }) {
-    return Matrix.create({ name, width, height, userId, config: DEFAULT_MATRIX_CONFIG })
+    const matrix = await Matrix.create({
+      name,
+      width,
+      height,
+      userId,
+      config: DEFAULT_MATRIX_CONFIG,
+    })
+
+    MatrixCreated.dispatch(matrix)
+
+    return matrix
   }
 
   async patchMatrix(
@@ -38,12 +51,25 @@ export class MatrixService {
     matrix.name = name ?? matrix.name
     matrix.config = config ?? matrix.config
 
+    /**
+     * Read before `save()`, which resets the tracking. A client resubmitting an
+     * unchanged form — the edit sheet does — must not wake every open tab for a
+     * refetch that would return the row it already holds.
+     */
+    const modified = matrix.$isDirty
+
     await matrix.save()
+
+    if (modified) {
+      MatrixUpdated.dispatch(matrix)
+    }
 
     return matrix
   }
 
   async deleteMatrix(matrix: Matrix) {
     await matrix.delete()
+
+    MatrixDeleted.dispatch(matrix)
   }
 }

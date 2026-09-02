@@ -221,6 +221,11 @@
       "description": "This token is shown once. Copy it now: it cannot be retrieved again.",
       "copy": "Copy",
       "copied": "Copied"
+    },
+    "connectionLost": {
+      "title": "Live updates stopped",
+      "description": "The connection to the server was lost and could not be restored. This page no longer reflects any change, your own included. Reload to reconnect.",
+      "reload": "Reload"
     }
   }
 }

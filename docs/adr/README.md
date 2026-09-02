@@ -40,3 +40,4 @@ rouvre en refaisant toute l'analyse.
 | [0019](0019-cadence-portee-par-la-scene.md) | La cadence appartient à la scène, le device en pose le plafond | Accepté |
 | [0020](0020-simulateur-device-declare.md) | Le simulateur est un device déclaré, pas un device emprunté | Accepté |
 | [0021](0021-credential-du-simulateur-par-rotation.md) | Le simulateur obtient son credential par rotation à l'ouverture | Accepté |
+| [0022](0022-notifications-dashboard-par-sse.md) | Notifications du dashboard en SSE, émises par un bus d'événements de domaine | Accepté |

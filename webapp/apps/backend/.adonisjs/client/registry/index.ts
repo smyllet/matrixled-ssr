@@ -126,6 +126,24 @@ const routes = {
     tokens: [{"old":"/api/v1/scenes/:id","type":0,"val":"api","end":""},{"old":"/api/v1/scenes/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/scenes/:id","type":0,"val":"scenes","end":""},{"old":"/api/v1/scenes/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['scenes.delete']['types'],
   },
+  'event_stream': {
+    methods: ["GET","HEAD"],
+    pattern: '/__transmit/events',
+    tokens: [{"old":"/__transmit/events","type":0,"val":"__transmit","end":""},{"old":"/__transmit/events","type":0,"val":"events","end":""}],
+    types: placeholder as Registry['event_stream']['types'],
+  },
+  'subscribe': {
+    methods: ["POST"],
+    pattern: '/__transmit/subscribe',
+    tokens: [{"old":"/__transmit/subscribe","type":0,"val":"__transmit","end":""},{"old":"/__transmit/subscribe","type":0,"val":"subscribe","end":""}],
+    types: placeholder as Registry['subscribe']['types'],
+  },
+  'unsubscribe': {
+    methods: ["POST"],
+    pattern: '/__transmit/unsubscribe',
+    tokens: [{"old":"/__transmit/unsubscribe","type":0,"val":"__transmit","end":""},{"old":"/__transmit/unsubscribe","type":0,"val":"unsubscribe","end":""}],
+    types: placeholder as Registry['unsubscribe']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

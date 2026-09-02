@@ -15,7 +15,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { $api, callHook } = useNuxtApp()
+const { $api } = useNuxtApp()
 
 const open = ref(false)
 
@@ -62,7 +62,7 @@ watch(
 const onSubmit = form.handleSubmit(async (values) => {
   editionError.value = null
 
-  const [data, error] = await $api
+  const [_, error] = await $api
     .request('scenes.patch', {
       params: { id: props.scene.id },
       body: values,
@@ -74,8 +74,6 @@ const onSubmit = form.handleSubmit(async (values) => {
 
     return
   }
-
-  await callHook('app:scene:updated', data.data)
 
   open.value = false
 })

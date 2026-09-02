@@ -41,6 +41,15 @@ export default defineNuxtConfig({
       '/api': {
         target: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:3333/api',
       },
+      /**
+       * The transmit routes are registered at the backend root, outside the
+       * `/api` prefix, so they need their own entry. Without it the browser
+       * would open the `EventSource` on `:3333` cross-origin, and the session
+       * cookie (`httpOnly`, `sameSite: lax`) would stay behind.
+       */
+      '/__transmit': {
+        target: 'http://localhost:3333/__transmit',
+      },
     },
   },
 })
