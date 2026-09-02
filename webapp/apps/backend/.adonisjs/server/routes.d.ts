@@ -24,6 +24,9 @@ export type ScannedRoutes = {
     'scenes.store': { paramsTuple?: []; params?: {} }
     'scenes.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'event_stream': { paramsTuple?: []; params?: {} }
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
@@ -33,6 +36,7 @@ export type ScannedRoutes = {
     'renderers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.index': { paramsTuple?: []; params?: {} }
     'scenes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'event_stream': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
@@ -42,6 +46,7 @@ export type ScannedRoutes = {
     'renderers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.index': { paramsTuple?: []; params?: {} }
     'scenes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'event_stream': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
@@ -51,6 +56,8 @@ export type ScannedRoutes = {
     'renderers.store': { paramsTuple?: []; params?: {} }
     'renderers.token': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.store': { paramsTuple?: []; params?: {} }
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
     'matrices.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

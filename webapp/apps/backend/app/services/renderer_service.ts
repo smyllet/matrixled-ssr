@@ -1,3 +1,6 @@
+import RendererCreated from '#events/renderer_created'
+import RendererDeleted from '#events/renderer_deleted'
+import RendererUpdated from '#events/renderer_updated'
 import Renderer from '#models/renderer'
 import { TokenService } from '#services/token_service'
 import { inject } from '@adonisjs/core'
@@ -44,6 +47,8 @@ export class RendererService {
      */
     await renderer.refresh()
 
+    RendererCreated.dispatch(renderer)
+
     return { renderer, token: credential.token }
   }
 
@@ -80,13 +85,26 @@ export class RendererService {
   async patchRenderer(renderer: Renderer, { name }: Partial<{ name: string }>) {
     renderer.name = name ?? renderer.name
 
+    /**
+     * Read before `save()`, which resets the tracking. A client resubmitting an
+     * unchanged form — the edit sheet does — must not wake every open tab for a
+     * refetch that would return the row it already holds.
+     */
+    const modified = renderer.$isDirty
+
     await renderer.save()
+
+    if (modified) {
+      RendererUpdated.dispatch(renderer)
+    }
 
     return renderer
   }
 
   async deleteRenderer(renderer: Renderer) {
     await renderer.delete()
+
+    RendererDeleted.dispatch(renderer)
   }
 
   /**
@@ -100,6 +118,8 @@ export class RendererService {
     renderer.tokenHash = credential.hash
 
     await renderer.save()
+
+    RendererUpdated.dispatch(renderer)
 
     return { renderer, token: credential.token }
   }

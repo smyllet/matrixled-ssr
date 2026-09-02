@@ -3,4 +3,6 @@
  * DO NOT EDIT manually
  */
 
-export const listeners = {}
+export const listeners = {
+  BroadcastDashboardEvent: () => import('#listeners/broadcast_dashboard_event'),
+}

@@ -57,6 +57,7 @@ export default defineConfig({
     () => import('#providers/api_provider'),
     () => import('#providers/platform_renderer_provider'),
     () => import('@adonisjs/bouncer/bouncer_provider'),
+    () => import('@adonisjs/transmit/transmit_provider'),
   ],
 
   /*
@@ -71,6 +72,8 @@ export default defineConfig({
     () => import('#start/routes'),
     () => import('#start/kernel'),
     () => import('#start/validator'),
+    () => import('#start/transmit'),
+    () => import('#start/events'),
   ],
 
   /*
