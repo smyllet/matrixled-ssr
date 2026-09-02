@@ -65,6 +65,11 @@ dalles, pas les pixels.
 **Plan de contrôle** — Le chemin qui porte la configuration et l'état : renderer ↔ Adonis, JSON, à faible
 fréquence. Voir [ADR-0007](adr/0007-plan-de-controle-wss.md).
 
+**Canal de notification du dashboard** — Le chemin qui prévient le navigateur qu'une donnée a changé : Adonis →
+dashboard, en SSE, strictement descendant. Il ne porte qu'un identifiant, le dashboard relisant ensuite par
+l'API REST ([PROTOCOL-DASHBOARD.md](PROTOCOL-DASHBOARD.md)). **Ce n'est pas le plan de contrôle**, qui désigne
+strictement renderer ↔ Adonis — malgré une enveloppe de même forme.
+
 **Bootstrap** — La phase de démarrage d'un device : il demande à la plateforme l'adresse de son renderer avant
 de s'y connecter ([ADR-0009](adr/0009-bootstrap-par-redirection.md)).
 

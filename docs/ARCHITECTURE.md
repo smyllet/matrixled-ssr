@@ -11,8 +11,9 @@
 ┌───────────────────┐
 │   Nuxt (SPA)      │  Dashboard : appairage, scènes, supervision
 └─────────┬─────────┘
-          │ HTTP/JSON — API REST, types partagés via Tuyau
-          ▼
+          │ ▲  HTTP/JSON — API REST, types partagés via Tuyau
+          │ │  SSE — Adonis notifie le dashboard d'un changement
+          ▼ │  Enveloppe JSON versionnée {v, type, payload}
 ┌───────────────────┐      ┌──────────────┐
 │  AdonisJS         │─────▶│  PostgreSQL  │   Adonis est le SEUL à accéder à la base
 │  PLAN DE CONTRÔLE │      └──────────────┘
@@ -61,16 +62,21 @@ La séparation **plan de contrôle / plan de données** est la clé de lecture d
 contrôle est peu fréquent, typé lâchement, tolérant à la latence. Le plan de données est à cadence fixe, binaire,
 et sensible à la milliseconde. Ils n'ont ni le même transport, ni le même format, ni les mêmes garanties.
 
-## Les trois protocoles
+## Les quatre protocoles
 
 | # | Chemin | Transport | Format | Cadence | Spécification |
 |---|--------|-----------|--------|---------|---------------|
 | 1 | Renderer → Device | WebSocket | **Binaire** | 1 à 60 FPS, 30 par défaut | [PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md) |
 | 2 | Renderer ↔ Adonis | WSS sortant | JSON versionné | Événementiel | [PROTOCOL-CONTROL.md](PROTOCOL-CONTROL.md) |
 | 3 | Device → Adonis | HTTP | JSON | Une fois au boot | [PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md#bootstrap) |
+| 4 | Adonis → Navigateur | SSE | JSON versionné | Événementiel | [PROTOCOL-DASHBOARD.md](PROTOCOL-DASHBOARD.md) |
 
 Le JSON du protocole 2 n'est pas une entorse au principe « binaire uniquement » : ce principe ne s'applique qu'au
 protocole 1, où le coût de parsing est payé trente fois par seconde sur un microcontrôleur.
+
+Le protocole 4 est le seul qui **remonte** vers le navigateur. Il ne porte que des notifications de changement,
+réduites à un identifiant : le dashboard relit ensuite la ressource par l'API REST
+([ADR-0022](adr/0022-notifications-dashboard-par-sse.md)).
 
 ## Ports
 
