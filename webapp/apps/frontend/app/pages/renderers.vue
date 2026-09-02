@@ -6,13 +6,9 @@ definePageMeta({
 })
 
 const { t } = useI18n()
-const { $api, hook } = useNuxtApp()
+const { $api } = useNuxtApp()
 
-const {
-  data: renderers,
-  pending,
-  refresh,
-} = useAsyncData('renderers', async () => {
+const { data: renderers, pending } = useAsyncData('renderers', async () => {
   const [data, error] = await $api.request('renderers.index', {}).safe()
 
   if (error) {
@@ -20,16 +16,6 @@ const {
   }
 
   return data.data
-})
-
-hook('app:renderer:created', async () => {
-  await refresh()
-})
-hook('app:renderer:updated', async () => {
-  await refresh()
-})
-hook('app:renderer:deleted', async () => {
-  await refresh()
 })
 
 /**

@@ -221,6 +221,11 @@
       "description": "Ce token n'est affiché qu'une seule fois. Copiez-le maintenant : il ne pourra plus être récupéré.",
       "copy": "Copier",
       "copied": "Copié"
+    },
+    "connectionLost": {
+      "title": "Mises à jour temps réel interrompues",
+      "description": "La connexion au serveur a été perdue et n'a pas pu être rétablie. Cette page ne reflète plus aucune modification, y compris les vôtres. Rechargez pour vous reconnecter.",
+      "reload": "Recharger"
     }
   }
 }

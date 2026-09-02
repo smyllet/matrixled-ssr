@@ -8,17 +8,8 @@ const props = withDefaults(defineProps<SidebarProps>(), {
 })
 
 const { t } = useI18n()
-const { $api } = useNuxtApp()
 
-const { data: user } = useAsyncData('user', async () => {
-  const [data, error] = await $api.request('profile.profile.show', {}).safe()
-
-  if (error) {
-    return undefined
-  }
-
-  return data.data
-})
+const { data: user } = useCurrentUser()
 
 const data = computed(() => ({
   user: user.value,

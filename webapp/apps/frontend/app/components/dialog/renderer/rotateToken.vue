@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { $api, callHook } = useNuxtApp()
+const { $api } = useNuxtApp()
 
 const rotationError = ref<string | null>(null)
 
@@ -36,8 +36,6 @@ async function rotateToken() {
   }
 
   issuedToken.value = data.data.token
-
-  await callHook('app:renderer:updated', data.data)
 }
 
 function close() {

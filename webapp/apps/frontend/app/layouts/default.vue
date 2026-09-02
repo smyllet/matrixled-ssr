@@ -1,4 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+/**
+ * This layout is exactly the "signed-in user" perimeter — `login.vue` and
+ * `register.vue` use `empty` — so the dashboard channel opens here and closes
+ * with it.
+ */
+useDashboardEvents()
+</script>
 
 <template>
   <UiSidebarProvider>
@@ -14,6 +21,7 @@
         </div>
       </header>
       <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <AppConnectionLost />
         <slot />
       </div>
     </UiSidebarInset>

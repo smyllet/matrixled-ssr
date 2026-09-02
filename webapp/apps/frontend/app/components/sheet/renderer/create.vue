@@ -5,7 +5,7 @@ import { useForm } from 'vee-validate'
 import z from 'zod'
 
 const { t } = useI18n()
-const { $api, callHook } = useNuxtApp()
+const { $api } = useNuxtApp()
 
 const open = ref(false)
 
@@ -50,8 +50,6 @@ const onSubmit = form.handleSubmit(async (values) => {
   form.resetForm()
 
   issuedToken.value = data.data.token
-
-  await callHook('app:renderer:created', data.data)
 })
 
 function close() {
