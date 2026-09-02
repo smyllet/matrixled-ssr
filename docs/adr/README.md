@@ -41,3 +41,4 @@ rouvre en refaisant toute l'analyse.
 | [0020](0020-simulateur-device-declare.md) | Le simulateur est un device déclaré, pas un device emprunté | Accepté |
 | [0021](0021-credential-du-simulateur-par-rotation.md) | Le simulateur obtient son credential par rotation à l'ouverture | Accepté |
 | [0022](0022-notifications-dashboard-par-sse.md) | Notifications du dashboard en SSE, émises par un bus d'événements de domaine | Accepté |
+| [0023](0023-typecheck-du-frontend-par-vue-tsc.md) | Type-vérification du frontend par `vue-tsc`, sur le même programme que les sources du backend | Accepté |

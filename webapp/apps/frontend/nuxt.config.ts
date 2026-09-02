@@ -31,6 +31,17 @@ export default defineNuxtConfig({
   },
   typescript: {
     tsConfig: {
+      compilerOptions: {
+        /**
+         * `@matrixled-ssr/backend/registry` is exported as TypeScript source, and
+         * its types reach into the controllers, validators and Lucid models. Those
+         * files are therefore compiled as part of *this* program, and Lucid's
+         * `@column`/`@belongsTo` decorators only parse under the legacy semantics
+         * the backend's own tsconfig enables. Without this, a frontend typecheck
+         * drowns in `TS1206: Decorators are not valid here` coming from the backend.
+         */
+        experimentalDecorators: true,
+      },
       vueCompilerOptions: {
         checkUnknownComponents: true,
       },

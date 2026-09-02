@@ -13,7 +13,7 @@ export default class RendererWithTokenTransformer extends RendererTransformer {
     super(resource)
   }
 
-  toObject() {
+  override toObject() {
     return {
       ...super.toObject(),
       token: this.token,

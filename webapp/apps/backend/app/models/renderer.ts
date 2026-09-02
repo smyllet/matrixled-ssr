@@ -4,7 +4,7 @@ import User from './user.ts'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
 export default class Renderer extends RendererSchema {
-  static selfAssignPrimaryKey = true
+  static override selfAssignPrimaryKey = true
 
   /**
    * A null owner is the platform renderer, shared by every user.
