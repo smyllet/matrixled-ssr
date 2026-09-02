@@ -4,7 +4,7 @@ import User from './user.ts'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
 export default class Matrix extends MatrixSchema {
-  static selfAssignPrimaryKey = true
+  static override selfAssignPrimaryKey = true
 
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>

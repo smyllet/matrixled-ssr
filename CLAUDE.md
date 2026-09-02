@@ -55,10 +55,12 @@ pnpm format        # rewrites
 pnpm format:check  # reports, exits 1 — this is what CI runs
 ```
 
-Note that `lint`, `typecheck` and `test` only exercise the **backend** — the frontend package defines no such
-scripts. A green `pnpm typecheck` says nothing about the Nuxt app. `format:check` is the one check that covers
-both packages. `.github/workflows/ci.yml` runs these four commands on every pull request, so a green CI still
-says nothing about whether the frontend compiles or works.
+`typecheck` and `format:check` cover **both** packages; `lint` and `test` still only exercise the **backend**.
+The frontend's `typecheck` runs `nuxt typecheck` (vue-tsc), which checks `.vue` templates as well as scripts —
+that is what makes the end-to-end type safety below an actual check rather than a promise. It compiles the
+backend sources the Tuyau registry pulls in, so it is a second, stricter reading of part of the backend too.
+`.github/workflows/ci.yml` runs these four commands on every pull request. A green CI does not say the Nuxt app
+*works* — there is no frontend test suite — but it does say it compiles.
 
 ### Backend
 
@@ -112,11 +114,16 @@ const { $api } = useNuxtApp()
 const [data, error] = await $api.request('matrices.index', {}).safe()
 ```
 
-Route names come from the group/route `.as()` chain in `start/routes.ts`. Renaming a route silently breaks the
-frontend at the type level, so run a backend build after touching route names.
+Route names come from the group/route `.as()` chain in `start/routes.ts`. Renaming a route breaks the frontend
+at the type level; `pnpm typecheck` catches it, since Turbo rebuilds the backend registry first.
 
 Turbo's `dependsOn: ["^build"]` exists precisely because the frontend cannot typecheck before the backend has
 generated its registry.
+
+The registry is exported as TypeScript **source**, and its types reach into the controllers, validators and
+Lucid models — so a frontend typecheck compiles those backend files under the Nuxt program's own options. That
+is why `nuxt.config.ts` sets `experimentalDecorators`, without which Lucid's decorators do not parse. See
+[ADR-0023](docs/adr/0023-typecheck-du-frontend-par-vue-tsc.md).
 
 ### API response shape
 
