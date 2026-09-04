@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/scene'
+import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/protocol'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import z from 'zod'

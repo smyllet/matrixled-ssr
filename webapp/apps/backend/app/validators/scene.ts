@@ -1,4 +1,4 @@
-import { PROTOCOL_MAXIMUM_PIXELS } from '#constants/scene'
+import { boundedByProtocolMaximum } from '#validators/geometry'
 import vine from '@vinejs/vine'
 import type { Infer } from '@vinejs/vine/types'
 
@@ -27,26 +27,6 @@ const sceneConfig = () =>
   })
 
 export type SceneConfig = Infer<ReturnType<typeof sceneConfig>>
-
-/**
- * `width` and `height` are independently optional on a patch, so this rule
- * only ever runs where both are guaranteed present: on create, and again in
- * SceneService.patchScene against the row's merged geometry. It cannot live
- * solely on `patchSceneValidator`, which never sees the unpatched sibling
- * field.
- */
-const boundedByProtocolMaximum = vine.createRule<undefined>((value, _options, field) => {
-  const { width, height } = value as { width: number; height: number }
-
-  if (width * height > PROTOCOL_MAXIMUM_PIXELS) {
-    field.report(
-      'The scene geometry ({{ width }}x{{ height }}) exceeds the protocol maximum of {{ maximum }} pixels',
-      'boundedByProtocolMaximum',
-      field,
-      { width, height, maximum: PROTOCOL_MAXIMUM_PIXELS }
-    )
-  }
-})
 
 const sceneGeometrySchema = vine
   .object({

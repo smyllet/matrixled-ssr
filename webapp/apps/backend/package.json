@@ -4,7 +4,7 @@
   "private": true,
   "license": "MIT",
   "exports": {
-    "./constants/scene": "./app/constants/scene.ts",
+    "./constants/protocol": "./app/constants/protocol.ts",
     "./data": "./.adonisjs/client/data.d.ts",
     "./registry": "./.adonisjs/client/registry/index.ts"
   },

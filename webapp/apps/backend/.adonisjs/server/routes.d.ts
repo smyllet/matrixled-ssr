@@ -8,11 +8,11 @@ export type ScannedRoutes = {
     'auth.session.store': { paramsTuple?: []; params?: {} }
     'profile.profile.show': { paramsTuple?: []; params?: {} }
     'profile.session.destroy': { paramsTuple?: []; params?: {} }
-    'matrices.index': { paramsTuple?: []; params?: {} }
-    'matrices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'matrices.store': { paramsTuple?: []; params?: {} }
-    'matrices.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'matrices.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'devices.index': { paramsTuple?: []; params?: {} }
+    'devices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'devices.store': { paramsTuple?: []; params?: {} }
+    'devices.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'devices.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.index': { paramsTuple?: []; params?: {} }
     'renderers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.store': { paramsTuple?: []; params?: {} }
@@ -30,8 +30,8 @@ export type ScannedRoutes = {
   }
   GET: {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
-    'matrices.index': { paramsTuple?: []; params?: {} }
-    'matrices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'devices.index': { paramsTuple?: []; params?: {} }
+    'devices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.index': { paramsTuple?: []; params?: {} }
     'renderers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.index': { paramsTuple?: []; params?: {} }
@@ -40,8 +40,8 @@ export type ScannedRoutes = {
   }
   HEAD: {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
-    'matrices.index': { paramsTuple?: []; params?: {} }
-    'matrices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'devices.index': { paramsTuple?: []; params?: {} }
+    'devices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.index': { paramsTuple?: []; params?: {} }
     'renderers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.index': { paramsTuple?: []; params?: {} }
@@ -52,7 +52,7 @@ export type ScannedRoutes = {
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
     'auth.session.store': { paramsTuple?: []; params?: {} }
     'profile.session.destroy': { paramsTuple?: []; params?: {} }
-    'matrices.store': { paramsTuple?: []; params?: {} }
+    'devices.store': { paramsTuple?: []; params?: {} }
     'renderers.store': { paramsTuple?: []; params?: {} }
     'renderers.token': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.store': { paramsTuple?: []; params?: {} }
@@ -60,12 +60,12 @@ export type ScannedRoutes = {
     'unsubscribe': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
-    'matrices.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'devices.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
-    'matrices.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'devices.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }

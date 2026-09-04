@@ -9,28 +9,70 @@ import { DateTime } from 'luxon'
 import type { RendererEndpoints } from '#validators/renderer'
 import type { SceneConfig } from '#validators/scene'
 
-export class MatrixSchema extends BaseModel {
+export class DeviceSchema extends BaseModel {
   static $columns = [
-    'config',
+    'brightness',
+    'chainLength',
     'createdAt',
+    'firmwareVersion',
     'height',
     'id',
+    'ipAddress',
+    'kind',
+    'lastSeenAt',
+    'maxFps',
     'name',
+    'offlineGrace',
+    'panelType',
+    'protocolVersion',
+    'rendererId',
+    'sceneId',
+    'status',
+    'tokenHash',
+    'tokenPrefix',
     'updatedAt',
     'userId',
     'width',
   ] as const
-  $columns = MatrixSchema.$columns
+  $columns = DeviceSchema.$columns
   @column()
-  declare config: any
+  declare brightness: number
+  @column()
+  declare chainLength: number
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime | null
+  declare createdAt: DateTime
+  @column()
+  declare firmwareVersion: string | null
   @column()
   declare height: number
   @column({ isPrimary: true })
   declare id: string
   @column()
+  declare ipAddress: string | null
+  @column()
+  declare kind: 'hardware' | 'simulator'
+  @column.dateTime()
+  declare lastSeenAt: DateTime | null
+  @column()
+  declare maxFps: number | null
+  @column()
   declare name: string
+  @column()
+  declare offlineGrace: number | null
+  @column()
+  declare panelType: 'hub75'
+  @column()
+  declare protocolVersion: number | null
+  @column()
+  declare rendererId: string
+  @column()
+  declare sceneId: string | null
+  @column()
+  declare status: 'online' | 'offline' | 'error'
+  @column({ serializeAs: null })
+  declare tokenHash: string
+  @column()
+  declare tokenPrefix: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
   @column()
