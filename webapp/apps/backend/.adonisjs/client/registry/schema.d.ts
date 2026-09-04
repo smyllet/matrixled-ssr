@@ -55,64 +55,64 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/session_controller').default['destroy']>>>
     }
   }
-  'matrices.index': {
+  'devices.index': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v1/matrices'
+    pattern: '/api/v1/devices'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['index']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['index']>>>
     }
   }
-  'matrices.show': {
+  'devices.show': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v1/matrices/:id'
+    pattern: '/api/v1/devices/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['show']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['show']>>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/device').showDeviceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['show']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'matrices.store': {
+  'devices.store': {
     methods: ["POST"]
-    pattern: '/api/v1/matrices'
+    pattern: '/api/v1/devices'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/matrix').createMatrixValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/device').createDeviceValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/matrix').createMatrixValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+      query: ExtractQuery<InferInput<(typeof import('#validators/device').createDeviceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'matrices.patch': {
+  'devices.patch': {
     methods: ["PATCH"]
-    pattern: '/api/v1/matrices/:id'
+    pattern: '/api/v1/devices/:id'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/matrix').patchMatrixValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/device').patchDeviceValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/matrix').patchMatrixValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['patch']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['patch']>>> | { status: 422; response: { errors: SimpleError[] } }
+      query: ExtractQuery<InferInput<(typeof import('#validators/device').patchDeviceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['patch']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['patch']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'matrices.delete': {
+  'devices.delete': {
     methods: ["DELETE"]
-    pattern: '/api/v1/matrices/:id'
+    pattern: '/api/v1/devices/:id'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/matrix').deleteMatrixValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/device').deleteDeviceValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/matrix').deleteMatrixValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['delete']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/matrices_controller').default['delete']>>> | { status: 422; response: { errors: SimpleError[] } }
+      query: ExtractQuery<InferInput<(typeof import('#validators/device').deleteDeviceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['delete']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['delete']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'renderers.index': {

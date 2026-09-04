@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SidebarProps } from '@/components/ui/sidebar'
 
-import { Grid2x2, Layers, Server, Tv2 } from 'lucide-vue-next'
+import { Layers, MonitorSmartphone, Server, Tv2 } from 'lucide-vue-next'
 
 const props = withDefaults(defineProps<SidebarProps>(), {
   collapsible: 'icon',
@@ -15,9 +15,9 @@ const data = computed(() => ({
   user: user.value,
   navMain: [
     {
-      title: t('nav.matrices'),
+      title: t('nav.devices'),
       url: '/',
-      icon: Grid2x2,
+      icon: MonitorSmartphone,
     },
     {
       title: t('nav.scenes'),

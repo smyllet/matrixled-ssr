@@ -7,9 +7,9 @@ import { BaseEvent } from '@adonisjs/core/events'
  * without knowing that SSE exists.
  */
 export type DomainEventName =
-  | 'matrix.created'
-  | 'matrix.updated'
-  | 'matrix.deleted'
+  | 'device.created'
+  | 'device.updated'
+  | 'device.deleted'
   | 'scene.created'
   | 'scene.updated'
   | 'scene.deleted'

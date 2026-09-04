@@ -1,6 +1,6 @@
-import MatrixCreated from '#events/matrix_created'
-import MatrixDeleted from '#events/matrix_deleted'
-import MatrixUpdated from '#events/matrix_updated'
+import DeviceCreated from '#events/device_created'
+import DeviceDeleted from '#events/device_deleted'
+import DeviceUpdated from '#events/device_updated'
 import RendererCreated from '#events/renderer_created'
 import RendererDeleted from '#events/renderer_deleted'
 import RendererUpdated from '#events/renderer_updated'
@@ -8,7 +8,7 @@ import SceneCreated from '#events/scene_created'
 import SceneDeleted from '#events/scene_deleted'
 import SceneUpdated from '#events/scene_updated'
 import BroadcastDashboardEvent from '#listeners/broadcast_dashboard_event'
-import Matrix from '#models/matrix'
+import Device from '#models/device'
 import Renderer from '#models/renderer'
 import Scene from '#models/scene'
 import type { BroadcastService, DashboardEventType } from '#services/broadcast_service'
@@ -35,9 +35,9 @@ function listenerWithSpy() {
   }
 }
 
-function matrix() {
-  const record = new Matrix()
-  record.id = 'matrix-1'
+function device() {
+  const record = new Device()
+  record.id = 'device-1'
   record.userId = 'user-1'
   return record
 }
@@ -59,9 +59,9 @@ function renderer(ownerId: string | null = 'user-1') {
 test.group('Broadcast dashboard event listener', () => {
   test('forwards every event to its owner under the matching name', ({ assert }) => {
     const events = [
-      new MatrixCreated(matrix()),
-      new MatrixUpdated(matrix()),
-      new MatrixDeleted(matrix()),
+      new DeviceCreated(device()),
+      new DeviceUpdated(device()),
+      new DeviceDeleted(device()),
       new SceneCreated(scene()),
       new SceneUpdated(scene()),
       new SceneDeleted(scene()),
@@ -76,9 +76,9 @@ test.group('Broadcast dashboard event listener', () => {
      * itself and prove nothing.
      */
     const expected: DashboardEventType[] = [
-      'matrix.created',
-      'matrix.updated',
-      'matrix.deleted',
+      'device.created',
+      'device.updated',
+      'device.deleted',
       'scene.created',
       'scene.updated',
       'scene.deleted',

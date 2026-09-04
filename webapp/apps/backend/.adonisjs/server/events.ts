@@ -3,13 +3,13 @@
  * DO NOT EDIT manually
  */
 
+import BaseDeviceEvent from '#events/base/device_event'
 import BaseDomainEvent from '#events/base/domain_event'
-import BaseMatrixEvent from '#events/base/matrix_event'
 import BaseRendererEvent from '#events/base/renderer_event'
 import BaseSceneEvent from '#events/base/scene_event'
-import MatrixCreated from '#events/matrix_created'
-import MatrixDeleted from '#events/matrix_deleted'
-import MatrixUpdated from '#events/matrix_updated'
+import DeviceCreated from '#events/device_created'
+import DeviceDeleted from '#events/device_deleted'
+import DeviceUpdated from '#events/device_updated'
 import RendererCreated from '#events/renderer_created'
 import RendererDeleted from '#events/renderer_deleted'
 import RendererUpdated from '#events/renderer_updated'
@@ -19,14 +19,14 @@ import SceneUpdated from '#events/scene_updated'
 
 export const events = {
   base: {
+    DeviceEvent: BaseDeviceEvent,
     DomainEvent: BaseDomainEvent,
-    MatrixEvent: BaseMatrixEvent,
     RendererEvent: BaseRendererEvent,
     SceneEvent: BaseSceneEvent,
   },
-  MatrixCreated: MatrixCreated,
-  MatrixDeleted: MatrixDeleted,
-  MatrixUpdated: MatrixUpdated,
+  DeviceCreated: DeviceCreated,
+  DeviceDeleted: DeviceDeleted,
+  DeviceUpdated: DeviceUpdated,
   RendererCreated: RendererCreated,
   RendererDeleted: RendererDeleted,
   RendererUpdated: RendererUpdated,

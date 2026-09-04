@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/scene'
+import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/protocol'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import z from 'zod'
@@ -39,25 +39,19 @@ const formSchema = computed(() =>
 
 const form = useForm({
   validationSchema: formSchema,
-  initialValues: {
-    name: props.scene.name,
-    width: props.scene.width,
-    height: props.scene.height,
-    targetFps: props.scene.targetFps,
-  },
+  initialValues: valuesOf(props.scene),
 })
 
-watch(
-  () => props.scene,
-  (scene) => {
-    form.setValues({
-      name: scene.name,
-      width: scene.width,
-      height: scene.height,
-      targetFps: scene.targetFps,
-    })
+function valuesOf(scene: (typeof props)['scene']) {
+  return {
+    name: scene.name,
+    width: scene.width,
+    height: scene.height,
+    targetFps: scene.targetFps,
   }
-)
+}
+
+useReseedOnOpen(open, form, () => valuesOf(props.scene))
 
 const onSubmit = form.handleSubmit(async (values) => {
   editionError.value = null

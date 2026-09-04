@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/scene'
+import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/protocol'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import z from 'zod'
@@ -36,6 +36,8 @@ const form = useForm({
     targetFps: 30,
   },
 })
+
+useReseedOnOpen(open, form)
 
 const onSubmit = form.handleSubmit(async (values) => {
   creationError.value = null

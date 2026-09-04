@@ -4,7 +4,9 @@
   "private": true,
   "license": "MIT",
   "exports": {
-    "./constants/scene": "./app/constants/scene.ts",
+    "./constants/device": "./app/constants/device.ts",
+    "./constants/protocol": "./app/constants/protocol.ts",
+    "./shared/geometry": "./app/shared/geometry.ts",
     "./data": "./.adonisjs/client/data.d.ts",
     "./registry": "./.adonisjs/client/registry/index.ts"
   },
@@ -25,6 +27,7 @@
     "#models/*": "./app/models/*.js",
     "#mails/*": "./app/mails/*.js",
     "#services/*": "./app/services/*.js",
+    "#shared/*": "./app/shared/*.js",
     "#listeners/*": "./app/listeners/*.js",
     "#events/*": "./app/events/*.js",
     "#generated/*": "./.adonisjs/server/*.js",

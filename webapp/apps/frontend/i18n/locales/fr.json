@@ -37,19 +37,29 @@
       },
       "noAccount": "Vous n'avez pas de compte ? Inscrivez-vous"
     },
-    "home": {
-      "modules": {
-        "matrices": {
-          "title": "Mes matrices",
-          "table": {
-            "name": "Nom",
-            "size": "Taille (h x l)"
-          },
-          "actions": {
-            "create": "Nouvelle matrice",
-            "delete": "Supprimer"
-          }
-        }
+    "devices": {
+      "title": "Mes devices",
+      "noScene": "Aucune",
+      "table": {
+        "name": "Nom",
+        "size": "Taille (l x h)",
+        "kind": "Type",
+        "status": "État",
+        "scene": "Scène"
+      },
+      "kind": {
+        "hardware": "Matériel",
+        "simulator": "Simulateur"
+      },
+      "status": {
+        "online": "En ligne",
+        "offline": "Hors ligne",
+        "error": "En erreur"
+      },
+      "actions": {
+        "create": "Nouveau device",
+        "edit": "Modifier",
+        "delete": "Supprimer"
       }
     },
     "renderers": {
@@ -100,7 +110,7 @@
   "nav": {
     "logout": "Se déconnecter",
     "platform": "Plateforme",
-    "matrices": "Matrices",
+    "devices": "Devices",
     "renderers": "Renderers",
     "scenes": "Scènes"
   },
@@ -109,17 +119,61 @@
     "tagline": "v0.0.0"
   },
   "sheets": {
-    "createMatrix": {
-      "title": "Créer une matrice",
+    "createDevice": {
+      "title": "Créer un device",
       "failure": {
-        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de création d'une matrice."
+        "title": "Échec de la création",
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de création d'un device."
       },
       "fields": {
         "name": "Nom",
         "width": "Largeur (px)",
-        "height": "Hauteur (px)"
+        "height": "Hauteur (px)",
+        "kind": "Type",
+        "kindDescription": "Choisi une fois pour toutes : un device ne change pas de type ensuite.",
+        "brightness": "Luminosité",
+        "maxFps": "Plafond d'émission",
+        "maxFpsUncapped": "Sans plafond",
+        "maxFpsDescription": "Fréquence maximale à laquelle le device est écrit. La cadence, elle, appartient à la scène."
+      },
+      "kind": {
+        "hardware": "Matériel",
+        "simulator": "Simulateur"
+      },
+      "advanced": "Options avancées",
+      "validation": {
+        "geometry": "La géométrie du device dépasse le maximum du protocole de {max} pixels"
       },
       "submit": "Créer",
+      "cancel": "Annuler",
+      "done": "Terminé"
+    },
+    "editDevice": {
+      "title": "Modifier le device",
+      "failure": {
+        "title": "Échec de la modification",
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de modification du device."
+      },
+      "fields": {
+        "name": "Nom",
+        "width": "Largeur (px)",
+        "height": "Hauteur (px)",
+        "scene": "Scène",
+        "noScene": "Aucune",
+        "sceneDescription": "Seules les scènes dont la géométrie du device est un multiple exact sont proposées.",
+        "renderer": "Renderer",
+        "brightness": "Luminosité",
+        "maxFps": "Plafond d'émission",
+        "maxFpsUncapped": "Sans plafond",
+        "maxFpsDescription": "Fréquence maximale à laquelle le device est écrit. La cadence, elle, appartient à la scène.",
+        "offlineGrace": "Bail hors ligne (secondes)",
+        "offlineGraceDescription": "Durée pendant laquelle un renderer peut continuer à servir ce device sans nouvelle de la plateforme. 0 signifie un bail sans expiration."
+      },
+      "validation": {
+        "geometry": "La géométrie du device dépasse le maximum du protocole de {max} pixels",
+        "scene": "Cette scène ne peut plus être affichée sur la géométrie du device"
+      },
+      "submit": "Enregistrer",
       "cancel": "Annuler"
     },
     "createRenderer": {
@@ -173,15 +227,15 @@
     }
   },
   "dialogs": {
-    "deleteMatrix": {
+    "deleteDevice": {
+      "title": "Supprimer le device",
+      "description": "Êtes-vous sûr de vouloir supprimer le device {0} ? Cette action est irréversible.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer",
       "failure": {
         "title": "Échec de la suppression",
-        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de suppression de la matrice."
-      },
-      "title": "Supprimer la matrice",
-      "description": "Êtes-vous sûr de vouloir supprimer la matrice {0} ? Cette action est irréversible.",
-      "cancel": "Annuler",
-      "confirm": "Supprimer"
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de suppression du device."
+      }
     },
     "deleteRenderer": {
       "title": "Supprimer le renderer",
@@ -217,7 +271,7 @@
   },
   "components": {
     "tokenReveal": {
-      "title": "Token du renderer",
+      "title": "Token d'accès",
       "description": "Ce token n'est affiché qu'une seule fois. Copiez-le maintenant : il ne pourra plus être récupéré.",
       "copy": "Copier",
       "copied": "Copié"

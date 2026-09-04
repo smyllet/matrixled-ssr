@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { Check, Copy } from 'lucide-vue-next'
 
+/**
+ * Shows a freshly issued credential — a renderer's or a device's — for the one
+ * moment it exists. Nothing here can read a token back, so the component is
+ * always fed from the response that minted it.
+ */
 const props = defineProps<{
   token: string
 }>()
