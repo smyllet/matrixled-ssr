@@ -74,7 +74,8 @@ capacités affichera un résultat faux au lieu de refuser une scène.
 | `max_pixels_per_device` | Plafond de géométrie. Ne peut excéder 65 536 ([PROTOCOL-DEVICE.md](PROTOCOL-DEVICE.md)) |
 
 Le renderer déclare en outre ses **`endpoints`** : les adresses auxquelles ses devices peuvent le joindre,
-`wss://`, `ws://`, ou les deux ([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)). Sur un réseau
+`wss://`, `ws://`, ou les deux, de 1 à 4 entrées d'au plus 255 caractères
+([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)). Sur un réseau
 local, `ws://` en clair est un choix assumé : sans certificat reconnu, un `wss://` auto-signé non épinglé
 n'apporte que du chiffrement, pas d'authentification. Déclarer aussi un `wss://` avec un certificat reconnu est
 ce qui rend le renderer atteignable depuis le simulateur du dashboard hébergé ([SIMULATOR.md](SIMULATOR.md)).

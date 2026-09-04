@@ -15,7 +15,7 @@ interface RendererPayload {
   isDefault: boolean
   tokenPrefix: string
   version: string | null
-  endpoint: string | null
+  endpoints: string[] | null
   status: string
   token?: string
 }
@@ -123,7 +123,7 @@ test.group('Renderers', () => {
       .json({
         name: 'Living room renderer',
         version: '9.9.9',
-        endpoint: 'wss://attacker.example',
+        endpoints: ['wss://attacker.example'],
         status: 'online',
         isDefault: true,
       })
@@ -133,7 +133,7 @@ test.group('Renderers', () => {
 
     const created = rendererFrom(response.body())
     assert.isNull(created.version)
-    assert.isNull(created.endpoint)
+    assert.isNull(created.endpoints)
     assert.equal(created.status, 'offline')
     assert.isFalse(created.isDefault)
   })

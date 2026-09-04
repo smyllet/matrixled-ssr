@@ -82,6 +82,10 @@ transmet telle quelle au bootstrap et **ne choisit pas** à la place du client
 ([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)). Il ne peut d'ailleurs rien vérifier : un renderer
 auto-hébergé lui est injoignable.
 
+Ce qu'il fait, c'est **borner** : de 1 à 4 entrées, chacune une URL en `ws://` ou `wss://` d'au plus 255
+caractères. Un `hello` qui dépasse est rejeté — la borne protège la taille de la ligne, elle ne cherche pas à
+deviner quelle adresse était la bonne.
+
 `state_version` est le pivot de la resynchronisation.
 
 ### `device.status`
