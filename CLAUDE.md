@@ -5,9 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Read the specs first
 
 `docs/` is the source of truth for where this project is going, and **it describes an architecture the code only
-partly implements**. Reading the code alone will mislead you: `Renderer` exists, but the code still has a
-`Matrix` entity where the specs define `Device` and `Scene`, and the Go renderer, the binary device protocol and
-the firmware do not exist at all.
+partly implements**. Reading the code alone will mislead you: the `Renderer` / `Device` / `Scene` model
+exists, but the Go renderer, the binary device protocol and the firmware do not exist at all.
 
 Start with `docs/GLOSSARY.md` (short, and it prevents the main vocabulary confusion), then
 `docs/ARCHITECTURE.md`. Decisions and their rejected alternatives live in `docs/adr/`.
@@ -73,8 +72,8 @@ node ace generate:key
 
 node ace test                              # both suites
 node ace test unit                         # one suite: unit | functional
-node ace test --files="matrix"             # files matching a pattern
-node ace test --tests="creates a matrix"   # a single test by title
+node ace test --files="device"             # files matching a pattern
+node ace test --tests="creates a device"   # a single test by title
 ```
 
 Suites are declared in `adonisrc.ts`: `unit` (`tests/unit/**`, 2s timeout) and `functional`
@@ -99,7 +98,7 @@ wrong.
 
 - **`database/schema.ts`** is generated from the migrations (Lucid `schemaGeneration`, configured in
   `config/database.ts`). Models do not declare their own columns — they extend the generated classes:
-  `Matrix extends MatrixSchema`, `User extends compose(UserSchema, withAuthFinder(hash))`. After changing a
+  `Device extends DeviceSchema`, `User extends compose(UserSchema, withAuthFinder(hash))`. After changing a
   migration, re-run `node ace migration:run` to regenerate it. Custom rules go in `database/schema_rules.ts`.
 - **`.adonisjs/`** holds the Tuyau client registry and server-side controller/route manifests, regenerated on
   build and dev.
@@ -111,7 +110,7 @@ from the generated registry in `app/plugins/api.ts`. Calls are made by **route n
 
 ```ts
 const { $api } = useNuxtApp()
-const [data, error] = await $api.request('matrices.index', {}).safe()
+const [data, error] = await $api.request('devices.index', {}).safe()
 ```
 
 Route names come from the group/route `.as()` chain in `start/routes.ts`. Renaming a route breaks the frontend
@@ -136,8 +135,8 @@ transformers in `app/transformers/` control which fields are exposed.
 - Subpath imports throughout: `#controllers/*`, `#models/*`, `#services/*`, `#validators/*`, `#policies/*`,
   `#transformers/*` (mapped in `package.json`).
 - Controllers stay thin: validate with a VineJS validator, authorise with a Bouncer policy, delegate to a
-  service. `app/controllers/matrices_controller.ts` is the reference shape.
-- Authorisation is owner-based via policies (`app/policies/matrix_policy.ts`).
+  service. `app/controllers/devices_controller.ts` is the reference shape.
+- Authorisation is owner-based via policies (`app/policies/device_policy.ts`).
 - Primary keys are self-assigned UUIDs, generated in a `@beforeCreate` hook — `static selfAssignPrimaryKey = true`.
 - The API is JSON-only: `force_json_response_middleware` is registered globally.
 
@@ -157,7 +156,6 @@ transformers in `app/transformers/` control which fields are exposed.
 
 - **Devices cannot authenticate.** The token guard was deliberately removed in `59e299f`, leaving only the
   session guard. Anything requiring non-browser authentication needs it reintroduced first (issue #21).
-- `Matrix.config` is `vine.record(vine.any())` typed `any` — validated by nothing today.
 
 ## Commits
 
