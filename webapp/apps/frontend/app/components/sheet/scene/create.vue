@@ -37,15 +37,7 @@ const form = useForm({
   },
 })
 
-/**
- * The sheet unmounts its content when it closes, so vee-validate drops every
- * field with it and a reopened form would come back empty rather than at its
- * defaults. Reset on open, which is also what a creation form should do with
- * an abandoned draft.
- */
-watch(open, (opened) => {
-  if (opened) form.resetForm()
-})
+useReseedOnOpen(open, form)
 
 const onSubmit = form.handleSubmit(async (values) => {
   creationError.value = null

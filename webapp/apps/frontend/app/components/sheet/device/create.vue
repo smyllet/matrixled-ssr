@@ -60,7 +60,7 @@ const form = useForm({
    * fields inside. vee-validate drops the value of a field it sees unmount, so
    * without this a device folded back to its summary would be created with no
    * brightness and no cap at all — the fields are hidden here, never withdrawn.
-   * Reopening the sheet resets the form, so this keeps no draft across a close.
+   * `useReseedOnOpen` resets the form, so this keeps no draft across a close.
    */
   keepValuesOnUnmount: true,
   initialValues: {
@@ -73,13 +73,7 @@ const form = useForm({
   },
 })
 
-/**
- * The values survive the collapsible, but not a close: a creation form reopened
- * starts from its defaults rather than from an abandoned draft.
- */
-watch(open, (opened) => {
-  if (opened) form.resetForm()
-})
+useReseedOnOpen(open, form)
 
 const onSubmit = form.handleSubmit(async (values) => {
   creationError.value = null

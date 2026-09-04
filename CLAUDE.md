@@ -147,6 +147,9 @@ transformers in `app/transformers/` control which fields are exposed.
 - shadcn-nuxt components are auto-imported with a `Ui` prefix (`UiButton`, `UiTable`).
 - In dev, `/api` is proxied to `http://localhost:3333/api` by Nitro; there is no CORS setup in dev.
 - All user-facing strings go through i18n (`i18n/locales/{en,fr}.json`).
+- **A sheet holding a form must call `useReseedOnOpen(open, form[, seed])`.** A sheet unmounts its content when
+  it closes and vee-validate drops the value of every field it sees unmount, so a form reopened comes back
+  empty; the composable reseeds it — a creation form to its defaults, an edit form to the stored record.
 - Cross-component refresh goes through the SSE notification channel, not a store and no longer Nuxt hooks:
   `useDashboardEvents()` (called once, in `layouts/default.vue`) subscribes to `users/<id>` and `platform`, and
   turns each event into a `refreshNuxtData()` of the matching list. It is the **only** refresh path — a

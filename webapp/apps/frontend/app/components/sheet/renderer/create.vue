@@ -32,6 +32,8 @@ const form = useForm({
   },
 })
 
+useReseedOnOpen(open, form)
+
 const onSubmit = form.handleSubmit(async (values) => {
   creationError.value = null
 

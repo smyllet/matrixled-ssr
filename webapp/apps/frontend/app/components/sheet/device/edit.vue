@@ -99,16 +99,7 @@ function valuesOf(device: (typeof props)['device']) {
   }
 }
 
-/**
- * The sheet unmounts its content when it closes, and vee-validate drops every
- * field it sees unmount — a form reopened would come back empty. Reseeding on
- * open is the answer rather than keeping the values across the close: a sheet
- * dismissed with Cancel must come back showing the stored device, not the
- * edits that were abandoned.
- */
-watch([() => props.device, open], () => {
-  form.setValues(valuesOf(props.device))
-})
+useReseedOnOpen(open, form, () => valuesOf(props.device))
 
 /**
  * Recomputed from the geometry being edited, not from the stored one: raising

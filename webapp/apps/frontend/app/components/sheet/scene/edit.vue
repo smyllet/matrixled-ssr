@@ -51,16 +51,7 @@ function valuesOf(scene: (typeof props)['scene']) {
   }
 }
 
-/**
- * The sheet unmounts its content when it closes, and vee-validate drops every
- * field it sees unmount — a form reopened would come back empty. Reseeding on
- * open is the answer rather than keeping the values across the close: a sheet
- * dismissed with Cancel must come back showing the stored scene, not the edits
- * that were abandoned.
- */
-watch([() => props.scene, open], () => {
-  form.setValues(valuesOf(props.scene))
-})
+useReseedOnOpen(open, form, () => valuesOf(props.scene))
 
 const onSubmit = form.handleSubmit(async (values) => {
   editionError.value = null
