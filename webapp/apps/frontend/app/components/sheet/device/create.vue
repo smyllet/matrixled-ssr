@@ -52,6 +52,14 @@ const formSchema = computed(() =>
 
 const form = useForm({
   validationSchema: formSchema,
+  /**
+   * The advanced options live in a collapsible, and closing it unmounts the
+   * fields inside. vee-validate drops the value of a field it sees unmount, so
+   * without this a device folded back to its summary would be created with no
+   * chain length, brightness or cap at all — the fields are hidden here, never
+   * withdrawn.
+   */
+  keepValuesOnUnmount: true,
   initialValues: {
     name: '',
     width: 64,
