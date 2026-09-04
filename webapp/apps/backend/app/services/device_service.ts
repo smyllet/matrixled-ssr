@@ -11,6 +11,7 @@ import Renderer from '#models/renderer'
 import Scene from '#models/scene'
 import { RendererService } from '#services/renderer_service'
 import { TokenService } from '#services/token_service'
+import { isDisplayable, type Geometry } from '#shared/geometry'
 import { deviceGeometryValidator } from '#validators/device'
 import { inject } from '@adonisjs/core'
 import { errors } from '@vinejs/vine'
@@ -22,24 +23,6 @@ import { errors } from '@vinejs/vine'
  */
 const DEFAULT_KIND = 'hardware' as const
 const DEFAULT_PANEL_TYPE = 'hub75' as const
-
-interface Geometry {
-  width: number
-  height: number
-}
-
-/**
- * A scene is displayable on a device when the device geometry is a multiple of
- * the scene's by the **same integer factor on both axes**: the renderer then
- * replicates each pixel into a k×k block, which loses nothing
- * (docs/adr/0018-geometrie-native-de-la-scene.md). Any other pair would need a
- * pixel destroyed or a row stretched.
- */
-function isDisplayable(device: Geometry, scene: Geometry) {
-  if (device.width % scene.width !== 0 || device.height % scene.height !== 0) return false
-
-  return device.width / scene.width === device.height / scene.height
-}
 
 /**
  * Business refusals travel as validation errors so that a caller reads them in

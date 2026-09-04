@@ -2,7 +2,7 @@
 import { AlertCircleIcon } from 'lucide-vue-next'
 
 const props = defineProps<{
-  matrix: {
+  device: {
     id: string
     name: string
   }
@@ -11,21 +11,21 @@ const props = defineProps<{
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 
-let deleteError = ref<string | null>(null)
+const deleteError = ref<string | null>(null)
 
 const open = ref(false)
 
-async function deleteMatrix() {
+async function deleteDevice() {
   deleteError.value = null
 
   const [_, error] = await $api
-    .request('matrices.delete', {
-      params: { id: props.matrix.id },
+    .request('devices.delete', {
+      params: { id: props.device.id },
     })
     .safe()
 
   if (error) {
-    deleteError.value = t('dialogs.deleteMatrix.failure.unknownDescription')
+    deleteError.value = t('dialogs.deleteDevice.failure.unknownDescription')
     return
   }
 
@@ -41,29 +41,29 @@ async function deleteMatrix() {
     <UiAlertDialogContent>
       <UiAlertDialogHeader>
         <UiAlertDialogTitle>
-          {{ $t('dialogs.deleteMatrix.title') }}
+          {{ t('dialogs.deleteDevice.title') }}
         </UiAlertDialogTitle>
         <UiAlertDialogDescription>
           <UiAlert v-if="deleteError" variant="destructive">
             <AlertCircleIcon />
-            <UiAlertTitle>{{ t('dialogs.deleteMatrix.failure.title') }}</UiAlertTitle>
+            <UiAlertTitle>{{ t('dialogs.deleteDevice.failure.title') }}</UiAlertTitle>
             <UiAlertDescription>
               {{ deleteError }}
             </UiAlertDescription>
           </UiAlert>
 
-          <i18n-t keypath="dialogs.deleteMatrix.description" scope="global">
-            <span class="font-medium">{{ props.matrix.name }}</span>
+          <i18n-t keypath="dialogs.deleteDevice.description" scope="global">
+            <span class="font-medium">{{ props.device.name }}</span>
           </i18n-t>
         </UiAlertDialogDescription>
       </UiAlertDialogHeader>
       <UiAlertDialogFooter>
         <UiAlertDialogCancel class="cursor-pointer">
-          {{ $t('dialogs.deleteMatrix.cancel') }}
+          {{ t('dialogs.deleteDevice.cancel') }}
         </UiAlertDialogCancel>
         <UiAlertDialogAction asChild>
-          <UiButton class="cursor-pointer" variant="destructive" @click="deleteMatrix()">
-            {{ $t('dialogs.deleteMatrix.confirm') }}
+          <UiButton class="cursor-pointer" variant="destructive" @click="deleteDevice()">
+            {{ t('dialogs.deleteDevice.confirm') }}
           </UiButton>
         </UiAlertDialogAction>
       </UiAlertDialogFooter>

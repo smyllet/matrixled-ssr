@@ -76,7 +76,7 @@ function close() {
           <UiAlertDescription>{{ creationError }}</UiAlertDescription>
         </UiAlert>
 
-        <RendererTokenReveal v-if="issuedToken" :token="issuedToken" />
+        <TokenReveal v-if="issuedToken" :token="issuedToken" />
 
         <form v-else @submit.prevent="onSubmit" id="create-renderer-form">
           <UiFormField v-slot="{ componentField }" name="name">

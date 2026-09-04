@@ -37,19 +37,29 @@
       },
       "noAccount": "Don't have an account? Sign up"
     },
-    "home": {
-      "modules": {
-        "matrices": {
-          "title": "My matrices",
-          "table": {
-            "name": "Name",
-            "size": "Size (h x w)"
-          },
-          "actions": {
-            "create": "New matrix",
-            "delete": "Delete"
-          }
-        }
+    "devices": {
+      "title": "My devices",
+      "noScene": "None",
+      "table": {
+        "name": "Name",
+        "size": "Size (w x h)",
+        "kind": "Kind",
+        "status": "Status",
+        "scene": "Scene"
+      },
+      "kind": {
+        "hardware": "Hardware",
+        "simulator": "Simulator"
+      },
+      "status": {
+        "online": "Online",
+        "offline": "Offline",
+        "error": "Error"
+      },
+      "actions": {
+        "create": "New device",
+        "edit": "Edit",
+        "delete": "Delete"
       }
     },
     "renderers": {
@@ -100,7 +110,7 @@
   "nav": {
     "logout": "Log out",
     "platform": "Platform",
-    "matrices": "Matrices",
+    "devices": "Devices",
     "renderers": "Renderers",
     "scenes": "Scenes"
   },
@@ -109,17 +119,63 @@
     "tagline": "v0.0.0"
   },
   "sheets": {
-    "createMatrix": {
-      "title": "Create a matrix",
+    "createDevice": {
+      "title": "Create a device",
       "failure": {
-        "unknownDescription": "An unknown error occurred while trying to create a matrix."
+        "title": "Creation failed",
+        "unknownDescription": "An unknown error occurred while trying to create a device."
       },
       "fields": {
         "name": "Name",
         "width": "Width (px)",
-        "height": "Height (px)"
+        "height": "Height (px)",
+        "kind": "Kind",
+        "kindDescription": "Chosen once: a device cannot change kind afterwards.",
+        "chainLength": "Chained panels",
+        "chainLengthDescription": "How many panels are wired in series. It describes the wiring, not the image.",
+        "brightness": "Brightness",
+        "maxFps": "Emission cap",
+        "maxFpsUncapped": "Uncapped",
+        "maxFpsDescription": "How often the device may be written to. The cadence itself belongs to the scene."
+      },
+      "kind": {
+        "hardware": "Hardware",
+        "simulator": "Simulator"
+      },
+      "advanced": "Advanced options",
+      "validation": {
+        "geometry": "The device geometry exceeds the protocol maximum of {max} pixels"
       },
       "submit": "Create",
+      "cancel": "Cancel",
+      "done": "Done"
+    },
+    "editDevice": {
+      "title": "Edit the device",
+      "failure": {
+        "title": "Update failed",
+        "unknownDescription": "An unknown error occurred while trying to update the device."
+      },
+      "fields": {
+        "name": "Name",
+        "width": "Width (px)",
+        "height": "Height (px)",
+        "scene": "Scene",
+        "noScene": "None",
+        "sceneDescription": "Only the scenes whose geometry the device is an exact multiple of are listed.",
+        "renderer": "Renderer",
+        "brightness": "Brightness",
+        "maxFps": "Emission cap",
+        "maxFpsUncapped": "Uncapped",
+        "maxFpsDescription": "How often the device may be written to. The cadence itself belongs to the scene.",
+        "offlineGrace": "Offline grace (seconds)",
+        "offlineGraceDescription": "How long a renderer may keep serving this device without hearing from the platform. 0 means the lease never expires."
+      },
+      "validation": {
+        "geometry": "The device geometry exceeds the protocol maximum of {max} pixels",
+        "scene": "This scene can no longer be displayed on the device geometry"
+      },
+      "submit": "Save",
       "cancel": "Cancel"
     },
     "createRenderer": {
@@ -173,15 +229,15 @@
     }
   },
   "dialogs": {
-    "deleteMatrix": {
+    "deleteDevice": {
+      "title": "Delete the device",
+      "description": "Are you sure you want to delete the device {0}? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
       "failure": {
         "title": "Deletion failed",
-        "unknownDescription": "An unknown error occurred while trying to delete the matrix."
-      },
-      "title": "Delete matrix",
-      "description": "Are you sure you want to delete {0} matrix? This action cannot be undone.",
-      "cancel": "Cancel",
-      "confirm": "Delete"
+        "unknownDescription": "An unknown error occurred while trying to delete the device."
+      }
     },
     "deleteRenderer": {
       "title": "Delete the renderer",
@@ -217,7 +273,7 @@
   },
   "components": {
     "tokenReveal": {
-      "title": "Renderer token",
+      "title": "Access token",
       "description": "This token is shown once. Copy it now: it cannot be retrieved again.",
       "copy": "Copy",
       "copied": "Copied"

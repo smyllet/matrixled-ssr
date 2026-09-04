@@ -14,7 +14,7 @@ const ENVELOPE_VERSION = 1
  * reserved but not implemented — is simply ignored.
  */
 const DATA_KEY_BY_ENTITY: Record<string, string> = {
-  matrix: 'matrices',
+  device: 'devices',
   scene: 'scenes',
   renderer: 'renderers',
 }
