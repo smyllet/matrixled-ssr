@@ -131,8 +131,6 @@
         "height": "Hauteur (px)",
         "kind": "Type",
         "kindDescription": "Choisi une fois pour toutes : un device ne change pas de type ensuite.",
-        "chainLength": "Panneaux chaînés",
-        "chainLengthDescription": "Nombre de panneaux câblés en série. Décrit le câblage, pas l'image.",
         "brightness": "Luminosité",
         "maxFps": "Plafond d'émission",
         "maxFpsUncapped": "Sans plafond",

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
   DEVICE_DEFAULT_BRIGHTNESS,
-  DEVICE_DEFAULT_CHAIN_LENGTH,
   DEVICE_MAXIMUM_BRIGHTNESS,
   DEVICE_MAXIMUM_MAX_FPS,
 } from '@matrixled-ssr/backend/constants/device'
@@ -31,6 +30,11 @@ const creationError = ref<string | null>(null)
  */
 const issuedToken = ref<string | null>(null)
 
+/**
+ * `chainLength` is deliberately absent: the column exists and defaults to 1,
+ * but nothing reads it yet — it is wiring information for a firmware that does
+ * not exist. It gets a control once it has a concrete use.
+ */
 const formSchema = computed(() =>
   toTypedSchema(
     z
@@ -38,7 +42,6 @@ const formSchema = computed(() =>
         name: z.string().min(3).max(100),
         width: z.coerce.number().int().min(1),
         height: z.coerce.number().int().min(1),
-        chainLength: z.coerce.number().int().min(1),
         kind: z.enum(['hardware', 'simulator']),
         brightness: z.coerce.number().int().min(0).max(DEVICE_MAXIMUM_BRIGHTNESS),
         maxFps: z.coerce.number().int().min(NO_MAX_FPS).max(DEVICE_MAXIMUM_MAX_FPS),
@@ -56,15 +59,13 @@ const form = useForm({
    * The advanced options live in a collapsible, and closing it unmounts the
    * fields inside. vee-validate drops the value of a field it sees unmount, so
    * without this a device folded back to its summary would be created with no
-   * chain length, brightness or cap at all — the fields are hidden here, never
-   * withdrawn.
+   * brightness and no cap at all — the fields are hidden here, never withdrawn.
    */
   keepValuesOnUnmount: true,
   initialValues: {
     name: '',
     width: 64,
     height: 32,
-    chainLength: DEVICE_DEFAULT_CHAIN_LENGTH,
     kind: 'hardware' as const,
     brightness: DEVICE_DEFAULT_BRIGHTNESS,
     maxFps: NO_MAX_FPS,
@@ -201,27 +202,6 @@ function close() {
               </UiCollapsibleTrigger>
 
               <UiCollapsibleContent class="grid gap-6">
-                <UiFormField v-slot="{ componentField }" name="chainLength">
-                  <UiFormItem>
-                    <UiFormControl>
-                      <UiNumberField v-bind="componentField" :min="1" :step="1">
-                        <UiFormLabel>
-                          {{ t('sheets.createDevice.fields.chainLength') }}
-                        </UiFormLabel>
-                        <UiNumberFieldContent>
-                          <UiNumberFieldDecrement />
-                          <UiNumberFieldInput />
-                          <UiNumberFieldIncrement />
-                        </UiNumberFieldContent>
-                        <UiFormMessage />
-                      </UiNumberField>
-                    </UiFormControl>
-                    <UiFormDescription>
-                      {{ t('sheets.createDevice.fields.chainLengthDescription') }}
-                    </UiFormDescription>
-                  </UiFormItem>
-                </UiFormField>
-
                 <UiFormField v-slot="{ value, handleChange }" name="brightness">
                   <UiFormItem>
                     <UiFormLabel>

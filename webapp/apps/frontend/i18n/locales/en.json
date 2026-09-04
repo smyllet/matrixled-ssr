@@ -131,8 +131,6 @@
         "height": "Height (px)",
         "kind": "Kind",
         "kindDescription": "Chosen once: a device cannot change kind afterwards.",
-        "chainLength": "Chained panels",
-        "chainLengthDescription": "How many panels are wired in series. It describes the wiring, not the image.",
         "brightness": "Brightness",
         "maxFps": "Emission cap",
         "maxFpsUncapped": "Uncapped",
