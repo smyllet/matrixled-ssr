@@ -6,6 +6,7 @@
 
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
+import type { RendererEndpoints } from '#validators/renderer'
 import type { SceneConfig } from '#validators/scene'
 
 export class MatrixSchema extends BaseModel {
@@ -42,7 +43,7 @@ export class RendererSchema extends BaseModel {
   static $columns = [
     'capabilities',
     'createdAt',
-    'endpoint',
+    'endpoints',
     'id',
     'isDefault',
     'lastSeenAt',
@@ -60,7 +61,7 @@ export class RendererSchema extends BaseModel {
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
-  declare endpoint: string | null
+  declare endpoints: RendererEndpoints | null
   @column({ isPrimary: true })
   declare id: string
   @column()

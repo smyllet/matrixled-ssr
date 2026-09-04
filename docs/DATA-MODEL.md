@@ -28,7 +28,7 @@ Un moteur de rendu déclaré auprès de la plateforme.
 | `isDefault` | boolean | Renderer assigné par défaut aux nouveaux devices |
 | `version` | string \| null | Version annoncée à la connexion. `null` tant qu'il ne s'est pas connecté |
 | `capabilities` | jsonb \| null | Primitives que ce renderer sait rendre. `null` tant qu'il ne s'est pas connecté |
-| `endpoints` | jsonb \| null | Adresses annoncées, transmises telles quelles aux devices au bootstrap. Liste : `wss://`, `ws://`, ou les deux ([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)) |
+| `endpoints` | jsonb \| null | Adresses annoncées, transmises telles quelles aux devices au bootstrap. Liste de 1 à 4 URL `ws://` ou `wss://` ([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)). `null` tant qu'il ne s'est pas connecté |
 | `status` | enum | `online` \| `offline` |
 | `lastSeenAt` | timestamptz \| null | Dernière activité sur le canal de contrôle |
 | `createdAt` / `updatedAt` | timestamptz | |
@@ -37,7 +37,9 @@ Un moteur de rendu déclaré auprès de la plateforme.
 
 - Exactement un renderer porte `isDefault = true` et `ownerId = null`.
 - `version`, `capabilities` et `endpoints` sont **déclarés par le renderer** à sa connexion. Ce sont des données
-  non fiables : Adonis les valide et les borne avant de les persister.
+  non fiables : Adonis les valide et les borne avant de les persister. Pour `endpoints`, la borne est de 1 à 4
+  entrées d'au plus 255 caractères, chacune une URL en `ws://` ou `wss://` — une liste vide n'est pas une
+  déclaration, c'est `null`.
 - `status` et `lastSeenAt` sont dérivés de l'état de la connexion de contrôle, jamais renseignés par une requête.
 
 ## Device

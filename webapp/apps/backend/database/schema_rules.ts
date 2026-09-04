@@ -21,6 +21,15 @@ export default {
           tsType: "'online' | 'offline'",
           decorators: [{ name: '@column' }],
         },
+        /**
+         * A jsonb column the generator would otherwise type `any`; this ties
+         * it to the bounded list the validator accepts.
+         */
+        endpoints: {
+          tsType: 'RendererEndpoints',
+          decorators: [{ name: '@column' }],
+          imports: [{ source: '#validators/renderer', typeImports: ['RendererEndpoints'] }],
+        },
       },
     },
     scenes: {

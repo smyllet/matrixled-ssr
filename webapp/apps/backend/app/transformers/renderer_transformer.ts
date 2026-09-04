@@ -15,7 +15,7 @@ export default class RendererTransformer extends BaseTransformer<Renderer> {
       'tokenPrefix',
       'version',
       'capabilities',
-      'endpoint',
+      'endpoints',
       'status',
       'lastSeenAt',
       'createdAt',
