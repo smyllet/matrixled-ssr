@@ -1,5 +1,8 @@
+import Device from '#models/device'
 import Scene from '#models/scene'
 import User from '#models/user'
+import { platformRenderer } from '#tests/helpers'
+import { TokenService } from '#services/token_service'
 import { test } from '@japa/runner'
 
 interface ScenePayload {
@@ -225,6 +228,56 @@ test.group('Scenes', () => {
 
     const stored = await Scene.findOrFail(scene.id)
     assert.equal(stored.width, 64)
+  })
+
+  test('refuses a geometry that would strand a device showing it', async ({ client, assert }) => {
+    const user = await createUser()
+    const renderer = await platformRenderer()
+    const credential = await new TokenService().issue('device')
+
+    const creation = await client
+      .post('/api/v1/scenes')
+      .json({ name: 'Clock', width: 64, height: 32 })
+      .loginAs(user)
+
+    const scene = sceneFrom(creation.body())
+
+    await Device.create({
+      name: 'Hallway panel',
+      userId: user.id,
+      rendererId: renderer.id,
+      sceneId: scene.id,
+      width: 64,
+      height: 32,
+      tokenPrefix: credential.prefix,
+      tokenHash: credential.hash,
+    })
+
+    /**
+     * The mirror of the device-side refusal: 48x32 would leave the pair at
+     * k = 1.333, which ADR-0018 rejects, and an incompatible pair must never
+     * stay in the database (docs/DATA-MODEL.md § Scene).
+     */
+    const stranding = await client
+      .patch(`/api/v1/scenes/${scene.id}`)
+      .json({ width: 48 })
+      .loginAs(user)
+
+    stranding.assertStatus(422)
+
+    const stored = await Scene.findOrFail(scene.id)
+    assert.equal(stored.width, 64)
+
+    /**
+     * Twice the device geometry is refused too — the factor divides the wrong
+     * way — while halving it is accepted: the device is then k = 2.
+     */
+    const halved = await client
+      .patch(`/api/v1/scenes/${scene.id}`)
+      .json({ width: 32, height: 16 })
+      .loginAs(user)
+
+    halved.assertStatus(200)
   })
 
   test('requires an authenticated user', async ({ client }) => {

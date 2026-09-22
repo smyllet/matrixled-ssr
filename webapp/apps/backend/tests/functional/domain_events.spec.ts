@@ -93,19 +93,38 @@ test.group('Device events', () => {
     using fakeEmitter = emitter.fake()
 
     /**
-     * Longer than the column accepts, so the device insert fails *after* the
-     * scene has been written inside the transaction — the one ordering where a
+     * `chainLength` overflows the `integer` column — a value the request
+     * validator refuses, reached here by calling the service directly. It is
+     * the *device* insert that fails, and only it: the scene has already been
+     * written inside the transaction by then. That is the one ordering where a
      * scene could be announced, and left behind, by mistake.
+     *
+     * A name too long would not do: `scenes.name` is a `varchar(255)` as well,
+     * so the scene insert would be the one to fail and nothing would be rolled
+     * back.
      */
-    await assert.rejects(() =>
-      deviceService.createDevice({
-        name: 'x'.repeat(300),
+    const failure = await deviceService
+      .createDevice({
+        name: 'Kitchen panel',
         width: 64,
         height: 32,
+        chainLength: 99_999_999_999,
         createScene: true,
         userId: user.id,
       })
-    )
+      .then(
+        () => null,
+        (error: Error) => error
+      )
+
+    assert.isNotNull(failure)
+
+    /**
+     * Asserted rather than assumed: the previous version of this test failed
+     * on the scene insert instead, which exercised nothing — it would have
+     * passed with no transaction at all.
+     */
+    assert.include(failure!.message, 'insert into "devices"')
 
     fakeEmitter.assertNotEmitted(SceneCreated)
     fakeEmitter.assertNotEmitted(DeviceCreated)
@@ -133,6 +152,41 @@ test.group('Device events', () => {
 })
 
 test.group('Scene events', () => {
+  test('announces the devices a deleted scene detaches', async ({ assert }) => {
+    const deviceService = await createDeviceService()
+    const sceneService = new SceneService()
+    const user = await createUser()
+
+    const scene = await sceneService.createScene({
+      name: 'Clock',
+      width: 64,
+      height: 32,
+      userId: user.id,
+    })
+
+    const { device } = await deviceService.createDevice({
+      name: 'Hallway panel',
+      width: 64,
+      height: 32,
+      sceneId: scene.id,
+      userId: user.id,
+    })
+
+    using fakeEmitter = emitter.fake()
+
+    await sceneService.deleteScene(scene)
+
+    fakeEmitter.assertEmitted(SceneDeleted, ({ data }) => data.id === scene.id)
+
+    /**
+     * The FK detaches the device, which is a change to a row nothing else
+     * would announce — the dashboard would keep a `sceneId` that no longer
+     * resolves, and its edit sheet would refuse to save.
+     */
+    fakeEmitter.assertEmitted(DeviceUpdated, ({ data }) => data.id === device.id)
+    assert.isNull(fakeEmitter.find(DeviceUpdated)?.data.device.sceneId)
+  })
+
   test('emits created and deleted', async () => {
     using fakeEmitter = emitter.fake()
     const user = await createUser()
@@ -205,51 +259,6 @@ test.group('Renderer events', () => {
       RendererDeleted,
       ({ data }) => data.userId === user.id && data.id === renderer.id
     )
-  })
-
-  test('announces a generated scene, and only once it is committed', async () => {
-    const deviceService = await createDeviceService()
-    const user = await createUser()
-
-    using fakeEmitter = emitter.fake()
-
-    const { device } = await deviceService.createDevice({
-      name: 'Kitchen panel',
-      width: 64,
-      height: 32,
-      createScene: true,
-      userId: user.id,
-    })
-
-    fakeEmitter.assertEmitted(SceneCreated, ({ data }) => data.id === device.sceneId)
-    fakeEmitter.assertEmitted(DeviceCreated, ({ data }) => data.id === device.id)
-  })
-
-  test('announces nothing when the device rolls back', async ({ assert }) => {
-    const deviceService = await createDeviceService()
-    const user = await createUser()
-
-    using fakeEmitter = emitter.fake()
-
-    /**
-     * Longer than the column accepts, so the device insert fails *after* the
-     * scene has been written inside the transaction — the one ordering where a
-     * scene could be announced, and left behind, by mistake.
-     */
-    await assert.rejects(() =>
-      deviceService.createDevice({
-        name: 'x'.repeat(300),
-        width: 64,
-        height: 32,
-        createScene: true,
-        userId: user.id,
-      })
-    )
-
-    fakeEmitter.assertNotEmitted(SceneCreated)
-    fakeEmitter.assertNotEmitted(DeviceCreated)
-
-    assert.lengthOf(await Scene.query().where('user_id', user.id), 0)
   })
 
   test('stays quiet when a patch changes nothing', async () => {
