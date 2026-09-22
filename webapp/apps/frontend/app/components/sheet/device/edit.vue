@@ -36,37 +36,6 @@ const NO_MAX_FPS = 0
 const NO_OFFLINE_GRACE = 0
 const NO_SCENE = 'none'
 
-/**
- * A lease is read in days, not in seconds: 604 800 tells nobody it means a
- * week. These cover what a panel is actually given — a short revocation window,
- * a day, the default week, a month — and `NO_OFFLINE_GRACE` the lease that
- * never expires. Anything else is typed in, in seconds, which is the unit the
- * API and the renderer speak.
- */
-const OFFLINE_GRACE_PRESETS = [3600, 86400, 604800, 2592000, NO_OFFLINE_GRACE]
-
-const customOfflineGrace = ref(false)
-
-function isPreset(seconds: number) {
-  return OFFLINE_GRACE_PRESETS.includes(seconds)
-}
-
-function offlineGraceLabel(seconds: number) {
-  if (seconds === NO_OFFLINE_GRACE) {
-    return t('sheets.editDevice.fields.offlineGraceUnlimited')
-  }
-
-  if (seconds < 86400) {
-    const hours = seconds / 3600
-
-    return t('sheets.editDevice.fields.offlineGraceHours', { count: hours }, hours)
-  }
-
-  const days = seconds / 86400
-
-  return t('sheets.editDevice.fields.offlineGraceDays', { count: days }, days)
-}
-
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 
@@ -131,18 +100,6 @@ function valuesOf(device: (typeof props)['device']) {
 }
 
 useReseedOnOpen(open, form, () => valuesOf(props.device))
-
-/**
- * A device already carrying a lease nobody would have picked from the list
- * opens on the free-form input rather than silently snapping to a preset.
- */
-watch(
-  open,
-  (opened) => {
-    if (opened) customOfflineGrace.value = !isPreset(props.device.offlineGrace ?? NO_OFFLINE_GRACE)
-  },
-  { immediate: true }
-)
 
 /**
  * Recomputed from the geometry being edited, not from the stored one: raising
@@ -357,77 +314,7 @@ const onSubmit = form.handleSubmit(async (values) => {
               </UiFormItem>
             </UiFormField>
 
-            <UiFormField v-slot="{ value, handleChange }" name="offlineGrace">
-              <UiFormItem>
-                <div class="flex items-center justify-between gap-2">
-                  <UiFormLabel>
-                    {{
-                      customOfflineGrace
-                        ? t('sheets.editDevice.fields.offlineGraceSeconds')
-                        : t('sheets.editDevice.fields.offlineGrace')
-                    }}
-                  </UiFormLabel>
-                  <UiButton
-                    type="button"
-                    variant="link"
-                    size="sm"
-                    class="h-auto cursor-pointer p-0 text-xs"
-                    @click="customOfflineGrace = !customOfflineGrace"
-                  >
-                    {{
-                      customOfflineGrace
-                        ? t('sheets.editDevice.fields.offlineGraceUsePresets')
-                        : t('sheets.editDevice.fields.offlineGraceUseCustom')
-                    }}
-                  </UiButton>
-                </div>
-
-                <template v-if="customOfflineGrace">
-                  <UiFormControl>
-                    <UiNumberField
-                      :model-value="value"
-                      @update:model-value="handleChange"
-                      :min="0"
-                      :step="60"
-                    >
-                      <UiNumberFieldContent>
-                        <UiNumberFieldDecrement />
-                        <UiNumberFieldInput />
-                        <UiNumberFieldIncrement />
-                      </UiNumberFieldContent>
-                      <UiFormMessage />
-                    </UiNumberField>
-                  </UiFormControl>
-                </template>
-
-                <template v-else>
-                  <UiSelect
-                    :model-value="String(value)"
-                    @update:model-value="handleChange(Number($event))"
-                  >
-                    <UiFormControl>
-                      <UiSelectTrigger class="w-full cursor-pointer">
-                        <UiSelectValue />
-                      </UiSelectTrigger>
-                    </UiFormControl>
-                    <UiSelectContent>
-                      <UiSelectItem
-                        v-for="seconds in OFFLINE_GRACE_PRESETS"
-                        :key="seconds"
-                        :value="String(seconds)"
-                      >
-                        {{ offlineGraceLabel(seconds) }}
-                      </UiSelectItem>
-                    </UiSelectContent>
-                  </UiSelect>
-                  <UiFormMessage />
-                </template>
-
-                <UiFormDescription>
-                  {{ t('sheets.editDevice.fields.offlineGraceDescription') }}
-                </UiFormDescription>
-              </UiFormItem>
-            </UiFormField>
+            <OfflineGraceField />
           </div>
         </form>
       </div>

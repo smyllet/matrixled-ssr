@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   DEVICE_DEFAULT_BRIGHTNESS,
+  DEVICE_DEFAULT_OFFLINE_GRACE,
   DEVICE_MAXIMUM_BRIGHTNESS,
   DEVICE_MAXIMUM_MAX_FPS,
 } from '@matrixled-ssr/backend/constants/device'
@@ -15,6 +16,12 @@ import z from 'zod'
  * the bottom of its range stands for it and is mapped back on submit.
  */
 const NO_MAX_FPS = 0
+
+/**
+ * Same sentinel as the emission cap, for the same reason: `null` is a value on
+ * the server — a lease that never expires — and no control can hold it.
+ */
+const NO_OFFLINE_GRACE = 0
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
@@ -45,6 +52,7 @@ const formSchema = computed(() =>
         kind: z.enum(['hardware', 'simulator']),
         brightness: z.coerce.number().int().min(0).max(DEVICE_MAXIMUM_BRIGHTNESS),
         maxFps: z.coerce.number().int().min(NO_MAX_FPS).max(DEVICE_MAXIMUM_MAX_FPS),
+        offlineGrace: z.coerce.number().int().min(NO_OFFLINE_GRACE),
       })
       .refine((values) => values.width * values.height <= PROTOCOL_MAXIMUM_PIXELS, {
         message: t('sheets.createDevice.validation.geometry', { max: PROTOCOL_MAXIMUM_PIXELS }),
@@ -70,6 +78,7 @@ const form = useForm({
     kind: 'hardware' as const,
     brightness: DEVICE_DEFAULT_BRIGHTNESS,
     maxFps: NO_MAX_FPS,
+    offlineGrace: DEVICE_DEFAULT_OFFLINE_GRACE,
   },
 })
 
@@ -83,6 +92,7 @@ const onSubmit = form.handleSubmit(async (values) => {
       body: {
         ...values,
         maxFps: values.maxFps === NO_MAX_FPS ? null : values.maxFps,
+        offlineGrace: values.offlineGrace === NO_OFFLINE_GRACE ? null : values.offlineGrace,
       },
     })
     .safe()
@@ -268,6 +278,8 @@ function close() {
                     <UiFormMessage />
                   </UiFormItem>
                 </UiFormField>
+
+                <OfflineGraceField />
               </UiCollapsibleContent>
             </UiCollapsible>
           </div>

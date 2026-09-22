@@ -168,15 +168,7 @@
         "brightness": "Brightness",
         "maxFps": "Emission cap",
         "maxFpsUncapped": "Uncapped",
-        "maxFpsDescription": "How often the device may be written to. The cadence itself belongs to the scene.",
-        "offlineGrace": "Offline lease",
-        "offlineGraceDescription": "How long a renderer may keep serving this device without hearing from the platform.",
-        "offlineGraceSeconds": "Offline lease (seconds)",
-        "offlineGraceUnlimited": "Never expires",
-        "offlineGraceHours": "{count} hour | {count} hours",
-        "offlineGraceDays": "{count} day | {count} days",
-        "offlineGraceUseCustom": "Exact value",
-        "offlineGraceUsePresets": "Common durations"
+        "maxFpsDescription": "How often the device may be written to. The cadence itself belongs to the scene."
       },
       "validation": {
         "geometry": "The device geometry exceeds the protocol maximum of {max} pixels",
@@ -289,6 +281,17 @@
       "title": "Live updates stopped",
       "description": "The connection to the server was lost and could not be restored. This page no longer reflects any change, your own included. Reload to reconnect.",
       "reload": "Reload"
+    },
+    "offlineGrace": {
+      "label": "Offline lease",
+      "labelSeconds": "Offline lease (seconds)",
+      "unlimited": "Never expires",
+      "minutes": "{count} minute | {count} minutes",
+      "hours": "{count} hour | {count} hours",
+      "days": "{count} day | {count} days",
+      "useCustom": "Exact value",
+      "usePresets": "Common durations",
+      "description": "How long a renderer may keep serving this device without hearing from the platform."
     }
   }
 }

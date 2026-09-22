@@ -168,15 +168,7 @@
         "brightness": "Luminosité",
         "maxFps": "Plafond d'émission",
         "maxFpsUncapped": "Sans plafond",
-        "maxFpsDescription": "Fréquence maximale à laquelle le device est écrit. La cadence, elle, appartient à la scène.",
-        "offlineGrace": "Bail hors ligne",
-        "offlineGraceDescription": "Durée pendant laquelle un renderer peut continuer à servir ce device sans nouvelle de la plateforme.",
-        "offlineGraceSeconds": "Bail hors ligne (secondes)",
-        "offlineGraceUnlimited": "Sans expiration",
-        "offlineGraceHours": "{count} heure | {count} heures",
-        "offlineGraceDays": "{count} jour | {count} jours",
-        "offlineGraceUseCustom": "Valeur précise",
-        "offlineGraceUsePresets": "Durées courantes"
+        "maxFpsDescription": "Fréquence maximale à laquelle le device est écrit. La cadence, elle, appartient à la scène."
       },
       "validation": {
         "geometry": "La géométrie du device dépasse le maximum du protocole de {max} pixels",
@@ -289,6 +281,17 @@
       "title": "Mises à jour temps réel interrompues",
       "description": "La connexion au serveur a été perdue et n'a pas pu être rétablie. Cette page ne reflète plus aucune modification, y compris les vôtres. Rechargez pour vous reconnecter.",
       "reload": "Recharger"
+    },
+    "offlineGrace": {
+      "label": "Bail hors ligne",
+      "labelSeconds": "Bail hors ligne (secondes)",
+      "unlimited": "Sans expiration",
+      "minutes": "{count} minute | {count} minutes",
+      "hours": "{count} heure | {count} heures",
+      "days": "{count} jour | {count} jours",
+      "useCustom": "Valeur précise",
+      "usePresets": "Durées courantes",
+      "description": "Durée pendant laquelle un renderer peut continuer à servir ce device sans nouvelle de la plateforme."
     }
   }
 }
