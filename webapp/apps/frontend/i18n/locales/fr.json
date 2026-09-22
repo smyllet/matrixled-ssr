@@ -169,8 +169,14 @@
         "maxFps": "Plafond d'émission",
         "maxFpsUncapped": "Sans plafond",
         "maxFpsDescription": "Fréquence maximale à laquelle le device est écrit. La cadence, elle, appartient à la scène.",
-        "offlineGrace": "Bail hors ligne (secondes)",
-        "offlineGraceDescription": "Durée pendant laquelle un renderer peut continuer à servir ce device sans nouvelle de la plateforme. 0 signifie un bail sans expiration."
+        "offlineGrace": "Bail hors ligne",
+        "offlineGraceDescription": "Durée pendant laquelle un renderer peut continuer à servir ce device sans nouvelle de la plateforme.",
+        "offlineGraceSeconds": "Bail hors ligne (secondes)",
+        "offlineGraceUnlimited": "Sans expiration",
+        "offlineGraceHours": "{count} heure | {count} heures",
+        "offlineGraceDays": "{count} jour | {count} jours",
+        "offlineGraceUseCustom": "Valeur précise",
+        "offlineGraceUsePresets": "Durées courantes"
       },
       "validation": {
         "geometry": "La géométrie du device dépasse le maximum du protocole de {max} pixels",
