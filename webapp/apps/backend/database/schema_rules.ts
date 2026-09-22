@@ -2,6 +2,35 @@ import { type SchemaRules } from '@adonisjs/lucid/types/schema_generator'
 
 export default {
   tables: {
+    devices: {
+      columns: {
+        /**
+         * Same treatment as `renderers.token_hash` and `users.password`: a
+         * fingerprint must not be able to leak through a stray serialization,
+         * whatever the transformers expose.
+         */
+        token_hash: {
+          tsType: 'string',
+          decorators: [{ name: '@column', args: { serializeAs: null } }],
+        },
+        /**
+         * The generator maps every enum to `string`; narrowing them here keeps
+         * the unions the migration declares.
+         */
+        status: {
+          tsType: "'online' | 'offline' | 'error'",
+          decorators: [{ name: '@column' }],
+        },
+        panel_type: {
+          tsType: "'hub75'",
+          decorators: [{ name: '@column' }],
+        },
+        kind: {
+          tsType: "'hardware' | 'simulator'",
+          decorators: [{ name: '@column' }],
+        },
+      },
+    },
     renderers: {
       columns: {
         /**

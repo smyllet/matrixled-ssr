@@ -58,7 +58,7 @@ Un appareil qui affiche : matériel ou simulateur.
 | `panelType` | enum | `hub75` — seule valeur supportée ([ADR-0005](adr/0005-hub75-dabord.md)) |
 | `kind` | enum | `hardware` \| `simulator`. Nature du device, choisie à la création et non modifiable ensuite ([ADR-0020](adr/0020-simulateur-device-declare.md)) |
 | `width` / `height` | integer | Géométrie totale en pixels |
-| `chainLength` | integer | Nombre de dalles chaînées |
+| `chainLength` | integer | Nombre de dalles chaînées. Défaut 1 |
 | `brightness` | integer | Luminosité de la dalle, 0 à 255. Défaut 128 |
 | `maxFps` | integer \| null | Plafond d'émission, 1 à 60. `null` = aucun plafond, valeur par défaut ([ADR-0019](adr/0019-cadence-portee-par-la-scene.md)) |
 | `offlineGrace` | integer \| null | Secondes pendant lesquelles le renderer peut servir ce device sans contact avec la plateforme. `null` = illimité. Défaut 604 800, soit 7 jours ([ADR-0015](adr/0015-bail-de-session-device.md)) |
@@ -179,31 +179,3 @@ C'est ce qui rend acceptable la réplication chez un tiers imposée par
 
 La V1 stockait le token en clair. Ce n'est plus acceptable dès lors qu'un renderer peut être hébergé par un
 tiers.
-
-## Migration depuis `matrices`
-
-La table `matrices` actuelle porte `id`, `name`, `width`, `height`, `config`, `userId`. Elle mélange appareil et
-contenu.
-
-Le découpage :
-
-| Colonne actuelle | Destination |
-|------------------|-------------|
-| `id`, `name`, `width`, `height`, `userId` | `devices` |
-| `config`, `userId` | `scenes`, avec un nom dérivé de celui de la matrice |
-| `width`, `height` | recopiés aussi dans `scenes` : la scène migrée a la géométrie de la matrice, donc `k = 1` |
-| — | aucune cadence à migrer : `scenes.targetFps` prend son défaut de 30, `devices.maxFps` reste `null` |
-| — | `devices.kind` vaut `hardware` : une matrice existante décrit du matériel |
-| — | `devices.sceneId` pointe vers la scène créée |
-| — | `devices.rendererId` pointe vers le renderer par défaut |
-| — | `devices.tokenHash` doit être régénéré : aucun token n'existe dans le schéma actuel |
-
-Points d'attention :
-
-- La table actuelle **n'a pas de token** — le guard correspondant avait été retiré. Chaque device migré devra
-  donc être ré-appairé.
-- `config` est aujourd'hui un objet libre non validé. Les valeurs existantes ne passeront pas la validation du
-  schéma versionné et devront être soit converties, soit remises à une scène vide.
-- `createMatrixValidator` plafonne la géométrie à 128 ; la nouvelle limite est de 65 536 pixels au total.
-
-L'écriture de la migration ne fait pas partie du périmètre de cette refonte documentaire.

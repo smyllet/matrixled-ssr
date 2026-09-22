@@ -5,7 +5,7 @@ import hash from '@adonisjs/core/services/hash'
 import { beforeCreate, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { randomUUID } from 'node:crypto'
-import Matrix from './matrix.ts'
+import Device from './device.ts'
 
 export default class User extends compose(UserSchema, withAuthFinder(hash)) {
   static override selfAssignPrimaryKey = true
@@ -18,8 +18,8 @@ export default class User extends compose(UserSchema, withAuthFinder(hash)) {
     return `${first?.slice(0, 2) ?? ''}`.toUpperCase()
   }
 
-  @hasMany(() => Matrix)
-  declare matrices: HasMany<typeof Matrix>
+  @hasMany(() => Device)
+  declare devices: HasMany<typeof Device>
 
   @beforeCreate()
   static assignUuid(user: User) {

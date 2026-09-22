@@ -69,5 +69,5 @@ ignorer.
   complet passe de ~1 s à ~6 s.
 - **Ce que le contrôle n'attrape pas.** Il ne vérifie que ce qui est typé. Restent hors de portée : les clés de
   `useAsyncData` et les types d'événements du dashboard, qui sont des **chaînes** rapprochées à l'exécution ;
-  les clés i18n ; le contenu de `Matrix.config`, typé `any` ; et tout ce qui relève du comportement — il n'y a
+  les clés i18n ; les clés d'un catalogue de primitives de scène encore ouvert ; et tout ce qui relève du comportement — il n'y a
   pas de suite de tests frontend, et un composant qui compile peut ne rien afficher.

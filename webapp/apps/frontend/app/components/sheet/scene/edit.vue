@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/scene'
+import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/protocol'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import z from 'zod'
@@ -39,25 +39,19 @@ const formSchema = computed(() =>
 
 const form = useForm({
   validationSchema: formSchema,
-  initialValues: {
-    name: props.scene.name,
-    width: props.scene.width,
-    height: props.scene.height,
-    targetFps: props.scene.targetFps,
-  },
+  initialValues: valuesOf(props.scene),
 })
 
-watch(
-  () => props.scene,
-  (scene) => {
-    form.setValues({
-      name: scene.name,
-      width: scene.width,
-      height: scene.height,
-      targetFps: scene.targetFps,
-    })
+function valuesOf(scene: (typeof props)['scene']) {
+  return {
+    name: scene.name,
+    width: scene.width,
+    height: scene.height,
+    targetFps: scene.targetFps,
   }
-)
+}
+
+useReseedOnOpen(open, form, () => valuesOf(props.scene))
 
 const onSubmit = form.handleSubmit(async (values) => {
   editionError.value = null
@@ -70,7 +64,8 @@ const onSubmit = form.handleSubmit(async (values) => {
     .safe()
 
   if (error) {
-    editionError.value = t('sheets.editScene.failure.unknownDescription')
+    editionError.value =
+      validationMessage(error) ?? t('sheets.editScene.failure.unknownDescription')
 
     return
   }
@@ -107,11 +102,25 @@ const onSubmit = form.handleSubmit(async (values) => {
               </UiFormItem>
             </UiFormField>
 
-            <div class="grid grid-cols-2 gap-4">
-              <UiFormField v-slot="{ componentField }" name="width">
+            <!-- items-start: a validation message under one field must not shift the other -->
+            <div class="grid grid-cols-2 items-start gap-4">
+              <!--
+                Bound explicitly rather than with `v-bind="componentField"`: that
+                spread also lands vee-validate's `onChange` on the field root,
+                where the input's native change event bubbles at blur — and
+                vee-validate would then store the *formatted* string a number
+                field shows once it is long enough to be grouped, which coerces
+                to NaN and empties the field.
+              -->
+              <UiFormField v-slot="{ value, handleChange }" name="width">
                 <UiFormItem>
                   <UiFormControl>
-                    <UiNumberField v-bind="componentField" :min="1" :step="1">
+                    <UiNumberField
+                      :model-value="value"
+                      @update:model-value="handleChange"
+                      :min="1"
+                      :step="1"
+                    >
                       <UiFormLabel>{{ t('sheets.editScene.fields.width') }}</UiFormLabel>
                       <UiNumberFieldContent>
                         <UiNumberFieldDecrement />
@@ -124,10 +133,15 @@ const onSubmit = form.handleSubmit(async (values) => {
                 </UiFormItem>
               </UiFormField>
 
-              <UiFormField v-slot="{ componentField }" name="height">
+              <UiFormField v-slot="{ value, handleChange }" name="height">
                 <UiFormItem>
                   <UiFormControl>
-                    <UiNumberField v-bind="componentField" :min="1" :step="1">
+                    <UiNumberField
+                      :model-value="value"
+                      @update:model-value="handleChange"
+                      :min="1"
+                      :step="1"
+                    >
                       <UiFormLabel>{{ t('sheets.editScene.fields.height') }}</UiFormLabel>
                       <UiNumberFieldContent>
                         <UiNumberFieldDecrement />

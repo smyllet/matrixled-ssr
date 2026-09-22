@@ -1,9 +1,9 @@
 # Documentation technique
 
-> **Ces documents décrivent l'architecture cible, que le code n'implémente aujourd'hui qu'en partie.** `Renderer`
-> existe ; `Matrix` est encore là où les specs parlent de `Device` et de `Scene` ; le renderer Go, le protocole
-> binaire et le firmware n'existent pas. L'écart se lit dans les [issues](#travaux-en-cours), et il est censé se
-> réduire : une spec et un code qui divergent sont un défaut, pas un état de fait.
+> **Ces documents décrivent l'architecture cible, que le code n'implémente aujourd'hui qu'en partie.** Le modèle
+> `Renderer` / `Device` / `Scene` existe ; le renderer Go, le protocole binaire et le firmware n'existent pas.
+> L'écart se lit dans les [issues](#travaux-en-cours), et il est censé se réduire : une spec et un code qui
+> divergent sont un défaut, pas un état de fait.
 
 ## Par où commencer
 

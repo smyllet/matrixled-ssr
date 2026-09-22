@@ -31,7 +31,8 @@ async function rotateToken() {
     .safe()
 
   if (error) {
-    rotationError.value = t('dialogs.rotateRendererToken.failure.unknownDescription')
+    rotationError.value =
+      validationMessage(error) ?? t('dialogs.rotateRendererToken.failure.unknownDescription')
     return
   }
 
@@ -74,7 +75,7 @@ function close() {
         </UiAlertDialogDescription>
       </UiAlertDialogHeader>
 
-      <RendererTokenReveal v-if="issuedToken" :token="issuedToken" />
+      <TokenReveal v-if="issuedToken" :token="issuedToken" />
 
       <UiAlertDialogFooter>
         <UiAlertDialogAction v-if="issuedToken" asChild>

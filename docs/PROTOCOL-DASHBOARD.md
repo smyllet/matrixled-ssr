@@ -59,12 +59,9 @@ Neuf types, tous avec la même charge utile `{ id }` :
 
 | Type | Émis quand |
 |------|-----------|
-| `matrix.created` · `matrix.updated` · `matrix.deleted` | Une entité `Matrix` du code est créée, modifiée, supprimée |
+| `device.created` · `device.updated` · `device.deleted` | Un device est créé, modifié, supprimé |
 | `scene.created` · `scene.updated` · `scene.deleted` | Une scène est créée, modifiée, supprimée |
 | `renderer.created` · `renderer.updated` · `renderer.deleted` | Un renderer est créé, modifié, supprimé — la rotation de son credential émet `renderer.updated` |
-
-`matrix.*` cite l'entité du code telle qu'elle existe aujourd'hui : les specs définissent **device** et
-**scene** ([GLOSSARY.md](GLOSSARY.md)), et ces types suivront le renommage de l'entité.
 
 `.updated` n'est émis que si la mutation a réellement changé quelque chose — `SceneService.patchScene` ne
 considère la scène modifiée que si le modèle est *dirty*, ce qui est aussi la condition sous laquelle il

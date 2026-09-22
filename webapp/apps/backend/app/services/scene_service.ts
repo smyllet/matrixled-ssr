@@ -1,11 +1,24 @@
+import DeviceUpdated from '#events/device_updated'
 import SceneCreated from '#events/scene_created'
 import SceneDeleted from '#events/scene_deleted'
 import SceneUpdated from '#events/scene_updated'
+import Device from '#models/device'
 import Scene from '#models/scene'
+import { isDisplayable, type Geometry } from '#shared/geometry'
 import { sceneGeometryValidator, type SceneConfig } from '#validators/scene'
+import { errors } from '@vinejs/vine'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 const DEFAULT_SCENE_CONFIG: SceneConfig = { version: 1, nodes: [] }
 const DEFAULT_TARGET_FPS = 30
+
+/**
+ * Business refusals travel as validation errors, in the shape every other
+ * refusal comes in — the same treatment as in `DeviceService`.
+ */
+function refuse(field: string, rule: string, message: string): never {
+  throw new errors.E_VALIDATION_ERROR([{ field, rule, message }])
+}
 
 export class SceneService {
   async getVisibleScenes(userId: string) {
@@ -16,29 +29,40 @@ export class SceneService {
     return Scene.findOrFail(sceneId)
   }
 
-  async createScene({
-    name,
-    width,
-    height,
-    targetFps,
-    config,
-    userId,
-  }: {
-    name: string
-    width: number
-    height: number
-    targetFps?: number
-    config?: SceneConfig
-    userId: string
-  }) {
-    const scene = await Scene.create({
+  /**
+   * `client` lets a caller enlist this creation in its own transaction — a
+   * device generating the scene it will display, which must not survive a
+   * device that fails to be written.
+   */
+  async createScene(
+    {
       name,
       width,
       height,
+      targetFps,
+      config,
       userId,
-      targetFps: targetFps ?? DEFAULT_TARGET_FPS,
-      config: config ?? DEFAULT_SCENE_CONFIG,
-    })
+    }: {
+      name: string
+      width: number
+      height: number
+      targetFps?: number
+      config?: SceneConfig
+      userId: string
+    },
+    client?: TransactionClientContract
+  ) {
+    const scene = await Scene.create(
+      {
+        name,
+        width,
+        height,
+        userId,
+        targetFps: targetFps ?? DEFAULT_TARGET_FPS,
+        config: config ?? DEFAULT_SCENE_CONFIG,
+      },
+      client ? { client } : undefined
+    )
 
     /**
      * `version` is a database default, so the fresh instance does not carry
@@ -46,7 +70,16 @@ export class SceneService {
      */
     await scene.refresh()
 
-    SceneCreated.dispatch(scene)
+    /**
+     * Inside a transaction the row is not there for anybody else yet: telling
+     * the dashboard now would have it refetch a scene it cannot see, and tell
+     * it about one that a rollback is about to remove.
+     */
+    if (client) {
+      client.after('commit', () => SceneCreated.dispatch(scene))
+    } else {
+      SceneCreated.dispatch(scene)
+    }
 
     return scene
   }
@@ -70,6 +103,8 @@ export class SceneService {
      */
     if (patch.width !== undefined || patch.height !== undefined) {
       await sceneGeometryValidator.validate({ width: mergedWidth, height: mergedHeight })
+
+      await this.refuseIfItStrandsADevice(scene, { width: mergedWidth, height: mergedHeight })
     }
 
     scene.name = patch.name ?? scene.name
@@ -111,8 +146,44 @@ export class SceneService {
   }
 
   async deleteScene(scene: Scene) {
+    /**
+     * `ON DELETE SET NULL` detaches every device showing this scene, which is
+     * a change to those rows that nothing else would announce: read them
+     * before they lose the link, so the dashboards holding them refetch and
+     * the control plane hears about a device that just went to a black screen.
+     */
+    const detached = await Device.query().where('scene_id', scene.id)
+
     await scene.delete()
 
     SceneDeleted.dispatch(scene)
+
+    for (const device of detached) {
+      await device.refresh()
+
+      DeviceUpdated.dispatch(device)
+    }
+  }
+
+  /**
+   * The mirror of the check `DeviceService` makes when a device geometry
+   * moves: a scene may only be displayed on a device whose geometry is a
+   * multiple of its own by the same integer factor on both axes (ADR-0018),
+   * and an incompatible pair must never stay in the database
+   * (docs/DATA-MODEL.md § Scene). Refusing rather than detaching, as on the
+   * device side: the caller says what becomes of the assignment.
+   */
+  private async refuseIfItStrandsADevice(scene: Scene, geometry: Geometry) {
+    const devices = await Device.query().where('scene_id', scene.id)
+
+    const stranded = devices.find((device) => !isDisplayable(device, geometry))
+
+    if (stranded) {
+      refuse(
+        'width',
+        'displayableScene',
+        `The scene geometry (${geometry.width}x${geometry.height}) would no longer divide the geometry of device ${stranded.name} (${stranded.width}x${stranded.height})`
+      )
+    }
   }
 }

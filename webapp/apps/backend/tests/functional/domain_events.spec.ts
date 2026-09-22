@@ -1,38 +1,48 @@
-import MatrixCreated from '#events/matrix_created'
-import MatrixDeleted from '#events/matrix_deleted'
-import MatrixUpdated from '#events/matrix_updated'
+import DeviceCreated from '#events/device_created'
+import DeviceDeleted from '#events/device_deleted'
+import DeviceUpdated from '#events/device_updated'
 import RendererCreated from '#events/renderer_created'
 import RendererDeleted from '#events/renderer_deleted'
 import RendererUpdated from '#events/renderer_updated'
 import SceneCreated from '#events/scene_created'
 import SceneDeleted from '#events/scene_deleted'
 import SceneUpdated from '#events/scene_updated'
-import Matrix from '#models/matrix'
+import Device from '#models/device'
 import Renderer from '#models/renderer'
-import { MatrixService } from '#services/matrix_service'
+import Scene from '#models/scene'
+import { DeviceService } from '#services/device_service'
 import { RendererService } from '#services/renderer_service'
 import { SceneService } from '#services/scene_service'
 import { TokenService } from '#services/token_service'
-import { createUser } from '#tests/helpers'
+import { createUser, platformRenderer } from '#tests/helpers'
 import emitter from '@adonisjs/core/services/emitter'
 import { test } from '@japa/runner'
 
-test.group('Matrix events', () => {
-  test('emits created, updated and deleted', async ({ assert }) => {
-    using fakeEmitter = emitter.fake()
-    const user = await createUser()
-    const matrixService = new MatrixService()
+async function createDeviceService() {
+  const tokenService = new TokenService()
 
-    const matrix = await matrixService.createMatrix({
-      name: 'Kitchen',
-      width: 16,
-      height: 16,
+  await platformRenderer()
+
+  return new DeviceService(tokenService, new RendererService(tokenService), new SceneService())
+}
+
+test.group('Device events', () => {
+  test('emits created, updated and deleted', async ({ assert }) => {
+    const deviceService = await createDeviceService()
+    const user = await createUser()
+
+    using fakeEmitter = emitter.fake()
+
+    const { device } = await deviceService.createDevice({
+      name: 'Kitchen panel',
+      width: 64,
+      height: 32,
       userId: user.id,
     })
 
     fakeEmitter.assertEmitted(
-      MatrixCreated,
-      ({ data }) => data.userId === user.id && data.id === matrix.id
+      DeviceCreated,
+      ({ data }) => data.userId === user.id && data.id === device.id
     )
     /**
      * The point of carrying the entity rather than only its id: a listener gets
@@ -40,44 +50,143 @@ test.group('Matrix events', () => {
      * mutates the same in-memory instance — the event holds a live reference,
      * not a snapshot frozen at emission time.
      */
-    assert.equal(fakeEmitter.find(MatrixCreated)?.data.matrix.name, 'Kitchen')
+    assert.equal(fakeEmitter.find(DeviceCreated)?.data.device.name, 'Kitchen panel')
 
-    await matrixService.patchMatrix(matrix, { name: 'Kitchen wall' })
+    await deviceService.patchDevice(device, { name: 'Kitchen wall' })
 
     fakeEmitter.assertEmitted(
-      MatrixUpdated,
-      ({ data }) => data.userId === user.id && data.id === matrix.id
+      DeviceUpdated,
+      ({ data }) => data.userId === user.id && data.id === device.id
     )
-    assert.equal(fakeEmitter.find(MatrixUpdated)?.data.matrix.name, 'Kitchen wall')
+    assert.equal(fakeEmitter.find(DeviceUpdated)?.data.device.name, 'Kitchen wall')
 
-    await matrixService.deleteMatrix(matrix)
+    await deviceService.deleteDevice(device)
 
     fakeEmitter.assertEmitted(
-      MatrixDeleted,
-      ({ data }) => data.userId === user.id && data.id === matrix.id
+      DeviceDeleted,
+      ({ data }) => data.userId === user.id && data.id === device.id
     )
   })
 
-  test('stays quiet when a patch changes nothing', async () => {
+  test('announces a generated scene, and only once it is committed', async () => {
+    const deviceService = await createDeviceService()
     const user = await createUser()
-    const matrixService = new MatrixService()
 
-    const matrix = await matrixService.createMatrix({
-      name: 'Kitchen',
-      width: 16,
-      height: 16,
+    using fakeEmitter = emitter.fake()
+
+    const { device } = await deviceService.createDevice({
+      name: 'Kitchen panel',
+      width: 64,
+      height: 32,
+      createScene: true,
+      userId: user.id,
+    })
+
+    fakeEmitter.assertEmitted(SceneCreated, ({ data }) => data.id === device.sceneId)
+    fakeEmitter.assertEmitted(DeviceCreated, ({ data }) => data.id === device.id)
+  })
+
+  test('announces nothing when the device rolls back', async ({ assert }) => {
+    const deviceService = await createDeviceService()
+    const user = await createUser()
+
+    using fakeEmitter = emitter.fake()
+
+    /**
+     * `chainLength` overflows the `integer` column — a value the request
+     * validator refuses, reached here by calling the service directly. It is
+     * the *device* insert that fails, and only it: the scene has already been
+     * written inside the transaction by then. That is the one ordering where a
+     * scene could be announced, and left behind, by mistake.
+     *
+     * A name too long would not do: `scenes.name` is a `varchar(255)` as well,
+     * so the scene insert would be the one to fail and nothing would be rolled
+     * back.
+     */
+    const failure = await deviceService
+      .createDevice({
+        name: 'Kitchen panel',
+        width: 64,
+        height: 32,
+        chainLength: 99_999_999_999,
+        createScene: true,
+        userId: user.id,
+      })
+      .then(
+        () => null,
+        (error: Error) => error
+      )
+
+    assert.isNotNull(failure)
+
+    /**
+     * Asserted rather than assumed: the previous version of this test failed
+     * on the scene insert instead, which exercised nothing — it would have
+     * passed with no transaction at all.
+     */
+    assert.include(failure!.message, 'insert into "devices"')
+
+    fakeEmitter.assertNotEmitted(SceneCreated)
+    fakeEmitter.assertNotEmitted(DeviceCreated)
+
+    assert.lengthOf(await Scene.query().where('user_id', user.id), 0)
+  })
+
+  test('stays quiet when a patch changes nothing', async () => {
+    const deviceService = await createDeviceService()
+    const user = await createUser()
+
+    const { device } = await deviceService.createDevice({
+      name: 'Kitchen panel',
+      width: 64,
+      height: 32,
       userId: user.id,
     })
 
     using fakeEmitter = emitter.fake()
 
-    await matrixService.patchMatrix(matrix, { name: 'Kitchen' })
+    await deviceService.patchDevice(device, { name: 'Kitchen panel' })
 
-    fakeEmitter.assertNotEmitted(MatrixUpdated)
+    fakeEmitter.assertNotEmitted(DeviceUpdated)
   })
 })
 
 test.group('Scene events', () => {
+  test('announces the devices a deleted scene detaches', async ({ assert }) => {
+    const deviceService = await createDeviceService()
+    const sceneService = new SceneService()
+    const user = await createUser()
+
+    const scene = await sceneService.createScene({
+      name: 'Clock',
+      width: 64,
+      height: 32,
+      userId: user.id,
+    })
+
+    const { device } = await deviceService.createDevice({
+      name: 'Hallway panel',
+      width: 64,
+      height: 32,
+      sceneId: scene.id,
+      userId: user.id,
+    })
+
+    using fakeEmitter = emitter.fake()
+
+    await sceneService.deleteScene(scene)
+
+    fakeEmitter.assertEmitted(SceneDeleted, ({ data }) => data.id === scene.id)
+
+    /**
+     * The FK detaches the device, which is a change to a row nothing else
+     * would announce — the dashboard would keep a `sceneId` that no longer
+     * resolves, and its edit sheet would refuse to save.
+     */
+    fakeEmitter.assertEmitted(DeviceUpdated, ({ data }) => data.id === device.id)
+    assert.isNull(fakeEmitter.find(DeviceUpdated)?.data.device.sceneId)
+  })
+
   test('emits created and deleted', async () => {
     using fakeEmitter = emitter.fake()
     const user = await createUser()
@@ -208,12 +317,12 @@ test.group('Event listener failures', () => {
       throw new Error('listener exploded')
     }
 
-    emitter.on(MatrixCreated, failing)
+    emitter.on(DeviceCreated, failing)
 
     try {
-      await MatrixCreated.dispatch(new Matrix())
+      await DeviceCreated.dispatch(new Device())
     } finally {
-      emitter.off(MatrixCreated, failing)
+      emitter.off(DeviceCreated, failing)
     }
   })
 })

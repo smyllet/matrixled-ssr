@@ -9,9 +9,9 @@
 |
 */
 
-import MatrixCreated from '#events/matrix_created'
-import MatrixDeleted from '#events/matrix_deleted'
-import MatrixUpdated from '#events/matrix_updated'
+import DeviceCreated from '#events/device_created'
+import DeviceDeleted from '#events/device_deleted'
+import DeviceUpdated from '#events/device_updated'
 import RendererCreated from '#events/renderer_created'
 import RendererDeleted from '#events/renderer_deleted'
 import RendererUpdated from '#events/renderer_updated'
@@ -37,9 +37,9 @@ emitter.onError((event, error) => {
   )
 })
 
-emitter.on(MatrixCreated, [broadcastDashboardEvent])
-emitter.on(MatrixUpdated, [broadcastDashboardEvent])
-emitter.on(MatrixDeleted, [broadcastDashboardEvent])
+emitter.on(DeviceCreated, [broadcastDashboardEvent])
+emitter.on(DeviceUpdated, [broadcastDashboardEvent])
+emitter.on(DeviceDeleted, [broadcastDashboardEvent])
 emitter.on(SceneCreated, [broadcastDashboardEvent])
 emitter.on(SceneUpdated, [broadcastDashboardEvent])
 emitter.on(SceneDeleted, [broadcastDashboardEvent])

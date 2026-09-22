@@ -36,14 +36,14 @@ router
 
     router
       .group(() => {
-        router.get('/', [controllers.Matrices, 'index']).as('index')
-        router.get('/:id', [controllers.Matrices, 'show']).as('show')
-        router.post('/', [controllers.Matrices, 'store']).as('store')
-        router.patch('/:id', [controllers.Matrices, 'patch']).as('patch')
-        router.delete('/:id', [controllers.Matrices, 'delete']).as('delete')
+        router.get('/', [controllers.Devices, 'index']).as('index')
+        router.get('/:id', [controllers.Devices, 'show']).as('show')
+        router.post('/', [controllers.Devices, 'store']).as('store')
+        router.patch('/:id', [controllers.Devices, 'patch']).as('patch')
+        router.delete('/:id', [controllers.Devices, 'delete']).as('delete')
       })
-      .prefix('matrices')
-      .as('matrices')
+      .prefix('devices')
+      .as('devices')
       .use(middleware.auth())
 
     router
