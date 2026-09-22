@@ -17,6 +17,14 @@ export const DEVICE_MAXIMUM_BRIGHTNESS = 255
 export const DEVICE_DEFAULT_OFFLINE_GRACE = 604800
 
 /**
+ * Not a rule about panels — it is what the column holds. `chain_length` and
+ * `offline_grace` are PostgreSQL `integer`s, so a larger value is a failed
+ * insert rather than a refused request: bounded here so that an out-of-range
+ * write reads as a 422 like every other one, instead of a 500.
+ */
+export const DEVICE_MAXIMUM_INTEGER = 2147483647
+
+/**
  * One panel unless the wiring says otherwise. `chainLength` is wiring
  * information for the firmware; it describes nothing about the image, whose
  * only geometry is `width` × `height`.

@@ -144,7 +144,7 @@ test.group('Devices', () => {
    * (docs/adr/0020-simulateur-device-declare.md), so the patch validator does
    * not know the field at all — nor `panelType`.
    */
-  test('refuses to change kind or panelType after creation', async ({ client, assert }) => {
+  test('ignores kind and panelType on a patch', async ({ client, assert }) => {
     const user = await createUser()
     await platformRenderer()
 
@@ -443,7 +443,7 @@ test.group('Devices', () => {
     assert.lengthOf(await Scene.query().where('user_id', user.id), 1)
   })
 
-  test('leaves no scene behind when the device is refused', async ({ client, assert }) => {
+  test('refuses a renderer it may not use before writing anything', async ({ client, assert }) => {
     const user = await createUser()
     const stranger = await createUser()
     await platformRenderer()
@@ -470,6 +470,28 @@ test.group('Devices', () => {
 
     assert.lengthOf(await Scene.query().where('user_id', user.id), 0)
     assert.lengthOf(await Device.query().where('user_id', user.id), 0)
+  })
+
+  test('bounds chainLength and offlineGrace to what the column holds', async ({ client }) => {
+    const user = await createUser()
+    await platformRenderer()
+
+    const grace = await client
+      .post('/api/v1/devices')
+      .json({ name: 'Hallway panel', width: 64, height: 32, offlineGrace: 99_999_999_999 })
+      .loginAs(user)
+
+    const chain = await client
+      .post('/api/v1/devices')
+      .json({ name: 'Hallway panel', width: 64, height: 32, chainLength: 99_999_999_999 })
+      .loginAs(user)
+
+    /**
+     * 422 rather than the 500 an out-of-range `integer` insert would raise:
+     * a value the database cannot hold is a refused request, not a failure.
+     */
+    grace.assertStatus(422)
+    chain.assertStatus(422)
   })
 
   test('requires an authenticated user', async ({ client }) => {

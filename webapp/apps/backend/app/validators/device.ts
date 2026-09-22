@@ -1,5 +1,6 @@
 import {
   DEVICE_MAXIMUM_BRIGHTNESS,
+  DEVICE_MAXIMUM_INTEGER,
   DEVICE_MAXIMUM_MAX_FPS,
   DEVICE_MINIMUM_BRIGHTNESS,
   DEVICE_MINIMUM_MAX_FPS,
@@ -19,7 +20,7 @@ import vine from '@vinejs/vine'
  */
 const name = () => vine.string().minLength(3).maxLength(100)
 const dimension = () => vine.number().positive().withoutDecimals()
-const chainLength = () => vine.number().positive().withoutDecimals()
+const chainLength = () => vine.number().positive().max(DEVICE_MAXIMUM_INTEGER).withoutDecimals()
 const brightness = () =>
   vine.number().min(DEVICE_MINIMUM_BRIGHTNESS).max(DEVICE_MAXIMUM_BRIGHTNESS).withoutDecimals()
 
@@ -34,7 +35,8 @@ const maxFps = () =>
  * `null` is a value here too: a lease that never expires
  * (docs/adr/0015-bail-de-session-device.md).
  */
-const offlineGrace = () => vine.number().positive().withoutDecimals().nullable()
+const offlineGrace = () =>
+  vine.number().positive().max(DEVICE_MAXIMUM_INTEGER).withoutDecimals().nullable()
 
 /**
  * `null` unassigns the scene, which is a black screen rather than an error.
