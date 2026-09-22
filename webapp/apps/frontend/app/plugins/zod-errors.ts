@@ -1,4 +1,3 @@
-import { provideSSRWidth } from '@vueuse/core'
 import z from 'zod'
 
 export default defineNuxtPlugin(() => {
@@ -9,14 +8,30 @@ export default defineNuxtPlugin(() => {
       if (issue.received === 'undefined') {
         return { message: $i18n.t('validation.required') }
       }
+
+      /**
+       * What an emptied number field produces: `z.coerce.number()` turns `''`
+       * into `NaN`, which is a number by type and so never reports as missing.
+       */
+      if (issue.received === 'nan') {
+        return { message: $i18n.t('validation.number') }
+      }
     }
 
+    /**
+     * The bounds read differently on a length and on a value: "at least 1
+     * characters" under a width field is simply wrong.
+     */
     if (issue.code === z.ZodIssueCode.too_small) {
-      return { message: $i18n.t('validation.min', { min: issue.minimum }) }
+      const key = issue.type === 'number' ? 'validation.minNumber' : 'validation.min'
+
+      return { message: $i18n.t(key, { min: issue.minimum }) }
     }
 
     if (issue.code === z.ZodIssueCode.too_big) {
-      return { message: $i18n.t('validation.max', { max: issue.maximum }) }
+      const key = issue.type === 'number' ? 'validation.maxNumber' : 'validation.max'
+
+      return { message: $i18n.t(key, { max: issue.maximum }) }
     }
 
     if (issue.code === z.ZodIssueCode.invalid_string) {

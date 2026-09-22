@@ -88,7 +88,8 @@ const onSubmit = form.handleSubmit(async (values) => {
               </UiFormItem>
             </UiFormField>
 
-            <div class="grid grid-cols-2 gap-4">
+            <!-- items-start: a validation message under one field must not shift the other -->
+            <div class="grid grid-cols-2 items-start gap-4">
               <UiFormField v-slot="{ componentField }" name="width">
                 <UiFormItem>
                   <UiFormControl>

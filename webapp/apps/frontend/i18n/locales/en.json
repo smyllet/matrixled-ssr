@@ -105,7 +105,10 @@
     "required": "This field is required",
     "min": "The field must be at least {min} characters",
     "max": "The field must be at most {max} characters",
-    "email": "The field must be a valid email"
+    "email": "The field must be a valid email",
+    "number": "Enter a number",
+    "minNumber": "The value must be at least {min}",
+    "maxNumber": "The value must be at most {max}"
   },
   "nav": {
     "logout": "Log out",

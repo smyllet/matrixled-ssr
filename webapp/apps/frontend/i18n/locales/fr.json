@@ -105,7 +105,10 @@
     "required": "Ce champ est requis",
     "min": "Le champ doit contenir au moins {min} caractères",
     "max": "Le champ doit contenir au plus {max} caractères",
-    "email": "Le champ doit être un email valide"
+    "email": "Le champ doit être un email valide",
+    "number": "Saisissez un nombre",
+    "minNumber": "La valeur doit être au moins {min}",
+    "maxNumber": "La valeur doit être au plus {max}"
   },
   "nav": {
     "logout": "Se déconnecter",
