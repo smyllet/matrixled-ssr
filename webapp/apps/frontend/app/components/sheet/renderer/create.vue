@@ -44,7 +44,8 @@ const onSubmit = form.handleSubmit(async (values) => {
     .safe()
 
   if (error) {
-    creationError.value = t('sheets.createRenderer.failure.unknownDescription')
+    creationError.value =
+      validationMessage(error) ?? t('sheets.createRenderer.failure.unknownDescription')
 
     return
   }

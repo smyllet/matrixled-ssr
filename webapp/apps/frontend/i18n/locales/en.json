@@ -149,7 +149,8 @@
       },
       "advanced": "Advanced options",
       "validation": {
-        "geometry": "The device geometry exceeds the protocol maximum of {max} pixels"
+        "geometry": "The device geometry exceeds the protocol maximum of {max} pixels",
+        "scene": "This scene cannot be displayed on the device geometry"
       },
       "submit": "Create",
       "cancel": "Cancel",

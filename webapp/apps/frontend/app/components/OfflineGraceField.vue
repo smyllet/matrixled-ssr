@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DEVICE_MAXIMUM_INTEGER } from '@matrixled-ssr/backend/constants/device'
 import { useFieldValue } from 'vee-validate'
 
 /**
@@ -75,6 +76,7 @@ function label(seconds: number) {
           <UiNumberField
             :model-value="current"
             :min="0"
+            :max="DEVICE_MAXIMUM_INTEGER"
             :step="60"
             @update:model-value="handleChange"
           >

@@ -25,7 +25,8 @@ async function deleteDevice() {
     .safe()
 
   if (error) {
-    deleteError.value = t('dialogs.deleteDevice.failure.unknownDescription')
+    deleteError.value =
+      validationMessage(error) ?? t('dialogs.deleteDevice.failure.unknownDescription')
     return
   }
 

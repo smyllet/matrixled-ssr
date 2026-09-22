@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   DEVICE_MAXIMUM_BRIGHTNESS,
+  DEVICE_MAXIMUM_INTEGER,
   DEVICE_MAXIMUM_MAX_FPS,
 } from '@matrixled-ssr/backend/constants/device'
 import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/protocol'
@@ -52,7 +53,7 @@ const formSchema = computed(() =>
         height: z.coerce.number().int().min(1),
         brightness: z.coerce.number().int().min(0).max(DEVICE_MAXIMUM_BRIGHTNESS),
         maxFps: z.coerce.number().int().min(NO_MAX_FPS).max(DEVICE_MAXIMUM_MAX_FPS),
-        offlineGrace: z.coerce.number().int().min(NO_OFFLINE_GRACE),
+        offlineGrace: z.coerce.number().int().min(NO_OFFLINE_GRACE).max(DEVICE_MAXIMUM_INTEGER),
         rendererId: z.string().uuid(),
         sceneId: z.string(),
       })
@@ -130,7 +131,8 @@ const onSubmit = form.handleSubmit(async (values) => {
     .safe()
 
   if (error) {
-    editionError.value = t('sheets.editDevice.failure.unknownDescription')
+    editionError.value =
+      validationMessage(error) ?? t('sheets.editDevice.failure.unknownDescription')
 
     return
   }

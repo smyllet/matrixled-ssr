@@ -149,7 +149,8 @@
       },
       "advanced": "Options avancées",
       "validation": {
-        "geometry": "La géométrie du device dépasse le maximum du protocole de {max} pixels"
+        "geometry": "La géométrie du device dépasse le maximum du protocole de {max} pixels",
+        "scene": "Cette scène ne peut pas être affichée sur la géométrie du device"
       },
       "submit": "Créer",
       "cancel": "Annuler",

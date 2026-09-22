@@ -3,6 +3,7 @@ import {
   DEVICE_DEFAULT_BRIGHTNESS,
   DEVICE_DEFAULT_OFFLINE_GRACE,
   DEVICE_MAXIMUM_BRIGHTNESS,
+  DEVICE_MAXIMUM_INTEGER,
   DEVICE_MAXIMUM_MAX_FPS,
 } from '@matrixled-ssr/backend/constants/device'
 import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/protocol'
@@ -65,13 +66,28 @@ const formSchema = computed(() =>
         kind: z.enum(['hardware', 'simulator']),
         brightness: z.coerce.number().int().min(0).max(DEVICE_MAXIMUM_BRIGHTNESS),
         maxFps: z.coerce.number().int().min(NO_MAX_FPS).max(DEVICE_MAXIMUM_MAX_FPS),
-        offlineGrace: z.coerce.number().int().min(NO_OFFLINE_GRACE),
+        offlineGrace: z.coerce.number().int().min(NO_OFFLINE_GRACE).max(DEVICE_MAXIMUM_INTEGER),
         scene: z.string(),
       })
       .refine((values) => values.width * values.height <= PROTOCOL_MAXIMUM_PIXELS, {
         message: t('sheets.createDevice.validation.geometry', { max: PROTOCOL_MAXIMUM_PIXELS }),
         path: ['height'],
       })
+      /**
+       * The selector only lists compatible scenes, but a geometry edited after
+       * the scene was picked can invalidate the pair. The server refuses it;
+       * so does this, before the request is sent.
+       */
+      .refine(
+        (values) => {
+          if (values.scene === NO_SCENE || values.scene === GENERATE_SCENE) return true
+
+          const scene = props.scenes.find((candidate) => candidate.id === values.scene)
+
+          return scene !== undefined && isDisplayable(values, scene)
+        },
+        { message: t('sheets.createDevice.validation.scene'), path: ['scene'] }
+      )
   )
 )
 
@@ -132,7 +148,8 @@ const onSubmit = form.handleSubmit(async ({ scene, ...values }) => {
     .safe()
 
   if (error) {
-    creationError.value = t('sheets.createDevice.failure.unknownDescription')
+    creationError.value =
+      validationMessage(error) ?? t('sheets.createDevice.failure.unknownDescription')
 
     return
   }

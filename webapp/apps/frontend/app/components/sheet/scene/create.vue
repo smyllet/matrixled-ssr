@@ -49,7 +49,8 @@ const onSubmit = form.handleSubmit(async (values) => {
     .safe()
 
   if (error) {
-    creationError.value = t('sheets.createScene.failure.unknownDescription')
+    creationError.value =
+      validationMessage(error) ?? t('sheets.createScene.failure.unknownDescription')
 
     return
   }
@@ -94,8 +95,9 @@ const onSubmit = form.handleSubmit(async (values) => {
                 Bound explicitly rather than with `v-bind="componentField"`: that
                 spread also lands vee-validate's `onChange` on the field root,
                 where the input's native change event bubbles at blur — and
-                vee-validate would then store the *formatted* string ("604,800"),
-                which coerces to NaN and empties the field.
+                vee-validate would then store the *formatted* string a number
+                field shows once it is long enough to be grouped, which coerces
+                to NaN and empties the field.
               -->
               <UiFormField v-slot="{ value, handleChange }" name="width">
                 <UiFormItem>

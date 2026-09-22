@@ -25,7 +25,8 @@ async function deleteScene() {
     .safe()
 
   if (error) {
-    deleteError.value = t('dialogs.deleteScene.failure.unknownDescription')
+    deleteError.value =
+      validationMessage(error) ?? t('dialogs.deleteScene.failure.unknownDescription')
     return
   }
 

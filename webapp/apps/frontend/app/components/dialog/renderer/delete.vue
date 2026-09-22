@@ -25,7 +25,8 @@ async function deleteRenderer() {
     .safe()
 
   if (error) {
-    deleteError.value = t('dialogs.deleteRenderer.failure.unknownDescription')
+    deleteError.value =
+      validationMessage(error) ?? t('dialogs.deleteRenderer.failure.unknownDescription')
     return
   }
 

@@ -31,7 +31,8 @@ async function rotateToken() {
     .safe()
 
   if (error) {
-    rotationError.value = t('dialogs.rotateRendererToken.failure.unknownDescription')
+    rotationError.value =
+      validationMessage(error) ?? t('dialogs.rotateRendererToken.failure.unknownDescription')
     return
   }
 
