@@ -139,10 +139,23 @@ function close() {
 
             <!-- items-start: a validation message under one field must not shift the other -->
             <div class="grid grid-cols-2 items-start gap-4">
-              <UiFormField v-slot="{ componentField }" name="width">
+              <!--
+                Bound explicitly rather than with `v-bind="componentField"`: that
+                spread also lands vee-validate's `onChange` on the field root,
+                where the input's native change event bubbles at blur — and
+                vee-validate would then store the *formatted* string ("604,800"),
+                which coerces to NaN and empties the field.
+              -->
+              <UiFormField v-slot="{ value, handleChange }" name="width">
                 <UiFormItem>
                   <UiFormControl>
-                    <UiNumberField v-bind="componentField" :defaultValue="64" :min="1" :step="1">
+                    <UiNumberField
+                      :model-value="value"
+                      @update:model-value="handleChange"
+                      :defaultValue="64"
+                      :min="1"
+                      :step="1"
+                    >
                       <UiFormLabel>{{ t('sheets.createDevice.fields.width') }}</UiFormLabel>
                       <UiNumberFieldContent>
                         <UiNumberFieldDecrement />
@@ -155,10 +168,16 @@ function close() {
                 </UiFormItem>
               </UiFormField>
 
-              <UiFormField v-slot="{ componentField }" name="height">
+              <UiFormField v-slot="{ value, handleChange }" name="height">
                 <UiFormItem>
                   <UiFormControl>
-                    <UiNumberField v-bind="componentField" :defaultValue="32" :min="1" :step="1">
+                    <UiNumberField
+                      :model-value="value"
+                      @update:model-value="handleChange"
+                      :defaultValue="32"
+                      :min="1"
+                      :step="1"
+                    >
                       <UiFormLabel>{{ t('sheets.createDevice.fields.height') }}</UiFormLabel>
                       <UiNumberFieldContent>
                         <UiNumberFieldDecrement />
