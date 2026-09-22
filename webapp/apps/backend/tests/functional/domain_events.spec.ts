@@ -9,6 +9,7 @@ import SceneDeleted from '#events/scene_deleted'
 import SceneUpdated from '#events/scene_updated'
 import Device from '#models/device'
 import Renderer from '#models/renderer'
+import Scene from '#models/scene'
 import { DeviceService } from '#services/device_service'
 import { RendererService } from '#services/renderer_service'
 import { SceneService } from '#services/scene_service'
@@ -22,7 +23,7 @@ async function createDeviceService() {
 
   await platformRenderer()
 
-  return new DeviceService(tokenService, new RendererService(tokenService))
+  return new DeviceService(tokenService, new RendererService(tokenService), new SceneService())
 }
 
 test.group('Device events', () => {
@@ -65,6 +66,51 @@ test.group('Device events', () => {
       DeviceDeleted,
       ({ data }) => data.userId === user.id && data.id === device.id
     )
+  })
+
+  test('announces a generated scene, and only once it is committed', async () => {
+    const deviceService = await createDeviceService()
+    const user = await createUser()
+
+    using fakeEmitter = emitter.fake()
+
+    const { device } = await deviceService.createDevice({
+      name: 'Kitchen panel',
+      width: 64,
+      height: 32,
+      createScene: true,
+      userId: user.id,
+    })
+
+    fakeEmitter.assertEmitted(SceneCreated, ({ data }) => data.id === device.sceneId)
+    fakeEmitter.assertEmitted(DeviceCreated, ({ data }) => data.id === device.id)
+  })
+
+  test('announces nothing when the device rolls back', async ({ assert }) => {
+    const deviceService = await createDeviceService()
+    const user = await createUser()
+
+    using fakeEmitter = emitter.fake()
+
+    /**
+     * Longer than the column accepts, so the device insert fails *after* the
+     * scene has been written inside the transaction — the one ordering where a
+     * scene could be announced, and left behind, by mistake.
+     */
+    await assert.rejects(() =>
+      deviceService.createDevice({
+        name: 'x'.repeat(300),
+        width: 64,
+        height: 32,
+        createScene: true,
+        userId: user.id,
+      })
+    )
+
+    fakeEmitter.assertNotEmitted(SceneCreated)
+    fakeEmitter.assertNotEmitted(DeviceCreated)
+
+    assert.lengthOf(await Scene.query().where('user_id', user.id), 0)
   })
 
   test('stays quiet when a patch changes nothing', async () => {
@@ -159,6 +205,51 @@ test.group('Renderer events', () => {
       RendererDeleted,
       ({ data }) => data.userId === user.id && data.id === renderer.id
     )
+  })
+
+  test('announces a generated scene, and only once it is committed', async () => {
+    const deviceService = await createDeviceService()
+    const user = await createUser()
+
+    using fakeEmitter = emitter.fake()
+
+    const { device } = await deviceService.createDevice({
+      name: 'Kitchen panel',
+      width: 64,
+      height: 32,
+      createScene: true,
+      userId: user.id,
+    })
+
+    fakeEmitter.assertEmitted(SceneCreated, ({ data }) => data.id === device.sceneId)
+    fakeEmitter.assertEmitted(DeviceCreated, ({ data }) => data.id === device.id)
+  })
+
+  test('announces nothing when the device rolls back', async ({ assert }) => {
+    const deviceService = await createDeviceService()
+    const user = await createUser()
+
+    using fakeEmitter = emitter.fake()
+
+    /**
+     * Longer than the column accepts, so the device insert fails *after* the
+     * scene has been written inside the transaction — the one ordering where a
+     * scene could be announced, and left behind, by mistake.
+     */
+    await assert.rejects(() =>
+      deviceService.createDevice({
+        name: 'x'.repeat(300),
+        width: 64,
+        height: 32,
+        createScene: true,
+        userId: user.id,
+      })
+    )
+
+    fakeEmitter.assertNotEmitted(SceneCreated)
+    fakeEmitter.assertNotEmitted(DeviceCreated)
+
+    assert.lengthOf(await Scene.query().where('user_id', user.id), 0)
   })
 
   test('stays quiet when a patch changes nothing', async () => {

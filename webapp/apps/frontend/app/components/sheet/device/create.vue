@@ -6,6 +6,7 @@ import {
   DEVICE_MAXIMUM_MAX_FPS,
 } from '@matrixled-ssr/backend/constants/device'
 import { PROTOCOL_MAXIMUM_PIXELS } from '@matrixled-ssr/backend/constants/protocol'
+import { isDisplayable } from '@matrixled-ssr/backend/shared/geometry'
 import { AlertCircleIcon, ChevronsUpDown } from 'lucide-vue-next'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
@@ -22,6 +23,18 @@ const NO_MAX_FPS = 0
  * the server — a lease that never expires — and no control can hold it.
  */
 const NO_OFFLINE_GRACE = 0
+
+const props = defineProps<{
+  scenes: { id: string; name: string; width: number; height: number }[]
+}>()
+
+/**
+ * The scene field answers three things at once — none, this existing one, or
+ * one made for this device — so it holds a string rather than an id, and the
+ * two sentinels are values the API can never send back.
+ */
+const NO_SCENE = 'none'
+const GENERATE_SCENE = 'new'
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
@@ -53,6 +66,7 @@ const formSchema = computed(() =>
         brightness: z.coerce.number().int().min(0).max(DEVICE_MAXIMUM_BRIGHTNESS),
         maxFps: z.coerce.number().int().min(NO_MAX_FPS).max(DEVICE_MAXIMUM_MAX_FPS),
         offlineGrace: z.coerce.number().int().min(NO_OFFLINE_GRACE),
+        scene: z.string(),
       })
       .refine((values) => values.width * values.height <= PROTOCOL_MAXIMUM_PIXELS, {
         message: t('sheets.createDevice.validation.geometry', { max: PROTOCOL_MAXIMUM_PIXELS }),
@@ -79,12 +93,25 @@ const form = useForm({
     brightness: DEVICE_DEFAULT_BRIGHTNESS,
     maxFps: NO_MAX_FPS,
     offlineGrace: DEVICE_DEFAULT_OFFLINE_GRACE,
+    scene: NO_SCENE,
   },
 })
 
 useReseedOnOpen(open, form)
 
-const onSubmit = form.handleSubmit(async (values) => {
+/**
+ * Recomputed from the geometry being typed, not from a stored one: raising the
+ * device to 128x64 offers a 64x32 scene straight away.
+ */
+const compatibleScenes = computed(() => {
+  const geometry = { width: form.values.width ?? 0, height: form.values.height ?? 0 }
+
+  if (!geometry.width || !geometry.height) return []
+
+  return props.scenes.filter((scene) => isDisplayable(geometry, scene))
+})
+
+const onSubmit = form.handleSubmit(async ({ scene, ...values }) => {
   creationError.value = null
 
   const [data, error] = await $api
@@ -93,6 +120,13 @@ const onSubmit = form.handleSubmit(async (values) => {
         ...values,
         maxFps: values.maxFps === NO_MAX_FPS ? null : values.maxFps,
         offlineGrace: values.offlineGrace === NO_OFFLINE_GRACE ? null : values.offlineGrace,
+        /**
+         * One field, three answers: no scene, an existing one, or one made for
+         * this device — which the API derives entirely from the payload it
+         * already has, hence a flag rather than a second object.
+         */
+        createScene: scene === GENERATE_SCENE ? true : undefined,
+        sceneId: scene === NO_SCENE || scene === GENERATE_SCENE ? undefined : scene,
       },
     })
     .safe()
@@ -221,6 +255,45 @@ function close() {
                 </UiSelect>
                 <UiFormDescription>
                   {{ t('sheets.createDevice.fields.kindDescription') }}
+                </UiFormDescription>
+                <UiFormMessage />
+              </UiFormItem>
+            </UiFormField>
+
+            <UiFormField v-slot="{ componentField }" name="scene">
+              <UiFormItem>
+                <UiFormLabel>{{ t('sheets.createDevice.fields.scene') }}</UiFormLabel>
+                <UiSelect v-bind="componentField">
+                  <UiFormControl>
+                    <UiSelectTrigger class="w-full cursor-pointer">
+                      <UiSelectValue />
+                    </UiSelectTrigger>
+                  </UiFormControl>
+                  <UiSelectContent>
+                    <UiSelectItem :value="NO_SCENE">
+                      {{ t('sheets.createDevice.fields.noScene') }}
+                    </UiSelectItem>
+
+                    <UiSelectSeparator />
+
+                    <UiSelectItem :value="GENERATE_SCENE">
+                      {{ t('sheets.createDevice.fields.generateScene') }}
+                    </UiSelectItem>
+
+                    <!-- No rule above an empty list: the scenes are what it separates. -->
+                    <UiSelectSeparator v-if="compatibleScenes.length > 0" />
+
+                    <UiSelectItem
+                      v-for="scene in compatibleScenes"
+                      :key="scene.id"
+                      :value="scene.id"
+                    >
+                      {{ scene.name }} ({{ scene.width }} x {{ scene.height }})
+                    </UiSelectItem>
+                  </UiSelectContent>
+                </UiSelect>
+                <UiFormDescription>
+                  {{ t('sheets.createDevice.fields.sceneDescription') }}
                 </UiFormDescription>
                 <UiFormMessage />
               </UiFormItem>

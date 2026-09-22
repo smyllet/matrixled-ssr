@@ -60,7 +60,7 @@ function sceneName(sceneId: string | null) {
         <UiSpinner v-if="pending" />
         <span v-else class="text-md text-gray-500">({{ devices?.length ?? 0 }})</span>
       </div>
-      <SheetDeviceCreate>
+      <SheetDeviceCreate :scenes="scenes ?? []">
         <UiButton>
           {{ t('pages.devices.actions.create') }}
         </UiButton>

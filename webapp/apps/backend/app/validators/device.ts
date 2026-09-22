@@ -88,6 +88,13 @@ export const createDeviceValidator = vine.create(
       offlineGrace: offlineGrace().optional(),
       rendererId: rendererId().optional(),
       sceneId: sceneId().optional(),
+      /**
+       * Everything a generated scene needs is already in this payload: it
+       * takes the device geometry, so `k = 1`, and the device name. A flag is
+       * therefore the whole request — `DeviceService` refuses it alongside a
+       * `sceneId`, the two being two answers to the same question.
+       */
+      createScene: vine.boolean().optional(),
     })
     .use(boundedByProtocolMaximum())
 )

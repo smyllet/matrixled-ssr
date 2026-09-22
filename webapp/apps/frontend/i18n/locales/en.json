@@ -137,7 +137,11 @@
         "brightness": "Brightness",
         "maxFps": "Emission cap",
         "maxFpsUncapped": "Uncapped",
-        "maxFpsDescription": "How often the device may be written to. The cadence itself belongs to the scene."
+        "maxFpsDescription": "How often the device may be written to. The cadence itself belongs to the scene.",
+        "scene": "Scene",
+        "noScene": "None",
+        "generateScene": "Create an empty scene",
+        "sceneDescription": "Only scenes whose geometry the device geometry is an exact multiple of are offered. A scene created here takes the device name and size."
       },
       "kind": {
         "hardware": "Hardware",

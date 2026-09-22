@@ -10,10 +10,12 @@ import Device from '#models/device'
 import Renderer from '#models/renderer'
 import Scene from '#models/scene'
 import { RendererService } from '#services/renderer_service'
+import { SceneService } from '#services/scene_service'
 import { TokenService } from '#services/token_service'
 import { isDisplayable, type Geometry } from '#shared/geometry'
 import { deviceGeometryValidator } from '#validators/device'
 import { inject } from '@adonisjs/core'
+import db from '@adonisjs/lucid/services/db'
 import { errors } from '@vinejs/vine'
 
 /**
@@ -38,7 +40,8 @@ function refuse(field: string, rule: string, message: string): never {
 export class DeviceService {
   constructor(
     protected tokenService: TokenService,
-    protected rendererService: RendererService
+    protected rendererService: RendererService,
+    protected sceneService: SceneService
   ) {}
 
   async getVisibleDevices(userId: string) {
@@ -65,6 +68,7 @@ export class DeviceService {
     offlineGrace,
     rendererId,
     sceneId,
+    createScene,
     userId,
   }: {
     name: string
@@ -78,9 +82,18 @@ export class DeviceService {
     offlineGrace?: number | null
     rendererId?: string
     sceneId?: string | null
+    createScene?: boolean
     userId: string
   }) {
     const renderer = await this.resolveRenderer(rendererId, userId)
+
+    /**
+     * Two answers to the same question. Refusing is the only honest one: there
+     * is no reading of "attach this scene, and also make one" to prefer.
+     */
+    if (sceneId && createScene) {
+      refuse('sceneId', 'exclusive', 'A device is either given a scene or generates one, not both')
+    }
 
     if (sceneId) {
       await this.resolveDisplayableScene(sceneId, userId, { width, height })
@@ -88,21 +101,40 @@ export class DeviceService {
 
     const credential = await this.tokenService.issue('device')
 
-    const device = await Device.create({
-      name,
-      width,
-      height,
-      userId,
-      rendererId: renderer.id,
-      sceneId: sceneId ?? null,
-      tokenPrefix: credential.prefix,
-      tokenHash: credential.hash,
-      chainLength: chainLength ?? DEVICE_DEFAULT_CHAIN_LENGTH,
-      brightness: brightness ?? DEVICE_DEFAULT_BRIGHTNESS,
-      maxFps: maxFps ?? null,
-      offlineGrace: offlineGrace === undefined ? DEVICE_DEFAULT_OFFLINE_GRACE : offlineGrace,
-      kind: kind ?? DEFAULT_KIND,
-      panelType: panelType ?? DEFAULT_PANEL_TYPE,
+    /**
+     * A generated scene and its device are written together or not at all: a
+     * failed device would otherwise leave behind a scene nobody asked for, in
+     * a list where every other row was authored on purpose.
+     */
+    const device = await db.transaction(async (trx) => {
+      /**
+       * Through `SceneService` rather than the model: a scene created here is
+       * a scene like any other, and there is one place where that is decided.
+       * It dispatches its own event, after the commit it is enlisted in.
+       */
+      const scene = createScene
+        ? await this.sceneService.createScene({ name, width, height, userId }, trx)
+        : null
+
+      return Device.create(
+        {
+          name,
+          width,
+          height,
+          userId,
+          rendererId: renderer.id,
+          sceneId: scene?.id ?? sceneId ?? null,
+          tokenPrefix: credential.prefix,
+          tokenHash: credential.hash,
+          chainLength: chainLength ?? DEVICE_DEFAULT_CHAIN_LENGTH,
+          brightness: brightness ?? DEVICE_DEFAULT_BRIGHTNESS,
+          maxFps: maxFps ?? null,
+          offlineGrace: offlineGrace === undefined ? DEVICE_DEFAULT_OFFLINE_GRACE : offlineGrace,
+          kind: kind ?? DEFAULT_KIND,
+          panelType: panelType ?? DEFAULT_PANEL_TYPE,
+        },
+        { client: trx }
+      )
     })
 
     /**

@@ -3,6 +3,7 @@ import SceneDeleted from '#events/scene_deleted'
 import SceneUpdated from '#events/scene_updated'
 import Scene from '#models/scene'
 import { sceneGeometryValidator, type SceneConfig } from '#validators/scene'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 const DEFAULT_SCENE_CONFIG: SceneConfig = { version: 1, nodes: [] }
 const DEFAULT_TARGET_FPS = 30
@@ -16,29 +17,40 @@ export class SceneService {
     return Scene.findOrFail(sceneId)
   }
 
-  async createScene({
-    name,
-    width,
-    height,
-    targetFps,
-    config,
-    userId,
-  }: {
-    name: string
-    width: number
-    height: number
-    targetFps?: number
-    config?: SceneConfig
-    userId: string
-  }) {
-    const scene = await Scene.create({
+  /**
+   * `client` lets a caller enlist this creation in its own transaction — a
+   * device generating the scene it will display, which must not survive a
+   * device that fails to be written.
+   */
+  async createScene(
+    {
       name,
       width,
       height,
+      targetFps,
+      config,
       userId,
-      targetFps: targetFps ?? DEFAULT_TARGET_FPS,
-      config: config ?? DEFAULT_SCENE_CONFIG,
-    })
+    }: {
+      name: string
+      width: number
+      height: number
+      targetFps?: number
+      config?: SceneConfig
+      userId: string
+    },
+    client?: TransactionClientContract
+  ) {
+    const scene = await Scene.create(
+      {
+        name,
+        width,
+        height,
+        userId,
+        targetFps: targetFps ?? DEFAULT_TARGET_FPS,
+        config: config ?? DEFAULT_SCENE_CONFIG,
+      },
+      client ? { client } : undefined
+    )
 
     /**
      * `version` is a database default, so the fresh instance does not carry
@@ -46,7 +58,16 @@ export class SceneService {
      */
     await scene.refresh()
 
-    SceneCreated.dispatch(scene)
+    /**
+     * Inside a transaction the row is not there for anybody else yet: telling
+     * the dashboard now would have it refetch a scene it cannot see, and tell
+     * it about one that a rollback is about to remove.
+     */
+    if (client) {
+      client.after('commit', () => SceneCreated.dispatch(scene))
+    } else {
+      SceneCreated.dispatch(scene)
+    }
 
     return scene
   }

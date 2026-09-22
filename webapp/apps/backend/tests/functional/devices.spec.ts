@@ -392,6 +392,86 @@ test.group('Devices', () => {
     response.assertStatus(422)
   })
 
+  test('generates a scene of its own geometry when asked to', async ({ client, assert }) => {
+    const user = await createUser()
+    await platformRenderer()
+
+    const response = await client
+      .post('/api/v1/devices')
+      .json({ name: 'Hallway panel', width: 64, height: 32, createScene: true })
+      .loginAs(user)
+
+    response.assertStatus(201)
+
+    const created = deviceFrom(response.body())
+    assert.isNotNull(created.sceneId)
+
+    const scene = await Scene.findOrFail(created.sceneId!)
+
+    /**
+     * Same geometry as the device, so `k = 1`
+     * (docs/adr/0018-geometrie-native-de-la-scene.md), and the device name:
+     * everything a generated scene needs is already in the request.
+     */
+    assert.equal(scene.width, 64)
+    assert.equal(scene.height, 32)
+    assert.equal(scene.name, 'Hallway panel')
+    assert.equal(scene.userId, user.id)
+    assert.equal(scene.targetFps, 30)
+    assert.deepEqual(scene.config, { version: 1, nodes: [] })
+  })
+
+  test('refuses to both take a scene and generate one', async ({ client, assert }) => {
+    const user = await createUser()
+    await platformRenderer()
+
+    const scene = await Scene.create({
+      name: 'Clock',
+      userId: user.id,
+      width: 64,
+      height: 32,
+      config: { version: 1, nodes: [] },
+    })
+
+    const response = await client
+      .post('/api/v1/devices')
+      .json({ name: 'Hallway panel', width: 64, height: 32, sceneId: scene.id, createScene: true })
+      .loginAs(user)
+
+    response.assertStatus(422)
+
+    assert.lengthOf(await Scene.query().where('user_id', user.id), 1)
+  })
+
+  test('leaves no scene behind when the device is refused', async ({ client, assert }) => {
+    const user = await createUser()
+    const stranger = await createUser()
+    await platformRenderer()
+
+    const foreignRenderer = await Renderer.create({
+      name: 'Their renderer',
+      ownerId: stranger.id,
+      tokenPrefix: 'aabbccddeeff',
+      tokenHash: 'unused',
+    })
+
+    const response = await client
+      .post('/api/v1/devices')
+      .json({
+        name: 'Hallway panel',
+        width: 64,
+        height: 32,
+        createScene: true,
+        rendererId: foreignRenderer.id,
+      })
+      .loginAs(user)
+
+    response.assertStatus(422)
+
+    assert.lengthOf(await Scene.query().where('user_id', user.id), 0)
+    assert.lengthOf(await Device.query().where('user_id', user.id), 0)
+  })
+
   test('requires an authenticated user', async ({ client }) => {
     const response = await client.get('/api/v1/devices')
 

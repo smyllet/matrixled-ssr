@@ -137,7 +137,11 @@
         "brightness": "Luminosité",
         "maxFps": "Plafond d'émission",
         "maxFpsUncapped": "Sans plafond",
-        "maxFpsDescription": "Fréquence maximale à laquelle le device est écrit. La cadence, elle, appartient à la scène."
+        "maxFpsDescription": "Fréquence maximale à laquelle le device est écrit. La cadence, elle, appartient à la scène.",
+        "scene": "Scène",
+        "noScene": "Aucune",
+        "generateScene": "Créer une scène vide",
+        "sceneDescription": "Seules les scènes dont la géométrie du device est un multiple exact sont proposées. Une scène créée ici prend le nom et la taille du device."
       },
       "kind": {
         "hardware": "Matériel",
