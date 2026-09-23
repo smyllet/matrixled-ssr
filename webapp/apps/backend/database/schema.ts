@@ -102,7 +102,7 @@ export class RendererSchema extends BaseModel {
   declare capabilities: any | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
-  @column()
+  @column({ prepare: (value) => (value === null ? null : JSON.stringify(value)) })
   declare endpoints: RendererEndpoints | null
   @column({ isPrimary: true })
   declare id: string
