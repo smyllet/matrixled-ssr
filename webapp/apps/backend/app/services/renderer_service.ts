@@ -1,3 +1,5 @@
+import { CONTROL_CLOSE } from '#constants/control'
+import { RendererConnections } from '#control_plane/renderer_connections'
 import RendererCreated from '#events/renderer_created'
 import RendererDeleted from '#events/renderer_deleted'
 import RendererUpdated from '#events/renderer_updated'
@@ -7,7 +9,10 @@ import { inject } from '@adonisjs/core'
 
 @inject()
 export class RendererService {
-  constructor(protected tokenService: TokenService) {}
+  constructor(
+    protected tokenService: TokenService,
+    protected connections: RendererConnections
+  ) {}
 
   /**
    * A user sees the renderers they own plus the platform one, which serves
@@ -104,12 +109,15 @@ export class RendererService {
   async deleteRenderer(renderer: Renderer) {
     await renderer.delete()
 
+    this.connections.disconnect(renderer.id, CONTROL_CLOSE.revoked, 'renderer deleted')
+
     RendererDeleted.dispatch(renderer)
   }
 
   /**
    * Replaces the credential. The previous token stops working immediately,
-   * which is what makes this the answer to a leak.
+   * which is what makes this the answer to a leak — for a connection already
+   * open with it too, which is closed rather than left to outlive it.
    */
   async rotateToken(renderer: Renderer) {
     const credential = await this.tokenService.issue('renderer')
@@ -118,6 +126,8 @@ export class RendererService {
     renderer.tokenHash = credential.hash
 
     await renderer.save()
+
+    this.connections.disconnect(renderer.id, CONTROL_CLOSE.revoked, 'credential rotated')
 
     RendererUpdated.dispatch(renderer)
 

@@ -56,6 +56,7 @@ export default defineConfig({
     () => import('@adonisjs/auth/auth_provider'),
     () => import('#providers/api_provider'),
     () => import('#providers/platform_renderer_provider'),
+    () => import('#providers/control_plane_provider'),
     () => import('@adonisjs/bouncer/bouncer_provider'),
     () => import('@adonisjs/transmit/transmit_provider'),
   ],

@@ -83,7 +83,7 @@ Tests run against `matrixled_test`, configured by `.env.test` — deliberately s
 no local `.env`. `tests/bootstrap.ts` refuses to start against a database whose name does not end in `_test`,
 migrates once in `runnerHooks.setup` and truncates before every test.
 
-Node 24 (`.nvmrc`), pnpm 10.
+Node 24.9 or later (`.nvmrc`; the control plane needs `shouldUpgradeCallback`), pnpm 10.
 
 `minimumReleaseAge` in `pnpm-workspace.yaml` holds installs back to versions published at least three days ago.
 A brand-new release therefore resolves to the previous one rather than failing — if a version you expect does
@@ -130,10 +130,30 @@ is why `nuxt.config.ts` sets `experimentalDecorators`, without which Lucid's dec
 key. Controllers are expected to return `serialize(SomeTransformer.transform(model))`, never a raw model —
 transformers in `app/transformers/` control which fields are exposed.
 
+### Renderer control plane
+
+`/api/v1/renderer/control` is a WebSocket, and **it is not in `start/routes.ts`**. The Node server itself is
+built by `createServerWithRendererControl` (`app/control_plane/renderer_control_server.ts`, on `ws`), which
+diverts upgrades on that one path and leaves every other request to the router. Two places create the server
+through it — `bin/server.ts` for the app, `tests/bootstrap.ts` for the functional suite — and anything that
+changes how the HTTP server is created must keep both.
+
+Two ordering constraints come with it:
+
+- **Shutdown.** Node's `server.close()` waits for upgraded sockets, so the control connections must be closed
+  first. `bin/server.ts` registers that close from `app.ready`, which makes it run before Adonis's own
+  terminating hook.
+- **Tests.** Presence is written off the request path. `tests/bootstrap.ts` waits for those writes before each
+  test's migrations, whose Lucid advisory lock fails when a concurrent query splits it across two pooled
+  connections.
+
+Live connections are held in memory (`RendererConnections`), which is why the platform assumes a single Adonis
+instance — see [ADR-0024](docs/adr/0024-canal-de-controle-sur-le-serveur-http.md).
+
 ### Backend conventions
 
 - Subpath imports throughout: `#controllers/*`, `#models/*`, `#services/*`, `#validators/*`, `#policies/*`,
-  `#transformers/*`, `#guards/*` (mapped in `package.json`).
+  `#transformers/*`, `#guards/*`, `#constants/*`, `#control_plane/*` (mapped in `package.json`).
 - Controllers stay thin: validate with a VineJS validator, authorise with a Bouncer policy, delegate to a
   service. `app/controllers/devices_controller.ts` is the reference shape.
 - Authorisation is owner-based via policies (`app/policies/device_policy.ts`).

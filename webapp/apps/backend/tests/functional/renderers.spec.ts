@@ -1,3 +1,4 @@
+import { RendererConnections } from '#control_plane/renderer_connections'
 import Renderer from '#models/renderer'
 import User from '#models/user'
 import { RendererService } from '#services/renderer_service'
@@ -235,7 +236,7 @@ test.group('Platform renderer', () => {
 
   test('is resolved by the service without knowing its id', async ({ assert }) => {
     const platformRenderer = await createPlatformRenderer()
-    const rendererService = new RendererService(new TokenService())
+    const rendererService = new RendererService(new TokenService(), new RendererConnections())
 
     const defaultRenderer = await rendererService.getDefaultRenderer()
 
@@ -248,7 +249,7 @@ test.group('Platform renderer provisioning', () => {
     await createPlatformRenderer()
 
     const tokenService = new TokenService()
-    const rendererService = new RendererService(tokenService)
+    const rendererService = new RendererService(tokenService, new RendererConnections())
     const declared = await tokenService.issue('renderer')
 
     const renderer = await rendererService.provisionPlatformRenderer(declared.token)
@@ -261,7 +262,7 @@ test.group('Platform renderer provisioning', () => {
     const platformRenderer = await createPlatformRenderer()
 
     const tokenService = new TokenService()
-    const rendererService = new RendererService(tokenService)
+    const rendererService = new RendererService(tokenService, new RendererConnections())
     const declared = await tokenService.issue('renderer')
 
     await rendererService.provisionPlatformRenderer(declared.token)
@@ -277,7 +278,7 @@ test.group('Platform renderer provisioning', () => {
     await createPlatformRenderer()
 
     const tokenService = new TokenService()
-    const rendererService = new RendererService(tokenService)
+    const rendererService = new RendererService(tokenService, new RendererConnections())
     const deviceToken = await tokenService.issue('device')
 
     await assert.rejects(() => rendererService.provisionPlatformRenderer(deviceToken.token))
@@ -286,7 +287,7 @@ test.group('Platform renderer provisioning', () => {
 
   test('does nothing when there is no platform renderer', async ({ assert }) => {
     const tokenService = new TokenService()
-    const rendererService = new RendererService(tokenService)
+    const rendererService = new RendererService(tokenService, new RendererConnections())
     const declared = await tokenService.issue('renderer')
 
     assert.isNull(await rendererService.provisionPlatformRenderer(declared.token))

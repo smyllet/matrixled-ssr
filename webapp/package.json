@@ -6,7 +6,7 @@
   "description": "A batteries-included AdonisJS starter kit for building modern APIs with type-safe frontend integration",
   "license": "MIT",
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=24.9.0"
   },
   "scripts": {
     "dev": "turbo dev",

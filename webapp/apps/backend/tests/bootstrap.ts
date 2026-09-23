@@ -5,6 +5,8 @@ import type { Config } from '@japa/runner/types'
 import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import { dbAssertions } from '@adonisjs/lucid/plugins/db'
 import testUtils from '@adonisjs/core/services/test_utils'
+import { createServerWithRendererControl } from '#control_plane/renderer_control_server'
+import type { RendererControl } from '#control_plane/renderer_control_server'
 import { authApiClient } from '@adonisjs/auth/plugins/api_client'
 import { sessionApiClient } from '@adonisjs/session/plugins/api_client'
 import type { Registry } from '../.adonisjs/client/registry/schema.d.ts'
@@ -62,6 +64,11 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
 }
 
 /**
+ * The control plane of the functional suite's server, once started.
+ */
+let rendererControl: RendererControl | undefined
+
+/**
  * Configure suites by tapping into the test suite instance.
  * Learn more - https://japa.dev/docs/test-suites#lifecycle-hooks
  */
@@ -70,9 +77,49 @@ export const configureSuite: Config['configureSuite'] = (suite) => {
    * Empty the tables between tests while keeping the schema, so every test
    * starts from a known-empty database without repeating the hook everywhere.
    */
-  suite.onGroup((group) => group.each.setup(() => testUtils.db().truncate()))
+  suite.onGroup((group) =>
+    group.each.setup(async () => {
+      /**
+       * A presence write left by the previous test must land before the
+       * migrations run: see the advisory lock note below.
+       */
+      await rendererControl?.idle()
+
+      return testUtils.db().truncate()
+    })
+  )
 
   if (['browser', 'functional', 'e2e'].includes(suite.name)) {
-    return suite.setup(() => testUtils.httpServer().start())
+    /**
+     * Created the way `bin/server.ts` creates it, so functional tests reach the
+     * control-plane WebSocket on the same server as the HTTP routes.
+     */
+    return suite.setup(async () => {
+      let control: RendererControl | undefined
+
+      const closeServer = await testUtils.httpServer().start((handler) => {
+        const created = createServerWithRendererControl(handler)
+        control = created.control
+        return created.server
+      })
+
+      rendererControl = control
+
+      /**
+       * The presence reset queries the database off the request path. Every
+       * test starts by running the migrations, whose advisory lock Lucid takes
+       * and releases with two pooled queries: a concurrent query can make them
+       * land on two connections, and the release then fails.
+       */
+      await control?.ready
+
+      /**
+       * Connections first: the server's close waits for every open WebSocket.
+       */
+      return async () => {
+        await control?.close()
+        await closeServer()
+      }
+    })
   }
 }

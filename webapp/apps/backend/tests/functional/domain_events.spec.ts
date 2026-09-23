@@ -1,3 +1,4 @@
+import { RendererConnections } from '#control_plane/renderer_connections'
 import DeviceCreated from '#events/device_created'
 import DeviceDeleted from '#events/device_deleted'
 import DeviceUpdated from '#events/device_updated'
@@ -23,7 +24,11 @@ async function createDeviceService() {
 
   await platformRenderer()
 
-  return new DeviceService(tokenService, new RendererService(tokenService), new SceneService())
+  return new DeviceService(
+    tokenService,
+    new RendererService(tokenService, new RendererConnections()),
+    new SceneService()
+  )
 }
 
 test.group('Device events', () => {
@@ -239,7 +244,7 @@ test.group('Renderer events', () => {
   test('emits created, updated and deleted', async () => {
     using fakeEmitter = emitter.fake()
     const user = await createUser()
-    const rendererService = new RendererService(new TokenService())
+    const rendererService = new RendererService(new TokenService(), new RendererConnections())
 
     const { renderer } = await rendererService.createRenderer({
       name: 'Living room renderer',
@@ -263,7 +268,7 @@ test.group('Renderer events', () => {
 
   test('stays quiet when a patch changes nothing', async () => {
     const user = await createUser()
-    const rendererService = new RendererService(new TokenService())
+    const rendererService = new RendererService(new TokenService(), new RendererConnections())
 
     const { renderer } = await rendererService.createRenderer({
       name: 'Living room renderer',
@@ -285,7 +290,7 @@ test.group('Renderer events', () => {
    * history must keep seeing it.
    */
   test('still emits for the ownerless platform renderer', async ({ assert }) => {
-    const rendererService = new RendererService(new TokenService())
+    const rendererService = new RendererService(new TokenService(), new RendererConnections())
     const credential = await new TokenService().issue('renderer')
 
     const renderer = await Renderer.create({

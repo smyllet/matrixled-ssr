@@ -28,6 +28,37 @@ Le format est du **JSON**, ce qui n'est pas une entorse au principe « binaire u
 que pour le chemin device, où le coût de parsing est payé trente fois par seconde sur un microcontrôleur. Ici le
 trafic est événementiel.
 
+### Cycle de vie de la connexion
+
+Les choix ci-dessous sont justifiés par [ADR-0024](adr/0024-canal-de-controle-sur-le-serveur-http.md).
+
+- **Handshake** : un token absent, invalide ou d'un autre scope (un token device, par exemple) est refusé par
+  une réponse HTTP `401`, avant tout `101`. Le corps est celui des autres erreurs de l'API :
+  `{ "errors": [{ "message": "Unauthorized access" }] }`.
+- **Présence** : l'ouverture passe le renderer `online`, la fermeture le repasse `offline`. `lastSeenAt` est
+  écrit à ces deux moments et à chaque pong répondu au heartbeat. Chaque écriture est notifiée au dashboard
+  par `renderer.updated`.
+- **Heartbeat** : Adonis envoie un ping WebSocket toutes les 30 s. Une connexion restée sans pong entre deux
+  pings est coupée, si bien qu'une coupure silencieuse est détectée en une minute au plus.
+- **Taille** : un message entrant de plus de 64 Kio ferme la connexion.
+- **Une connexion par renderer** : une nouvelle connexion remplace la précédente, qui est fermée.
+- **Révocation** : renouveler le token d'un renderer ou le supprimer ferme sa connexion, y compris quand la
+  révocation tombe pendant le handshake.
+- **Arrêt de la plateforme** : chaque connexion est fermée en `1001` et le renderer passe `offline` avant que le
+  process ne s'arrête. Un renderer qui ne répond pas à la fermeture est coupé au bout de 2 s.
+
+Codes de fermeture émis par Adonis :
+
+| Code | Sens | Le renderer doit |
+|------|------|------------------|
+| `1001` | La plateforme s'arrête | reconnecter, avec son backoff : tant que l'arrêt dure, le handshake répond `503` |
+| `1011` | La plateforme n'a pas pu vérifier le credential (incident de base de données) | reconnecter, avec son backoff : le token est peut-être valide |
+| `4001` | Remplacée par une connexion plus récente du même renderer | ne rien faire : la connexion qui gagne est la sienne |
+| `4003` | Credential révoqué : token renouvelé, ou renderer supprimé | ne pas reconnecter avec ce token, qui sera refusé |
+
+> **État actuel.** Le canal accepte et suit les connexions, mais ignore encore tout message reçu : l'enveloppe
+> et le catalogue ci-dessous arrivent avec #27.
+
 ## Enveloppe
 
 Tout message est un objet JSON de cette forme :
@@ -230,8 +261,9 @@ est hors ligne : un secret que le renderer ne peut pas apprendre ne servirait qu
 
 > **État actuel.** La route `POST /api/v1/devices/:id/credential` existe et émet l'événement de domaine
 > `device.credential_rotated` avant de répondre, mais le plan de contrôle n'existe pas encore : rien ne le relaie
-> au renderer, et le refus hors ligne n'est pas appliqué — `renderers.status` n'est écrit par rien avant #26, donc
-> tous les renderers y paraissent hors ligne. Les deux arrivent avec #66, après #26 et #27.
+> au renderer, et le refus hors ligne n'est pas appliqué. `renderers.status` reflète désormais la connexion de
+> contrôle (#26), mais un événement ne peut pas être relayé tant que le catalogue n'existe pas. Les deux arrivent
+> avec #66, après #27.
 
 ### `scene.updated`
 
