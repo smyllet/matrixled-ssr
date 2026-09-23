@@ -133,10 +133,13 @@ transformers in `app/transformers/` control which fields are exposed.
 ### Backend conventions
 
 - Subpath imports throughout: `#controllers/*`, `#models/*`, `#services/*`, `#validators/*`, `#policies/*`,
-  `#transformers/*` (mapped in `package.json`).
+  `#transformers/*`, `#guards/*` (mapped in `package.json`).
 - Controllers stay thin: validate with a VineJS validator, authorise with a Bouncer policy, delegate to a
   service. `app/controllers/devices_controller.ts` is the reference shape.
 - Authorisation is owner-based via policies (`app/policies/device_policy.ts`).
+- Three auth guards (`config/auth.ts`): `web` (session, the dashboard), `device` and `renderer` (bearer token,
+  `app/guards/token_guard.ts`). Dashboard code reads the user through `auth.use('web')`, never `auth.user`,
+  which is whichever guard authenticated last and is typed `User | Device | Renderer`.
 - Primary keys are self-assigned UUIDs, generated in a `@beforeCreate` hook — `static selfAssignPrimaryKey = true`.
 - The API is JSON-only: `force_json_response_middleware` is registered globally.
 
@@ -157,8 +160,7 @@ transformers in `app/transformers/` control which fields are exposed.
 
 ## Known hazards
 
-- **Devices cannot authenticate.** The token guard was deliberately removed in `59e299f`, leaving only the
-  session guard. Anything requiring non-browser authentication needs it reintroduced first (issue #21).
+None open.
 
 ## Commits
 

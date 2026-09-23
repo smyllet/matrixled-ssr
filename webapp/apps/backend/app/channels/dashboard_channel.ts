@@ -1,7 +1,11 @@
 import type { HttpContext } from '@adonisjs/core/http'
 
+/**
+ * Read from the session guard alone: only a dashboard user subscribes, and a
+ * device or renderer id must never be mistaken for one.
+ */
 export function authorizeUserChannel(ctx: HttpContext, { id }: { id: string }): boolean {
-  return ctx.auth.user?.id === id
+  return ctx.auth.use('web').user?.id === id
 }
 
 /**
@@ -12,5 +16,5 @@ export function authorizeUserChannel(ctx: HttpContext, { id }: { id: string }): 
  * default, so the rule is stated rather than assumed.
  */
 export function authorizePlatformChannel(ctx: HttpContext): boolean {
-  return ctx.auth.user !== undefined
+  return ctx.auth.use('web').user !== undefined
 }

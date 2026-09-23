@@ -16,7 +16,7 @@ export default class DevicesController {
   constructor(protected deviceService: DeviceService) {}
 
   async index({ auth, serialize }: HttpContext) {
-    const user = auth.getUserOrFail()
+    const user = auth.use('web').getUserOrFail()
 
     const devices = await this.deviceService.getVisibleDevices(user.id)
 
@@ -38,7 +38,7 @@ export default class DevicesController {
   async store({ auth, request, serialize, response }: HttpContext) {
     const payload = await request.validateUsing(createDeviceValidator)
 
-    const user = auth.getUserOrFail()
+    const user = auth.use('web').getUserOrFail()
 
     const { device, token } = await this.deviceService.createDevice({
       ...payload,

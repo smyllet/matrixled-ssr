@@ -24,6 +24,7 @@ export type ScannedRoutes = {
     'scenes.store': { paramsTuple?: []; params?: {} }
     'scenes.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'device.bootstrap': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
     'subscribe': { paramsTuple?: []; params?: {} }
     'unsubscribe': { paramsTuple?: []; params?: {} }
@@ -36,6 +37,7 @@ export type ScannedRoutes = {
     'renderers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.index': { paramsTuple?: []; params?: {} }
     'scenes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'device.bootstrap': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -46,6 +48,7 @@ export type ScannedRoutes = {
     'renderers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.index': { paramsTuple?: []; params?: {} }
     'scenes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'device.bootstrap': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
   }
   POST: {

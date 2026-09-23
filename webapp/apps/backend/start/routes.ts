@@ -70,5 +70,16 @@ router
       .prefix('scenes')
       .as('scenes')
       .use(middleware.auth())
+
+    /**
+     * Called by a device rather than a browser, with its bearer token.
+     */
+    router
+      .group(() => {
+        router.get('bootstrap', [controllers.DeviceBootstrap, 'show']).as('bootstrap')
+      })
+      .prefix('device')
+      .as('device')
+      .use(middleware.auth({ guards: ['device'] }))
   })
   .prefix('/api/v1')

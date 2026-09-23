@@ -15,7 +15,7 @@ export default class ScenesController {
   constructor(protected sceneService: SceneService) {}
 
   async index({ auth, serialize }: HttpContext) {
-    const user = auth.getUserOrFail()
+    const user = auth.use('web').getUserOrFail()
 
     const scenes = await this.sceneService.getVisibleScenes(user.id)
 
@@ -38,7 +38,7 @@ export default class ScenesController {
     const { name, width, height, targetFps, config } =
       await request.validateUsing(createSceneValidator)
 
-    const user = auth.getUserOrFail()
+    const user = auth.use('web').getUserOrFail()
 
     const scene = await this.sceneService.createScene({
       name,

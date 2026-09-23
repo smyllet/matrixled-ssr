@@ -126,6 +126,12 @@ const routes = {
     tokens: [{"old":"/api/v1/scenes/:id","type":0,"val":"api","end":""},{"old":"/api/v1/scenes/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/scenes/:id","type":0,"val":"scenes","end":""},{"old":"/api/v1/scenes/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['scenes.delete']['types'],
   },
+  'device.bootstrap': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/device/bootstrap',
+    tokens: [{"old":"/api/v1/device/bootstrap","type":0,"val":"api","end":""},{"old":"/api/v1/device/bootstrap","type":0,"val":"v1","end":""},{"old":"/api/v1/device/bootstrap","type":0,"val":"device","end":""},{"old":"/api/v1/device/bootstrap","type":0,"val":"bootstrap","end":""}],
+    types: placeholder as Registry['device.bootstrap']['types'],
+  },
   'event_stream': {
     methods: ["GET","HEAD"],
     pattern: '/__transmit/events',

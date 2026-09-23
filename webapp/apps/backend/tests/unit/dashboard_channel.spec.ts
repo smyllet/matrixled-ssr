@@ -3,7 +3,15 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { test } from '@japa/runner'
 
 function ctxFor(userId: string | undefined) {
-  return { auth: { user: userId ? { id: userId } : undefined } } as unknown as HttpContext
+  const user = userId ? { id: userId } : undefined
+
+  /**
+   * Only the session guard knows the user: a rule reading `auth.user`, or any
+   * other guard, sees nobody and fails the tests that expect access.
+   */
+  return {
+    auth: { use: (guard: string) => ({ user: guard === 'web' ? user : undefined }) },
+  } as unknown as HttpContext
 }
 
 test.group('Dashboard channel authorization', () => {

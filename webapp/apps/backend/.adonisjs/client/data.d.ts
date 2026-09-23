@@ -5,6 +5,7 @@
 
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
+import type DeviceBootstrapTransformer from '#transformers/device_bootstrap_transformer'
 import type DeviceTransformer from '#transformers/device_transformer'
 import type DeviceWithTokenTransformer from '#transformers/device_with_token_transformer'
 import type RendererTransformer from '#transformers/renderer_transformer'
@@ -13,6 +14,10 @@ import type SceneTransformer from '#transformers/scene_transformer'
 import type UserTransformer from '#transformers/user_transformer'
 
 export namespace Data {
+  export type DeviceBootstrap = InferData<DeviceBootstrapTransformer>
+  export namespace DeviceBootstrap {
+    export type Variants = InferVariants<DeviceBootstrapTransformer>
+  }
   export type Device = InferData<DeviceTransformer>
   export namespace Device {
     export type Variants = InferVariants<DeviceTransformer>

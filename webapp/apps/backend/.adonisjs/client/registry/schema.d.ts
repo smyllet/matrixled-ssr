@@ -247,6 +247,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/scenes_controller').default['delete']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'device.bootstrap': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/device/bootstrap'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/device_bootstrap_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/device_bootstrap_controller').default['show']>>>
+    }
+  }
   'event_stream': {
     methods: ["GET","HEAD"]
     pattern: '/__transmit/events'

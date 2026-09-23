@@ -53,10 +53,22 @@ export default {
         /**
          * A jsonb column the generator would otherwise type `any`; this ties
          * it to the bounded list the validator accepts.
+         *
+         * `prepare` because the value is an array: the pg driver sends a JS
+         * array as a Postgres array literal, which jsonb refuses. An object —
+         * `scenes.config` — is already sent as JSON and needs nothing. The
+         * generator copies the function's source into database/schema.ts.
          */
         endpoints: {
           tsType: 'RendererEndpoints',
-          decorators: [{ name: '@column' }],
+          decorators: [
+            {
+              name: '@column',
+              args: {
+                prepare: (value: unknown) => (value === null ? null : JSON.stringify(value)),
+              },
+            },
+          ],
           imports: [{ source: '#validators/renderer', typeImports: ['RendererEndpoints'] }],
         },
       },

@@ -4,6 +4,7 @@
  */
 
 export const controllers = {
+  DeviceBootstrap: () => import('#controllers/device_bootstrap_controller'),
   Devices: () => import('#controllers/devices_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Profile: () => import('#controllers/profile_controller'),

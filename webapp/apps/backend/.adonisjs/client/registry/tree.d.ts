@@ -40,6 +40,9 @@ export interface ApiDefinition {
     patch: typeof routes['scenes.patch']
     delete: typeof routes['scenes.delete']
   }
+  device: {
+    bootstrap: typeof routes['device.bootstrap']
+  }
   eventStream: typeof routes['event_stream']
   subscribe: typeof routes['subscribe']
   unsubscribe: typeof routes['unsubscribe']
