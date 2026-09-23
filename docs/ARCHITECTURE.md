@@ -94,7 +94,7 @@ Un renderer **n'expose aucun port à la plateforme**. Le seul port qu'il ouvre s
 ```
 1. Le device s'allume. Il connaît l'adresse de la plateforme et son token (gravés au flash).
 2. GET /api/v1/device/bootstrap        (authentifié par le token device)
-       ──▶ { renderer_urls, panel: { width, height, chain }, scene_version }
+       ──▶ { data: { renderer_urls, panel: { width, height, chain }, scene_version } }
 3. Il met la réponse en cache local.
 4. Il choisit une URL selon son transport (wss d'abord) et ouvre un WebSocket.
 5. Il envoie son token en premier message binaire.

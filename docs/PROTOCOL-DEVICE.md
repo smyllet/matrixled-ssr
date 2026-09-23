@@ -37,11 +37,16 @@ Authorization: Bearer <token device>
 
 ```jsonc
 {
-  "renderer_urls": ["wss://renderer.example.net:8889", "ws://192.168.1.50:8889"],
-  "panel": { "width": 64, "height": 32, "chain": 1 },
-  "scene_version": 42
+  "data": {
+    "renderer_urls": ["wss://renderer.example.net:8889", "ws://192.168.1.50:8889"],
+    "panel": { "width": 64, "height": 32, "chain": 1 },
+    "scene_version": 42
+  }
 }
 ```
+
+Comme toute réponse de l'API, le contenu est enveloppé dans la clé `data`. Le device lit donc
+`data.renderer_urls`, pas `renderer_urls` à la racine.
 
 `renderer_urls` est la liste déclarée par le renderer, transmise telle quelle. **Le client choisit** : un
 firmware retient `wss://` s'il est présent et `ws://` sinon ; le simulateur ne retient que ce que le navigateur
@@ -53,6 +58,14 @@ redémarrage suivant. Sans ce cache, une panne de la plateforme empêcherait tou
 l'autonomie garantie par [ADR-0008](adr/0008-renderer-autonome.md).
 
 C'est le seul échange HTTP du cycle de vie d'un device, et le seul en JSON.
+
+Précisions :
+
+- `renderer_urls` est **vide** tant que le renderer assigné n'a déclaré aucun transport sur le plan de contrôle.
+  Le device n'a alors nulle part où se connecter : il réessaie plus tard, comme sur une panne de la plateforme.
+- `scene_version` vaut `null` si aucune scène n'est assignée — un écran noir, pas une erreur.
+- Tout refus d'authentification répond `401` avec le même corps, que le token soit absent, malformé, d'une autre
+  portée (`mxr_…`), d'un préfixe inconnu ou d'un secret faux : la réponse ne dit pas si le device existe.
 
 ---
 
