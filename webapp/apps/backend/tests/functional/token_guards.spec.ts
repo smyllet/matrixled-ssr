@@ -7,9 +7,10 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import { test } from '@japa/runner'
 
 /**
- * The renderer guard protects the control-plane WebSocket (#26), which has no
- * HTTP route yet. Both guards are exercised here as configured, through the
- * auth manager, on a bare request carrying only a bearer token.
+ * The control-plane WebSocket authenticates renderers on its handshake, outside
+ * any route (see renderer_control.spec.ts). Both guards are exercised here as
+ * configured, through the auth manager, on a bare request carrying only a
+ * bearer token.
  */
 async function authenticatorFor(token: string) {
   const ctx = await testUtils.createHttpContext()

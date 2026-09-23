@@ -21,6 +21,8 @@ export interface TokenGuardOptions<Subject extends Credentialed> {
   findByPrefix: (prefix: string) => Promise<Subject | null>
 }
 
+const tokenService = new TokenService()
+
 /**
  * Verified in place of a missing row, so that an unknown prefix costs the same
  * scrypt as a known one and response time does not tell them apart.
@@ -30,6 +32,34 @@ let decoyHash: Promise<string> | undefined
 function getDecoyHash() {
   decoyHash ??= hash.make(randomBytes(32).toString('hex'))
   return decoyHash
+}
+
+/**
+ * Resolves an `Authorization` header to the row its bearer token belongs to,
+ * or null. Shared by the guard and by the control-plane handshake, which runs
+ * on a bare upgrade request and has no `HttpContext` to hand a guard.
+ */
+export async function verifyBearerToken<Subject extends Credentialed>(
+  authorization: string | undefined,
+  options: TokenGuardOptions<Subject>
+): Promise<Subject | null> {
+  const [type, token] = (authorization ?? '').split(' ')
+
+  if (!type || type.toLowerCase() !== 'bearer' || !token) return null
+
+  const parsed = tokenService.parse(token)
+
+  /**
+   * The tag carries the scope, so a credential meant for the other channel is
+   * refused before any lookup or hashing (ADR-0012).
+   */
+  if (!parsed || parsed.scope !== options.scope) return null
+
+  const subject = await options.findByPrefix(parsed.prefix)
+  const tokenHash = subject?.tokenHash ?? (await getDecoyHash())
+  const verified = await tokenService.verify(tokenHash, token, options.scope)
+
+  return subject && verified ? subject : null
 }
 
 /**
@@ -55,8 +85,6 @@ export class TokenGuard<Subject extends Credentialed> implements GuardContract<S
   isAuthenticated = false
   user?: Subject
 
-  #tokenService = new TokenService()
-
   constructor(
     protected ctx: HttpContext,
     protected options: TokenGuardOptions<Subject>
@@ -66,14 +94,6 @@ export class TokenGuard<Subject extends Credentialed> implements GuardContract<S
     return new errors.E_UNAUTHORIZED_ACCESS('Unauthorized access', {
       guardDriverName: this.driverName,
     })
-  }
-
-  #getBearerToken() {
-    const [type, token] = this.ctx.request.header('authorization', '')!.split(' ')
-
-    if (!type || type.toLowerCase() !== 'bearer' || !token) return null
-
-    return token
   }
 
   getUserOrFail() {
@@ -87,22 +107,9 @@ export class TokenGuard<Subject extends Credentialed> implements GuardContract<S
 
     this.authenticationAttempted = true
 
-    const token = this.#getBearerToken()
-    const parsed = token ? this.#tokenService.parse(token) : null
+    const subject = await verifyBearerToken(this.ctx.request.header('authorization'), this.options)
 
-    /**
-     * The tag carries the scope, so a credential meant for the other channel is
-     * refused before any lookup or hashing (ADR-0012).
-     */
-    if (!token || !parsed || parsed.scope !== this.options.scope) {
-      throw this.#authenticationFailed()
-    }
-
-    const subject = await this.options.findByPrefix(parsed.prefix)
-    const tokenHash = subject?.tokenHash ?? (await getDecoyHash())
-    const verified = await this.#tokenService.verify(tokenHash, token, this.options.scope)
-
-    if (!subject || !verified) throw this.#authenticationFailed()
+    if (!subject) throw this.#authenticationFailed()
 
     this.isAuthenticated = true
     this.user = subject

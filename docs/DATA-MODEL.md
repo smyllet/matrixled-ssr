@@ -30,7 +30,7 @@ Un moteur de rendu déclaré auprès de la plateforme.
 | `capabilities` | jsonb \| null | Primitives que ce renderer sait rendre. `null` tant qu'il ne s'est pas connecté |
 | `endpoints` | jsonb \| null | Adresses annoncées, transmises telles quelles aux devices au bootstrap. Liste de 1 à 4 URL `ws://` ou `wss://` ([ADR-0016](adr/0016-transports-declares-par-le-renderer.md)). `null` tant qu'il ne s'est pas connecté |
 | `status` | enum | `online` \| `offline` |
-| `lastSeenAt` | timestamptz \| null | Dernière activité sur le canal de contrôle |
+| `lastSeenAt` | timestamptz \| null | Dernier signe de vie sur le canal de contrôle : ouverture, pong au heartbeat (toutes les 30 s) ou fermeture. `null` tant qu'il ne s'est jamais connecté |
 | `createdAt` / `updatedAt` | timestamptz | |
 
 **Règles**
@@ -41,6 +41,8 @@ Un moteur de rendu déclaré auprès de la plateforme.
   entrées d'au plus 255 caractères, chacune une URL en `ws://` ou `wss://` — une liste vide n'est pas une
   déclaration, c'est `null`.
 - `status` et `lastSeenAt` sont dérivés de l'état de la connexion de contrôle, jamais renseignés par une requête.
+  Au démarrage d'Adonis, tout renderer resté `online` est remis `offline`
+  ([ADR-0024](adr/0024-canal-de-controle-sur-le-serveur-http.md)).
 
 ## Device
 
