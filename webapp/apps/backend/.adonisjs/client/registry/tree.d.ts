@@ -24,6 +24,7 @@ export interface ApiDefinition {
     store: typeof routes['devices.store']
     patch: typeof routes['devices.patch']
     delete: typeof routes['devices.delete']
+    credential: typeof routes['devices.credential']
   }
   renderers: {
     index: typeof routes['renderers.index']

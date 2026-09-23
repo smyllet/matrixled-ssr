@@ -10,6 +10,7 @@ export type DomainEventName =
   | 'device.created'
   | 'device.updated'
   | 'device.deleted'
+  | 'device.credential_rotated'
   | 'scene.created'
   | 'scene.updated'
   | 'scene.deleted'

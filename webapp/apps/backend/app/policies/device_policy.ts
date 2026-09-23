@@ -15,4 +15,8 @@ export default class DevicePolicy extends BasePolicy {
   delete(user: User, device: Device): AuthorizerResponse {
     return user.id === device.userId
   }
+
+  rotateCredential(user: User, device: Device): AuthorizerResponse {
+    return user.id === device.userId
+  }
 }

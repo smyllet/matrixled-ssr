@@ -121,3 +121,9 @@ export const deleteDeviceValidator = vine.create({
     id: vine.string().uuid(),
   }),
 })
+
+export const rotateDeviceCredentialValidator = vine.create({
+  params: vine.object({
+    id: vine.string().uuid(),
+  }),
+})

@@ -8,6 +8,7 @@ import BaseDomainEvent from '#events/base/domain_event'
 import BaseRendererEvent from '#events/base/renderer_event'
 import BaseSceneEvent from '#events/base/scene_event'
 import DeviceCreated from '#events/device_created'
+import DeviceCredentialRotated from '#events/device_credential_rotated'
 import DeviceDeleted from '#events/device_deleted'
 import DeviceUpdated from '#events/device_updated'
 import RendererCreated from '#events/renderer_created'
@@ -25,6 +26,7 @@ export const events = {
     SceneEvent: BaseSceneEvent,
   },
   DeviceCreated: DeviceCreated,
+  DeviceCredentialRotated: DeviceCredentialRotated,
   DeviceDeleted: DeviceDeleted,
   DeviceUpdated: DeviceUpdated,
   RendererCreated: RendererCreated,

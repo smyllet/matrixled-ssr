@@ -115,6 +115,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['delete']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'devices.credential': {
+    methods: ["POST"]
+    pattern: '/api/v1/devices/:id/credential'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/device').rotateDeviceCredentialValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/device').rotateDeviceCredentialValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['rotateCredential']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/devices_controller').default['rotateCredential']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'renderers.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/renderers'

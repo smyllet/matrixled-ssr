@@ -228,6 +228,11 @@ par lequel le simulateur obtient à l'ouverture un token utilisable, puisque auc
 Adonis émet cet événement **avant** de rendre le secret à son demandeur, et refuse la rotation quand le renderer
 est hors ligne : un secret que le renderer ne peut pas apprendre ne servirait qu'à détruire le précédent.
 
+> **État actuel.** La route `POST /api/v1/devices/:id/credential` existe et émet l'événement de domaine
+> `device.credential_rotated` avant de répondre, mais le plan de contrôle n'existe pas encore : rien ne le relaie
+> au renderer, et le refus hors ligne n'est pas appliqué — `renderers.status` n'est écrit par rien avant #26, donc
+> tous les renderers y paraissent hors ligne. Les deux arrivent avec #66, après #26 et #27.
+
 ### `scene.updated`
 
 Une scène a changé. Le message porte la scène, pas les devices : il est émis **une fois**, et le renderer

@@ -59,6 +59,7 @@
       "actions": {
         "create": "Nouveau device",
         "edit": "Modifier",
+        "rotateCredential": "Régénérer le token",
         "delete": "Supprimer"
       }
     },
@@ -256,6 +257,20 @@
     "rotateRendererToken": {
       "title": "Régénérer le token",
       "description": "Régénérer le token du renderer {0} invalidera immédiatement le token actuel. Le renderer devra être reconfiguré.",
+      "cancel": "Annuler",
+      "confirm": "Régénérer",
+      "done": "Terminé",
+      "failure": {
+        "title": "Échec de la régénération",
+        "unknownDescription": "Une erreur inconnue s'est produite lors de la tentative de régénération du token."
+      }
+    },
+    "rotateDeviceCredential": {
+      "title": "Régénérer le token",
+      "description": {
+        "hardware": "Régénérer le token du device {0} invalidera immédiatement le token actuel. La dalle s'éteindra jusqu'à ce qu'elle soit reprovisionnée avec le nouveau token.",
+        "simulator": "Régénérer le token du device simulé {0} invalidera immédiatement le token actuel. Un simulateur ouvert sera déconnecté."
+      },
       "cancel": "Annuler",
       "confirm": "Régénérer",
       "done": "Terminé",

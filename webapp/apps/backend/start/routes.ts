@@ -41,6 +41,7 @@ router
         router.post('/', [controllers.Devices, 'store']).as('store')
         router.patch('/:id', [controllers.Devices, 'patch']).as('patch')
         router.delete('/:id', [controllers.Devices, 'delete']).as('delete')
+        router.post('/:id/credential', [controllers.Devices, 'rotateCredential']).as('credential')
       })
       .prefix('devices')
       .as('devices')

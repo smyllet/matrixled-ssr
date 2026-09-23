@@ -10,6 +10,7 @@
 */
 
 import DeviceCreated from '#events/device_created'
+import DeviceCredentialRotated from '#events/device_credential_rotated'
 import DeviceDeleted from '#events/device_deleted'
 import DeviceUpdated from '#events/device_updated'
 import RendererCreated from '#events/renderer_created'
@@ -40,6 +41,7 @@ emitter.onError((event, error) => {
 emitter.on(DeviceCreated, [broadcastDashboardEvent])
 emitter.on(DeviceUpdated, [broadcastDashboardEvent])
 emitter.on(DeviceDeleted, [broadcastDashboardEvent])
+emitter.on(DeviceCredentialRotated, [broadcastDashboardEvent])
 emitter.on(SceneCreated, [broadcastDashboardEvent])
 emitter.on(SceneUpdated, [broadcastDashboardEvent])
 emitter.on(SceneDeleted, [broadcastDashboardEvent])
