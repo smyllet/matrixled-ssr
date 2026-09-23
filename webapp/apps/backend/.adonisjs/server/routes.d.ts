@@ -13,6 +13,7 @@ export type ScannedRoutes = {
     'devices.store': { paramsTuple?: []; params?: {} }
     'devices.patch': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'devices.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'devices.credential': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.index': { paramsTuple?: []; params?: {} }
     'renderers.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.store': { paramsTuple?: []; params?: {} }
@@ -56,6 +57,7 @@ export type ScannedRoutes = {
     'auth.session.store': { paramsTuple?: []; params?: {} }
     'profile.session.destroy': { paramsTuple?: []; params?: {} }
     'devices.store': { paramsTuple?: []; params?: {} }
+    'devices.credential': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'renderers.store': { paramsTuple?: []; params?: {} }
     'renderers.token': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'scenes.store': { paramsTuple?: []; params?: {} }

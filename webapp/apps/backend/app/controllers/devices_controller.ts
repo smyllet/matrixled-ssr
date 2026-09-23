@@ -6,6 +6,7 @@ import {
   createDeviceValidator,
   deleteDeviceValidator,
   patchDeviceValidator,
+  rotateDeviceCredentialValidator,
   showDeviceValidator,
 } from '#validators/device'
 import { inject } from '@adonisjs/core'
@@ -75,5 +76,22 @@ export default class DevicesController {
     await this.deviceService.deleteDevice(device)
 
     return response.noContent()
+  }
+
+  /**
+   * Issues a new credential and invalidates the previous one.
+   */
+  async rotateCredential({ request, serialize, bouncer }: HttpContext) {
+    const {
+      params: { id: deviceId },
+    } = await request.validateUsing(rotateDeviceCredentialValidator)
+
+    const device = await this.deviceService.getDeviceById(deviceId)
+
+    await bouncer.with(DevicePolicy).authorize('rotateCredential', device)
+
+    const { device: rotatedDevice, token } = await this.deviceService.rotateCredential(device)
+
+    return serialize(DeviceWithTokenTransformer.transform(rotatedDevice, token))
   }
 }

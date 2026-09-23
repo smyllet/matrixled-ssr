@@ -2,8 +2,8 @@ import type Device from '#models/device'
 import DeviceTransformer from '#transformers/device_transformer'
 
 /**
- * Used by the one endpoint that mints a credential — pairing — and by nothing
- * else. The clear token is shown once and cannot be read back.
+ * Used by the two endpoints that mint a credential — pairing and rotation — and
+ * by nothing else. The clear token is shown once and cannot be read back.
  */
 export default class DeviceWithTokenTransformer extends DeviceTransformer {
   constructor(

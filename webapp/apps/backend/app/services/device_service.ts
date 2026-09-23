@@ -4,6 +4,7 @@ import {
   DEVICE_DEFAULT_OFFLINE_GRACE,
 } from '#constants/device'
 import DeviceCreated from '#events/device_created'
+import DeviceCredentialRotated from '#events/device_credential_rotated'
 import DeviceDeleted from '#events/device_deleted'
 import DeviceUpdated from '#events/device_updated'
 import Device from '#models/device'
@@ -233,6 +234,28 @@ export class DeviceService {
     await device.delete()
 
     DeviceDeleted.dispatch(device)
+  }
+
+  /**
+   * Replaces the credential. The previous token stops working immediately,
+   * which is what makes this the answer to a leak, and how a simulator gets a
+   * usable token when none can be read back (ADR-0021).
+   *
+   * The event goes out before the secret is returned, the order ADR-0021
+   * requires. Forwarding it to the renderer and refusing when that renderer is
+   * offline wait for the control plane (#26, #27).
+   */
+  async rotateCredential(device: Device) {
+    const credential = await this.tokenService.issue('device')
+
+    device.tokenPrefix = credential.prefix
+    device.tokenHash = credential.hash
+
+    await device.save()
+
+    DeviceCredentialRotated.dispatch(device)
+
+    return { device, token: credential.token }
   }
 
   /**

@@ -55,11 +55,12 @@ d'autre qu'une relecture — et relire deux fois n'a aucun effet de bord.
 
 ## Catalogue
 
-Neuf types, tous avec la même charge utile `{ id }` :
+Dix types, tous avec la même charge utile `{ id }` :
 
 | Type | Émis quand |
 |------|-----------|
 | `device.created` · `device.updated` · `device.deleted` | Un device est créé, modifié, supprimé |
+| `device.credential_rotated` | Le credential d'un device est remplacé — son `tokenPrefix` a changé |
 | `scene.created` · `scene.updated` · `scene.deleted` | Une scène est créée, modifiée, supprimée |
 | `renderer.created` · `renderer.updated` · `renderer.deleted` | Un renderer est créé, modifié, supprimé — la rotation de son credential émet `renderer.updated` |
 

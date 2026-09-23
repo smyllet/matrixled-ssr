@@ -60,6 +60,12 @@ const routes = {
     tokens: [{"old":"/api/v1/devices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/devices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/devices/:id","type":0,"val":"devices","end":""},{"old":"/api/v1/devices/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['devices.delete']['types'],
   },
+  'devices.credential': {
+    methods: ["POST"],
+    pattern: '/api/v1/devices/:id/credential',
+    tokens: [{"old":"/api/v1/devices/:id/credential","type":0,"val":"api","end":""},{"old":"/api/v1/devices/:id/credential","type":0,"val":"v1","end":""},{"old":"/api/v1/devices/:id/credential","type":0,"val":"devices","end":""},{"old":"/api/v1/devices/:id/credential","type":1,"val":"id","end":""},{"old":"/api/v1/devices/:id/credential","type":0,"val":"credential","end":""}],
+    types: placeholder as Registry['devices.credential']['types'],
+  },
   'renderers.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/renderers',

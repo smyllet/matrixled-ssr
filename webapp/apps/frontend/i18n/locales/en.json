@@ -59,6 +59,7 @@
       "actions": {
         "create": "New device",
         "edit": "Edit",
+        "rotateCredential": "Rotate the token",
         "delete": "Delete"
       }
     },
@@ -256,6 +257,20 @@
     "rotateRendererToken": {
       "title": "Rotate the token",
       "description": "Rotating the token of the renderer {0} invalidates the current one immediately. The renderer will have to be reconfigured.",
+      "cancel": "Cancel",
+      "confirm": "Rotate",
+      "done": "Done",
+      "failure": {
+        "title": "Rotation failed",
+        "unknownDescription": "An unknown error occurred while trying to rotate the token."
+      }
+    },
+    "rotateDeviceCredential": {
+      "title": "Rotate the token",
+      "description": {
+        "hardware": "Rotating the token of the device {0} invalidates the current one immediately. The panel goes dark until it is reprovisioned with the new token.",
+        "simulator": "Rotating the token of the simulated device {0} invalidates the current one immediately. An open simulator will be disconnected."
+      },
       "cancel": "Cancel",
       "confirm": "Rotate",
       "done": "Done",

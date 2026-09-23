@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Pencil, Trash } from 'lucide-vue-next'
+import { KeyRound, Pencil, Trash } from 'lucide-vue-next'
 
 definePageMeta({
   breadcrumb: [{ label: 'nav.platform' }, { label: 'nav.devices', to: '/' }],
@@ -97,6 +97,17 @@ function sceneName(sceneId: string | null) {
                   <Pencil />
                 </UiButton>
               </SheetDeviceEdit>
+
+              <DialogDeviceRotateCredential :device="device">
+                <UiButton
+                  variant="outline"
+                  size="icon"
+                  :aria-label="t('pages.devices.actions.rotateCredential')"
+                  class="cursor-pointer"
+                >
+                  <KeyRound />
+                </UiButton>
+              </DialogDeviceRotateCredential>
 
               <DialogDeviceDelete :device="device">
                 <UiButton

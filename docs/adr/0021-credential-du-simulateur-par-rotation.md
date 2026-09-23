@@ -21,7 +21,7 @@ ouvert depuis le dashboard. Un credential qu'on ne peut pas récupérer n'a alor
 et remet le secret frais à la page.
 
 ```http
-POST /api/v1/devices/:id/credential      → { "token": "mxd_71ce04ba82df_4d2f…" }
+POST /api/v1/devices/:id/credential      → { "data": { …device, "token": "mxd_71ce04ba82df_4d2f…" } }
 ```
 
 - La rotation vaut pour **tout** device : c'est la réponse à une fuite, que

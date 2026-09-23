@@ -166,7 +166,8 @@ mxd_71ce04ba82df_4d2f…   device
 - un credential se **remplace**, il ne se relit pas. La rotation crée un nouveau secret — affiché une fois lui
   aussi — et invalide immédiatement le précédent. C'est la réponse à une fuite, et le moyen par lequel le
   simulateur obtient un token utilisable à l'ouverture
-  ([ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md)).
+  ([ADR-0021](adr/0021-credential-du-simulateur-par-rotation.md)). Route : `POST /api/v1/devices/:id/credential`
+  pour un device, `POST /api/v1/renderers/:id/token` pour un renderer, réservées au propriétaire.
 
 **Une exception : le renderer de la plateforme.** Il n'a pas de propriétaire, donc personne ne peut l'appairer
 depuis l'interface. Son credential est déclaré par le déploiement dans `PLATFORM_RENDERER_TOKEN` et appliqué au
