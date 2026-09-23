@@ -30,7 +30,7 @@ const rendererEndpoints = () =>
 /**
  * Types `renderers.endpoints` through database/schema_rules.ts, which is what
  * keeps the column off `any`. Nothing writes it yet: the control plane that
- * receives `renderer.hello` lands with #21.
+ * receives `renderer.hello` lands with #26.
  */
 export const rendererEndpointsValidator = vine.create(rendererEndpoints())
 

@@ -53,6 +53,15 @@ export class DeviceService {
   }
 
   /**
+   * What a device needs before it can open its renderer connection: where the
+   * renderer is, and the panel and scene it is expected to drive
+   * (docs/PROTOCOL-DEVICE.md § Bootstrap).
+   */
+  async loadRendererAndScene(device: Device) {
+    await device.load((loader) => loader.load('renderer').load('scene'))
+  }
+
+  /**
    * Returns the clear token alongside the device: this is the only moment it
    * exists, and no endpoint can hand it out again afterwards.
    */

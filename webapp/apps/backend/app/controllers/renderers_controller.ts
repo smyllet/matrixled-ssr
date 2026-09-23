@@ -17,7 +17,7 @@ export default class RenderersController {
   constructor(protected rendererService: RendererService) {}
 
   async index({ auth, serialize }: HttpContext) {
-    const user = auth.getUserOrFail()
+    const user = auth.use('web').getUserOrFail()
 
     const renderers = await this.rendererService.getVisibleRenderers(user.id)
 
@@ -39,7 +39,7 @@ export default class RenderersController {
   async store({ auth, request, serialize, response }: HttpContext) {
     const { name } = await request.validateUsing(createRendererValidator)
 
-    const user = auth.getUserOrFail()
+    const user = auth.use('web').getUserOrFail()
 
     const { renderer, token } = await this.rendererService.createRenderer({
       name,

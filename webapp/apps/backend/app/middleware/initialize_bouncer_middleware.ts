@@ -1,6 +1,7 @@
 import * as abilities from '#abilities/main'
 import { policies } from '#generated/policies'
 
+import type User from '#models/user'
 import { Bouncer } from '@adonisjs/bouncer'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
@@ -12,11 +13,12 @@ import type { NextFn } from '@adonisjs/core/types/http'
 export default class InitializeBouncerMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
     /**
-     * Create bouncer instance for the ongoing HTTP request.
-     * We will pull the user from the HTTP context.
+     * Policies are about what a dashboard user owns, so the actor is read from
+     * the session guard alone. `ctx.auth.user` would be whichever guard
+     * authenticated last — a device or a renderer on their own routes.
      */
     ctx.bouncer = new Bouncer(
-      () => ctx.auth.user || null,
+      () => ctx.auth.use('web').user || null,
       abilities,
       policies
     ).setContainerResolver(ctx.containerResolver)
@@ -27,10 +29,6 @@ export default class InitializeBouncerMiddleware {
 
 declare module '@adonisjs/core/http' {
   export interface HttpContext {
-    bouncer: Bouncer<
-      Exclude<HttpContext['auth']['user'], undefined>,
-      typeof abilities,
-      typeof policies
-    >
+    bouncer: Bouncer<User, typeof abilities, typeof policies>
   }
 }
